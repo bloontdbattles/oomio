@@ -1,0 +1,163 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Inter:wght@400;500;600&display=swap");
+
+.home {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% -10%,
+            var(--oomio-green-500) 0%,
+            var(--oomio-green-600) 38%,
+            var(--oomio-green-900) 100%);
+    color: var(--oomio-cream);
+    font-family: var(--font-body);
+}
+
+.home__vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(120% 100% at 50% 50%,
+            transparent 40%,
+            var(--oomio-green-950) 130%);
+    z-index: 1;
+}
+
+.home__texture {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image: radial-gradient(rgba(246, 240, 222, 0.1) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.home__top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: flex-end;
+    padding: 24px clamp(16px, 5vw, 48px);
+}
+
+.home__hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+}
+
+.home__card-float {
+    position: absolute;
+    top: 4%;
+    width: 116px;
+    height: 162px;
+    border-radius: 14px;
+    background: linear-gradient(155deg, #fffdf7, var(--oomio-cream));
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    transform: rotate(-14deg);
+    animation: card-float 6s ease-in-out infinite;
+    z-index: 0;
+    opacity: 0.92;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 14px;
+}
+
+.home__card-pip {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--oomio-green-600);
+    line-height: 1;
+}
+
+@keyframes card-float {
+
+    0%,
+    100% {
+        transform: rotate(-14deg) translateY(0);
+    }
+
+    50% {
+        transform: rotate(-10deg) translateY(-14px);
+    }
+}
+
+.home__logo {
+    position: relative;
+    z-index: 2;
+    width: clamp(64px, 10vw, 96px);
+    height: auto;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+}
+
+.home__wordmark {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(3rem, 12vw, 6.5rem);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin: 0;
+    background: linear-gradient(180deg,
+            #fffdf6 0%,
+            var(--oomio-cream) 55%,
+            var(--oomio-gold) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.home__tagline {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: rgba(246, 240, 222, 0.85);
+    margin: 0 0 32px;
+    font-weight: 500;
+}
+
+.home__cta.btn {
+    position: relative;
+    z-index: 2;
+    font-size: 1.15rem;
+    padding: 18px 56px;
+    border-radius: 999px;
+}
+
+.home__foot {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: rgba(246, 240, 222, 0.55);
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 520px) {
+    .home__card-float {
+        width: 84px;
+        height: 118px;
+        top: 3%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home__card-float {
+        animation: none;
+    }
+}
