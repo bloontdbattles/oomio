@@ -1,0 +1,44 @@
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(4, 20, 11, 0.35);
+  border: 1px solid rgba(246, 240, 222, 0.25);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.lang-switch__option {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(246, 240, 222, 0.65);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.lang-switch__option.is-active {
+  background: var(--oomio-cream);
+  color: var(--oomio-ink);
+}
+
+.lang-switch__option:hover:not(.is-active) {
+  color: var(--oomio-cream);
+}
+
+.lang-switch__divider {
+  color: rgba(246, 240, 222, 0.3);
+  font-size: 0.75rem;
+}
+
+.lang-switch__option:focus-visible {
+  outline: 2px solid var(--oomio-cream);
+  outline-offset: 2px;
+}
