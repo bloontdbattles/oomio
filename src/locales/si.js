@@ -1,0 +1,12 @@
+export default {
+  playNow: "දැන් සෙල්ලම් කරන්න",
+  tagline: "සාම්ප්‍රදායික සිංහල කාඩ්පත් ක්‍රීඩාව, නවීන ලෙස.",
+  footerNote: "Oomio",
+  playWithAI: "AI සමඟ සෙල්ලම් කරන්න",
+  playWithFriends: "මිතුරන් සමඟ සෙල්ලම් කරන්න",
+  joinLobby: "Lobby එකට එකතු වන්න",
+  enterYourName: "ඔබේ නම ඇතුළත් කරන්න",
+  continue: "ඉදිරියට",
+  addBots: "Bots එකතු කරන්න",
+  startGame: "ක්‍රීඩාව ආරම්භ කරන්න",
+};
