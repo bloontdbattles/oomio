@@ -20,12 +20,7 @@ export default function Home() {
             </header>
 
             <main className="home__hero">
-                <div className="home__card-float" aria-hidden="true">
-                    <span className="home__card-pip">♦</span>
-                </div>
-
                 <img src={logo} alt="Oomio" className="home__logo" />
-                <h1 className="home__wordmark">OOMIO</h1>
                 <p className="home__tagline">{t("tagline")}</p>
 
                 <Button
