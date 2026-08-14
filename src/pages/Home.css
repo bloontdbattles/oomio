@@ -7,10 +7,7 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: radial-gradient(120% 90% at 50% -10%,
-            var(--oomio-green-500) 0%,
-            var(--oomio-green-600) 38%,
-            var(--oomio-green-900) 100%);
+    background: radial-gradient(120% 90% at 50% 110%, #063d20 0%, #1cbe58 35%, #0fa34c 65%, #063d20 100%);
     color: var(--oomio-cream);
     font-family: var(--font-body);
 }
