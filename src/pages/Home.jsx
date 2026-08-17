@@ -1,39 +1,101 @@
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import Button from "../components/common/Button";
+import Modal from "../components/common/Modal";
+import { generateId } from "../utils/generateId";
+import { savePlayer } from "../utils/localStorage";
 import logo from "../assets/images/logo.png";
 import "./Home.css";
+
+const TRANSITION_MS = 1100;
 
 export default function Home() {
     const { t } = useContext(LanguageContext);
     const navigate = useNavigate();
 
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [name, setName] = useState("");
+
+    const handlePlayNow = () => {
+        if (isTransitioning) return;
+        setIsTransitioning(true);
+        setTimeout(() => {
+            setModalOpen(true);
+            setIsTransitioning(false);
+        }, TRANSITION_MS);
+    };
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+    };
+
+    const handleContinue = () => {
+        const trimmed = name.trim();
+        if (!trimmed) return;
+        const player = { id: generateId("player"), name: trimmed };
+        savePlayer(player);
+        setModalOpen(false);
+        navigate("/player-setup");
+    };
+
     return (
-        <div className="home">
-            <div className="home__texture" aria-hidden="true" />
-            <div className="home__vignette" aria-hidden="true" />
+        <div className={`home${isTransitioning ? " home--transitioning" : ""}`}>
+            <div className="home__stage">
+                <div className="home__texture" aria-hidden="true" />
+                <div className="home__vignette" aria-hidden="true" />
 
-            <header className="home__top">
-                <LanguageSwitcher />
-            </header>
+                <div className="home__content">
+                    <header className="home__top">
+                        <LanguageSwitcher />
+                    </header>
 
-            <main className="home__hero">
-                <img src={logo} alt="Oomio" className="home__logo" />
-                <p className="home__tagline">{t("tagline")}</p>
+                    <main className="home__hero">
+                        <div className="home__logo-wrap">
+                            <img src={logo} alt="Oomio" className="home__logo" />
+                        </div>
+                        <p className="home__tagline">{t("tagline")}</p>
 
-                <Button
-                    className="home__cta"
-                    onClick={() => navigate("/player-setup")}
-                >
-                    {t("playNow")}
-                </Button>
-            </main>
+                        <Button
+                            className="home__cta"
+                            onClick={handlePlayNow}
+                            disabled={isTransitioning}
+                        >
+                            {t("playNow")}
+                        </Button>
+                    </main>
 
-            <footer className="home__foot">
-                <p>{t("footerNote")}</p>
-            </footer>
+                    <footer className="home__foot">
+                        <p>{t("footerNote")}</p>
+                    </footer>
+                </div>
+            </div>
+
+            <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+                <div className="home__modal-body">
+                    <h2 className="home__modal-title">{t("enterYourName")}</h2>
+                    <input
+                        id="player-name-input"
+                        className="home__modal-input"
+                        type="text"
+                        placeholder={t("enterYourName")}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleContinue()}
+                        autoFocus
+                        maxLength={24}
+                    />
+                    <Button
+                        className="home__modal-cta"
+                        onClick={handleContinue}
+                        disabled={!name.trim()}
+                    >
+                        {t("continue")}
+                    </Button>
+                </div>
+            </Modal>
         </div>
     );
 }
