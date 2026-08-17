@@ -7,24 +7,30 @@
     overflow: hidden;
 }
 
-.home--transitioning .home__stage {
-    filter: blur(8px) brightness(0.6);
-    transform: scale(1.04);
-    pointer-events: none;
-}
-
 .home__stage {
     position: relative;
     width: 100%;
-    height: 100%;
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    background: radial-gradient(120% 90% at 50% 110%, #063d20 0%, #1cbe58 35%, #0fa34c 65%, #063d20 100%);
+    background: radial-gradient(
+        120% 90% at 50% -10%,
+        var(--oomio-green-500) 0%,
+        var(--oomio-green-600) 38%,
+        var(--oomio-green-900) 100%
+    );
     color: var(--oomio-cream);
     font-family: var(--font-body);
-    transition: filter 0.6s ease, transform 0.6s ease;
+    transform-origin: 0% 0%;
+    transform: scale(1);
+    transition: transform 2s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: transform;
+}
+
+.home--transitioning .home__stage {
+    transform: scale(2);
+    pointer-events: none;
 }
 
 .home__content {
@@ -61,6 +67,11 @@
     display: flex;
     justify-content: flex-end;
     padding: 24px clamp(16px, 5vw, 48px);
+    transition: opacity 0.4s ease;
+}
+
+.home--transitioning .home__top {
+    opacity: 0;
 }
 
 .home__hero {
@@ -116,16 +127,27 @@
 .home__logo-wrap {
     position: relative;
     z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    perspective: 700px;
+    perspective-origin: 50% 100%;
     margin-bottom: 8px;
 }
 
 .home__logo {
+    display: block;
     width: clamp(320px, 50vw, 500px);
     height: auto;
+    margin: 0 auto;
     filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+    transform-origin: 50% 100%;
+    transform: rotateX(0deg);
+    transition: transform 0.85s cubic-bezier(0.55, 0, 0.85, 0.4),
+                opacity 0.7s ease 0.15s;
+    backface-visibility: hidden;
+}
+
+.home--transitioning .home__logo {
+    transform: rotateX(90deg) translateY(4px);
+    opacity: 0;
 }
 
 .home__wordmark {
@@ -154,6 +176,11 @@
     color: rgba(246, 240, 222, 0.85);
     margin: 0 0 32px;
     font-weight: 500;
+    transition: opacity 0.4s ease;
+}
+
+.home--transitioning .home__tagline {
+    opacity: 0;
 }
 
 .home__cta.btn {
@@ -162,6 +189,12 @@
     font-size: 1.15rem;
     padding: 18px 56px;
     border-radius: 999px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.home--transitioning .home__cta.btn {
+    opacity: 0;
+    transform: translateY(6px);
 }
 
 .home__foot {
