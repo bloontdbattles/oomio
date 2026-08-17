@@ -24,12 +24,14 @@ export default function Home() {
         setIsTransitioning(true);
         setTimeout(() => {
             setModalOpen(true);
-            setIsTransitioning(false);
+            // intentionally keep isTransitioning=true so the stage
+            // stays zoomed and the logo stays fallen while modal is open
         }, TRANSITION_MS);
     };
 
     const handleModalClose = () => {
         setModalOpen(false);
+        setIsTransitioning(false); // un-zoom stage when user dismisses
     };
 
     const handleContinue = () => {
