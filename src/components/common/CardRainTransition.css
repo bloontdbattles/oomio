@@ -8,8 +8,8 @@
 
 .card-rain__card {
     position: absolute;
-    top: -140px;
-    width: 46px;
+    top: -320px;
+    width: 184px;
     height: auto;
     opacity: 0;
     filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.4));
@@ -29,7 +29,7 @@
     }
 
     100% {
-        transform: translateY(calc(100vh + 220px)) rotate(var(--rotate, 20deg)) scale(var(--scale, 1));
+        transform: translateY(calc(100vh + 400px)) rotate(var(--rotate, 20deg)) scale(var(--scale, 1));
         opacity: 0.85;
     }
 }
