@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
+import { useCardRain } from "../context/CardRainContext";
 import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import Button from "../components/common/Button";
 import Modal from "../components/common/Modal";
@@ -14,6 +15,7 @@ const TRANSITION_MS = 1100;
 export default function Home() {
     const { t } = useContext(LanguageContext);
     const navigate = useNavigate();
+    const playCardRain = useCardRain();
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isModalOpen, setModalOpen] = useState(false);
@@ -37,10 +39,11 @@ export default function Home() {
     const handleContinue = () => {
         const trimmed = name.trim();
         if (!trimmed) return;
-        const player = { id: generateId("player"), name: trimmed };
-        savePlayer(player);
+
+        savePlayer({ playerId: generateId("p"), name: trimmed });
         setModalOpen(false);
-        navigate("/player-setup");
+
+        playCardRain(() => navigate("/game-mode"));
     };
 
     return (
