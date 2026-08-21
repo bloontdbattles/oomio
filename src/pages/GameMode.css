@@ -1,0 +1,206 @@
+.game-mode {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% -10%,
+            var(--oomio-green-500) 0%,
+            var(--oomio-green-600) 38%,
+            var(--oomio-green-900) 100%);
+    color: var(--oomio-cream);
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+}
+
+.game-mode__texture {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image: radial-gradient(rgba(246, 240, 222, 0.1) 1px, transparent 1px);
+    background-size: 22px 22px;
+}
+
+.game-mode__vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background: radial-gradient(120% 100% at 50% 50%, transparent 40%, var(--oomio-green-950) 130%);
+}
+
+.game-mode__top {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px clamp(16px, 5vw, 48px);
+}
+
+.game-mode__profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(4, 20, 11, 0.35);
+    border: 1px solid rgba(246, 240, 222, 0.2);
+    backdrop-filter: blur(6px);
+    border-radius: 999px;
+    padding: 6px 18px 6px 6px;
+}
+
+.game-mode__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.game-mode__settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(246, 240, 222, 0.2);
+    background: rgba(4, 20, 11, 0.35);
+    backdrop-filter: blur(6px);
+    color: var(--oomio-cream);
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.game-mode__settings:hover {
+    background: rgba(4, 20, 11, 0.55);
+    transform: rotate(20deg);
+}
+
+.game-mode__hero {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+}
+
+.game-mode__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    margin: 0 0 36px;
+}
+
+.game-mode__options,
+.game-mode__sub-options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 460px;
+    animation: fade-in 0.35s ease;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mode-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 220px;
+    padding: 32px 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(246, 240, 222, 0.18);
+    background: linear-gradient(165deg, rgba(246, 240, 222, 0.08), rgba(3, 19, 10, 0.35));
+    color: var(--oomio-cream);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.mode-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--oomio-gold);
+    background: linear-gradient(165deg, rgba(246, 240, 222, 0.14), rgba(3, 19, 10, 0.4));
+}
+
+.mode-card:focus-visible {
+    outline: 3px solid var(--oomio-cream);
+    outline-offset: 3px;
+}
+
+.mode-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(232, 184, 75, 0.15);
+    color: var(--oomio-gold);
+}
+
+.mode-card__label {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.mode-card--sub {
+    width: 180px;
+    padding: 24px 16px;
+}
+
+.game-mode__sub-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.game-mode__back {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    color: rgba(246, 240, 222, 0.7);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 4px;
+    padding: 6px 4px;
+    transition: color 0.15s ease;
+}
+
+.game-mode__back:hover {
+    color: var(--oomio-cream);
+}
+
+@media (min-width: 640px) {
+
+    .game-mode__options,
+    .game-mode__sub-buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+}
