@@ -1,0 +1,3 @@
+import GameMode from "./pages/GameMode";
+// ...
+<Route path="/game-mode" element={<GameMode />} />
