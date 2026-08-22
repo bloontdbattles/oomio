@@ -9,4 +9,9 @@ export default {
   continue: "ඉදිරියට",
   addBots: "Bots එකතු කරන්න",
   startGame: "ක්‍රීඩාව ආරම්භ කරන්න",
+  chooseMode: "ඔබ සෙල්ලම් කරන ආකාරය තෝරන්න",
+  createLobby: "Lobby එකක් සාදන්න",
+  joinGame: "ක්‍රීඩාවකට එකතු වන්න",
+  back: "ආපසු",
+  settings: "සැකසුම්",
 };
