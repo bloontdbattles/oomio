@@ -1,0 +1,12 @@
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fffdf6, var(--oomio-cream) 60%);
+    color: var(--oomio-green-600);
+    font-family: var(--font-display);
+    font-weight: 800;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
