@@ -9,4 +9,9 @@ export default {
   continue: "Continue",
   addBots: "Add Bots",
   startGame: "Start Game",
+  chooseMode: "Choose how you want to play",
+  createLobby: "Create Lobby",
+  joinGame: "Join Game",
+  back: "Back",
+  settings: "Settings",
 };
