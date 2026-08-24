@@ -1,0 +1,65 @@
+.player-seat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--oomio-cream);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+
+.player-seat__avatar-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(3, 19, 10, 0.65);
+    border-radius: 50%;
+    padding: 3px;
+    border: 2px solid rgba(246, 240, 222, 0.15);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.player-seat.is-active .player-seat__avatar-wrap {
+    border-color: var(--oomio-gold);
+    box-shadow: 0 0 15px rgba(232, 184, 75, 0.3);
+}
+
+.player-seat__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.player-seat__badge {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--oomio-gold);
+    color: var(--oomio-ink);
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Position-specific layouts */
+.player-seat--bottom {
+    /* Main player seat layout */
+}
+
+.player-seat--top {
+    flex-direction: column-reverse;
+}
+
+.player-seat--left {
+    flex-direction: row;
+}
+
+.player-seat--right {
+    flex-direction: row-reverse;
+}
