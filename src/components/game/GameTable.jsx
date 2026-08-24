@@ -1,0 +1,318 @@
+import { useState, useEffect, useCallback, useContext } from "react";
+import { getPlayer } from "../../utils/localStorage";
+import PlayerSeat from "./PlayerSeat";
+import PlayedCards from "./PlayedCards";
+import PlayerHand from "./PlayerHand";
+import TrumpDisplay from "./TrumpDisplay";
+import ScoreBoard from "./ScoreBoard";
+import BidPanel from "./BidPanel";
+import GameResult from "./GameResult";
+import "./GameTable.css";
+
+const SUITS = ["hearts", "diamonds", "clubs", "spades"];
+const RANKS = [
+    { rank: "7", value: 7 },
+    { rank: "8", value: 8 },
+    { rank: "9", value: 9 },
+    { rank: "10", value: 10 },
+    { rank: "J", value: 11 },
+    { rank: "Q", value: 12 },
+    { rank: "K", value: 13 },
+    { rank: "A", value: 14 }
+];
+
+const SEAT_ORDER = ["bottom", "left", "top", "right"];
+
+export default function GameTable() {
+    const [player, setPlayer] = useState({ name: "Player" });
+    const [gameState, setGameState] = useState("bidding"); // bidding | playing | result
+    const [trumpSuit, setTrumpSuit] = useState(null);
+    const [playerHand, setPlayerHand] = useState([]);
+    const [aiHands, setAiHands] = useState({ left: [], top: [], right: [] });
+    const [playedCards, setPlayedCards] = useState({});
+    const [activeSeat, setActiveSeat] = useState("bottom");
+    const [leadSuit, setLeadSuit] = useState(null);
+    
+    const [team1Tricks, setTeam1Tricks] = useState(0); // bottom + top (Us)
+    const [team2Tricks, setTeam2Tricks] = useState(0); // left + right (Them)
+    const [team1Score, setTeam1Score] = useState(0);
+    const [team2Score, setTeam2Score] = useState(0);
+
+    // Initialise player name from local storage
+    useEffect(() => {
+        const stored = getPlayer();
+        if (stored) {
+            setPlayer(stored);
+        }
+    }, []);
+
+    // Generate and deal cards
+    const startNewRound = useCallback(() => {
+        // Create 32-card deck for Omi
+        const deck = [];
+        let idCounter = 1;
+        SUITS.forEach((suit) => {
+            RANKS.forEach(({ rank, value }) => {
+                deck.push({ id: idCounter++, rank, suit, value });
+            });
+        });
+
+        // Shuffle deck
+        const shuffled = [...deck].sort(() => Math.random() - 0.5);
+
+        // Deal 8 cards to each player
+        setPlayerHand(shuffled.slice(0, 8).sort((a, b) => a.value - b.value));
+        setAiHands({
+            left: shuffled.slice(8, 16),
+            top: shuffled.slice(16, 24),
+            right: shuffled.slice(24, 32)
+        });
+
+        setPlayedCards({});
+        setLeadSuit(null);
+        setTeam1Tricks(0);
+        setTeam2Tricks(0);
+        setTrumpSuit(null);
+        setGameState("bidding");
+        setActiveSeat("bottom");
+    }, []);
+
+    useEffect(() => {
+        startNewRound();
+    }, [startNewRound]);
+
+    // Handle Bidding
+    const handleSelectTrump = (suit) => {
+        setTrumpSuit(suit);
+        setGameState("playing");
+    };
+
+    // Evaluate who won the trick
+    const evaluateTrick = useCallback((currentPlayed) => {
+        let winningSeat = null;
+        let highestCard = null;
+
+        Object.entries(currentPlayed).forEach(([seat, card]) => {
+            if (!highestCard) {
+                highestCard = card;
+                winningSeat = seat;
+                return;
+            }
+
+            // Check if trump card played
+            const isCardTrump = card.suit === trumpSuit;
+            const isHighestTrump = highestCard.suit === trumpSuit;
+
+            if (isCardTrump && !isHighestTrump) {
+                highestCard = card;
+                winningSeat = seat;
+            } else if (isCardTrump && isHighestTrump) {
+                if (card.value > highestCard.value) {
+                    highestCard = card;
+                    winningSeat = seat;
+                }
+            } else if (!isCardTrump && !isHighestTrump) {
+                // If neither is trump, card must match lead suit to compete
+                if (card.suit === leadSuit && highestCard.suit === leadSuit) {
+                    if (card.value > highestCard.value) {
+                        highestCard = card;
+                        winningSeat = seat;
+                    }
+                } else if (card.suit === leadSuit && highestCard.suit !== leadSuit) {
+                    highestCard = card;
+                    winningSeat = seat;
+                }
+            }
+        });
+
+        // Award trick points
+        const isTeam1 = ["bottom", "top"].includes(winningSeat);
+        setTimeout(() => {
+            if (isTeam1) {
+                setTeam1Tricks((t) => t + 1);
+            } else {
+                setTeam2Tricks((t) => t + 1);
+            }
+
+            // Clear table
+            setPlayedCards({});
+            setLeadSuit(null);
+
+            // Winner of trick starts next trick
+            setActiveSeat(winningSeat);
+        }, 1500);
+    }, [trumpSuit, leadSuit]);
+
+    // Play a card from any seat
+    const playCard = useCallback((seat, card) => {
+        setPlayedCards((prev) => {
+            const updated = { ...prev, [seat]: card };
+            
+            // Set lead suit if this is the first card in the trick
+            if (Object.keys(prev).length === 0) {
+                setLeadSuit(card.suit);
+            }
+
+            // Check if trick is complete (4 cards played)
+            if (Object.keys(updated).length === 4) {
+                evaluateTrick(updated);
+            } else {
+                // Clockwise turn selection
+                const currentIndex = SEAT_ORDER.indexOf(seat);
+                const nextIndex = (currentIndex + 1) % SEAT_ORDER.length;
+                setActiveSeat(SEAT_ORDER[nextIndex]);
+            }
+
+            return updated;
+        });
+    }, [evaluateTrick]);
+
+    // Simple AI card playing logic
+    useEffect(() => {
+        if (gameState !== "playing") return;
+        if (activeSeat === "bottom") return; // Wait for player
+
+        const timer = setTimeout(() => {
+            const hand = aiHands[activeSeat];
+            if (!hand || hand.length === 0) return;
+
+            // AI Card selection rule:
+            // 1. Must follow lead suit if possible
+            // 2. Otherwise play anything
+            let playableCards = hand.filter((c) => c.suit === leadSuit);
+            if (playableCards.length === 0) {
+                playableCards = hand; // Can't follow suit, play any card
+            }
+
+            // Choose a random valid card
+            const selectedCard = playableCards[Math.floor(Math.random() * playableCards.length)];
+
+            // Remove card from AI hand
+            setAiHands((prev) => ({
+                ...prev,
+                [activeSeat]: prev[activeSeat].filter((c) => c.id !== selectedCard.id)
+            }));
+
+            // Play the card
+            playCard(activeSeat, selectedCard);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [activeSeat, aiHands, gameState, leadSuit, playCard]);
+
+    // Check for round completion
+    useEffect(() => {
+        const totalTricks = team1Tricks + team2Tricks;
+        if (totalTricks === 8) {
+            // Round over
+            setTimeout(() => {
+                const playerWon = team1Tricks > team2Tricks;
+                if (playerWon) {
+                    setTeam1Score((s) => s + 1);
+                } else {
+                    setTeam2Score((s) => s + 1);
+                }
+                setGameState("result");
+            }, 1000);
+        }
+    }, [team1Tricks, team2Tricks]);
+
+    // Handle user playing a card
+    const handlePlayCard = (card) => {
+        // Only allow playing during user's turn
+        if (activeSeat !== "bottom") return;
+
+        // Follow suit rule
+        const hasLeadSuit = playerHand.some((c) => c.suit === leadSuit);
+        if (leadSuit && hasLeadSuit && card.suit !== leadSuit) {
+            alert("You must follow suit!");
+            return;
+        }
+
+        // Remove card from hand
+        setPlayerHand((prev) => prev.filter((c) => c.id !== card.id));
+
+        // Play card
+        playCard("bottom", card);
+    };
+
+    return (
+        <div className="game-table">
+            <div className="game-table__background">
+                <div className="game-table__felt" />
+            </div>
+
+            {/* Header widgets */}
+            <div className="game-table__header-widgets">
+                <TrumpDisplay suit={trumpSuit} />
+                <ScoreBoard
+                    team1Tricks={team1Tricks}
+                    team2Tricks={team2Tricks}
+                    team1Score={team1Score}
+                    team2Score={team2Score}
+                />
+            </div>
+
+            {/* Table layout containing seats and center cards */}
+            <div className="game-table__arena">
+                <PlayerSeat
+                    name="AI Top (Partner)"
+                    isAI={true}
+                    isActive={activeSeat === "top"}
+                    position="top"
+                />
+                
+                <div className="game-table__middle-row">
+                    <PlayerSeat
+                        name="AI Left"
+                        isAI={true}
+                        isActive={activeSeat === "left"}
+                        position="left"
+                    />
+
+                    <div className="game-table__center">
+                        <PlayedCards cards={playedCards} />
+                    </div>
+
+                    <PlayerSeat
+                        name="AI Right"
+                        isAI={true}
+                        isActive={activeSeat === "right"}
+                        position="right"
+                    />
+                </div>
+
+                <PlayerSeat
+                    name={player.name}
+                    isAI={false}
+                    isActive={activeSeat === "bottom"}
+                    position="bottom"
+                />
+            </div>
+
+            {/* Player controls */}
+            <div className="game-table__footer">
+                {gameState === "playing" && (
+                    <PlayerHand cards={playerHand} onConfirmPlay={handlePlayCard} />
+                )}
+            </div>
+
+            {/* Bidding Overlay */}
+            {gameState === "bidding" && (
+                <div className="game-table__overlay">
+                    <BidPanel onSelectTrump={handleSelectTrump} />
+                </div>
+            )}
+
+            {/* Round result Overlay */}
+            {gameState === "result" && (
+                <GameResult
+                    playerWon={team1Tricks > team2Tricks}
+                    team1Score={team1Tricks}
+                    team2Score={team2Tricks}
+                    onPlayAgain={startNewRound}
+                />
+            )}
+        </div>
+    );
+}
