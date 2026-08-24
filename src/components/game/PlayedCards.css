@@ -1,0 +1,55 @@
+.played-cards {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.played-cards__slot {
+    position: absolute;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    perspective: 800px;
+}
+
+.played-cards__slot .playing-card {
+    width: 80px;
+    height: 112px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.played-cards__slot--bottom {
+    bottom: 20px;
+    transform: translateY(0) rotate(-4deg);
+}
+
+.played-cards__slot--top {
+    top: 20px;
+    transform: translateY(0) rotate(6deg);
+}
+
+.played-cards__slot--left {
+    left: 20px;
+    transform: translateX(0) rotate(-12deg);
+}
+
+.played-cards__slot--right {
+    right: 20px;
+    transform: translateX(0) rotate(8deg);
+}
+
+@media (max-width: 600px) {
+    .played-cards {
+        width: 220px;
+        height: 220px;
+    }
+    .played-cards__slot .playing-card {
+        width: 60px;
+        height: 84px;
+    }
+    .played-cards__slot--bottom { bottom: 10px; }
+    .played-cards__slot--top { top: 10px; }
+    .played-cards__slot--left { left: 10px; }
+    .played-cards__slot--right { right: 10px; }
+}
