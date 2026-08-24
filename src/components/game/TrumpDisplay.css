@@ -1,0 +1,47 @@
+.trump-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(3, 19, 10, 0.85);
+    border: 2px solid var(--oomio-gold);
+    border-radius: 999px;
+    padding: 6px 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-family: var(--font-display);
+    user-select: none;
+}
+
+.trump-display__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(246, 240, 222, 0.75);
+}
+
+.trump-display__value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    line-height: 1;
+    font-weight: 700;
+}
+
+.trump-display.is-red .trump-display__value {
+    color: #e53e3e;
+}
+
+.trump-display.is-black .trump-display__value {
+    color: var(--oomio-cream);
+}
+
+.trump-display__hidden {
+    color: var(--oomio-gold);
+    animation: pulse-hidden 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-hidden {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
