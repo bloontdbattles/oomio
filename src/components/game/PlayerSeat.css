@@ -47,11 +47,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Position-specific layouts */
-.player-seat--bottom {
-    /* Main player seat layout */
-}
-
 .player-seat--top {
     flex-direction: column-reverse;
 }
