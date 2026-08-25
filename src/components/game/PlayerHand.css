@@ -11,6 +11,8 @@
     left: 75px;
     width: 700px;
     aspect-ratio: 1456 / 816;
+    transform: scale(0.5);
+    transform-origin: bottom left;
 }
 
 /* Responsive scaling for mobile & smaller screens */

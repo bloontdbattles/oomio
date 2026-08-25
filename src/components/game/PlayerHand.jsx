@@ -5,39 +5,47 @@ import handLeft from "../../assets/images/hand-left.png";
 import handRight from "../../assets/images/hand-right.png";
 import "./PlayerHand.css";
 
-const DEFAULT_CARDS = Array.from({ length: 8 }, () => ({}));
+// ─────────────────────────────────────────────────────────────────────────────
+// REFERENCE CARD — this is the rightmost / front card. It never moves.
+// Adjust these values to position it correctly over the hand image.
+// All units are INTERNAL px (container is scaled 0.5 → divide by 2 for screen px)
+// ─────────────────────────────────────────────────────────────────────────────
+const CARD_LEFT   = 222;   // bottom-left x of the reference card
+const CARD_TOP    = -210;  // top edge of the reference card  (increase = move down)
+const CARD_WIDTH  = 330;   // card width  in internal px
+const CARD_HEIGHT = 520;   // card height in internal px
+const CARD_ANGLE  = -17;   // rotation in degrees (positive = clockwise)
 
-// ---- Fixed reference card ---------------------------------------------
-// This is the card positioned in Figma to line up correctly with
-// hand-left.png. Every card now uses this exact size + position.
-const FIXED_CARD = {
-    left: 122,   // px, from left of the hand container
-    top: 100,    // px, from top of the hand container
-    width: 330,  // px
-    height: 520, // px
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// FAN STEP — how each successive card shifts relative to the one to its right
+// ─────────────────────────────────────────────────────────────────────────────
+const STEP_LEFT_PX  = 10;   // each card's bottom-left moves this many px to the left
+const STEP_ANGLE_DEG = 2;   // each card's angle decreases by this many degrees
 
-// ---- Fan rotation --------------------------------------------------------
-// Rotating each card by a different degree fans them out around the bottom-left.
-const FAN_DEGREES = [0, 6, 12, 18, 24, 30, 36, 42];
-
-function getDegrees(count) {
-    if (count === 1) return [0];
+// ─────────────────────────────────────────────────────────────────────────────
+// Build the per-card layout.
+// The reference card is always at index (N-1). Cards to its left are computed
+// recursively: each card's bottom-left = previous bottom-left - STEP_LEFT_PX,
+// and angle = previous angle - STEP_ANGLE_DEG.
+// Because all cards share the same height, top stays constant.
+// ─────────────────────────────────────────────────────────────────────────────
+function buildFan(count) {
     return Array.from({ length: count }, (_, i) => {
-        const t = i / (count - 1);
-        const pos = t * (FAN_DEGREES.length - 1);
-        const lo = Math.floor(pos);
-        const hi = Math.min(FAN_DEGREES.length - 1, lo + 1);
-        const f = pos - lo;
-        return FAN_DEGREES[lo] + (FAN_DEGREES[hi] - FAN_DEGREES[lo]) * f;
+        const stepsFromRef = (count - 1) - i;   // 0 for reference card
+        return {
+            left:  CARD_LEFT  - stepsFromRef * STEP_LEFT_PX,
+            top:   CARD_TOP,                    // constant (same height for all)
+            angle: CARD_ANGLE - stepsFromRef * STEP_ANGLE_DEG,
+            zIndex: i + 1,                      // reference card has highest z
+        };
     });
 }
 
-export default function PlayerHand({ cards = DEFAULT_CARDS, onConfirmPlay }) {
+export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const [selectedCardId, setSelectedCardId] = useState(null);
 
     const selectedCard = cards.find((c) => c.id === selectedCardId) || null;
-    const fanCards = cards.filter((c) => c.id !== selectedCardId);
+    const fanCards     = cards.filter((c) => c.id !== selectedCardId);
 
     const selectCard = (cardId) => setSelectedCardId(cardId);
 
@@ -54,39 +62,42 @@ export default function PlayerHand({ cards = DEFAULT_CARDS, onConfirmPlay }) {
         setSelectedCardId(null);
     };
 
-    const degrees = getDegrees(fanCards.length);
+    const fanLayout = buildFan(fanCards.length);
 
     return (
         <div className="player-hand">
             <div className="player-hand__fan-wrap">
-                {/* Cards sit below the hand image, all sharing the fixed card's box
-                    and pivoting around its bottom-left corner */}
-                {fanCards.map((card, i) => (
-                    <div
-                        key={card.id || i}
-                        style={{
-                            position: "absolute",
-                            left: `${FIXED_CARD.left}px`,
-                            top: `${FIXED_CARD.top}px`,
-                            width: `${FIXED_CARD.width}px`,
-                            height: `${FIXED_CARD.height}px`,
-                            zIndex: i + 1,
-                            transform: `rotate(${degrees[i]}deg)`,
-                            transformOrigin: "0% 100%", // bottom-left corner = shared pivot
-                            pointerEvents: "auto",
-                        }}
-                    >
-                        <PlayingCard
-                            rank={card.rank}
-                            suit={card.suit}
-                            className="player-hand__card"
-                            onClick={() => selectCard(card.id)}
-                            onContextMenu={(e) => handleContextMenu(e, card.id)}
-                        />
-                    </div>
-                ))}
 
-                {/* Hand image on top — transparent areas reveal cards behind */}
+                {/* ── Cards behind the hand image ──────────────────────── */}
+                {fanCards.map((card, i) => {
+                    const { left, top, angle, zIndex } = fanLayout[i];
+                    return (
+                        <div
+                            key={card.id || i}
+                            style={{
+                                position:        "absolute",
+                                left:            `${left}px`,
+                                top:             `${top}px`,
+                                width:           `${CARD_WIDTH}px`,
+                                height:          `${CARD_HEIGHT}px`,
+                                transform:       `rotate(${angle}deg)`,
+                                transformOrigin: "0% 100%",   // bottom-left pivot
+                                zIndex,
+                                pointerEvents:   "auto",
+                            }}
+                        >
+                            <PlayingCard
+                                rank={card.rank}
+                                suit={card.suit}
+                                className="player-hand__card"
+                                onClick={() => selectCard(card.id)}
+                                onContextMenu={(e) => handleContextMenu(e, card.id)}
+                            />
+                        </div>
+                    );
+                })}
+
+                {/* ── Hand image on top ─────────────────────────────────── */}
                 <img
                     src={handLeft}
                     alt="Left hand holding cards"
