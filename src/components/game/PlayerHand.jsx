@@ -6,46 +6,22 @@ import handRight from "../../assets/images/hand-right.png";
 import "./PlayerHand.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// REFERENCE CARD — this is the rightmost / front card. It never moves.
-// Adjust these values to position it correctly over the hand image.
-// All units are INTERNAL px (container is scaled 0.5 → divide by 2 for screen px)
+// ADJUST THESE to position / size / rotate the single reference card
+// All values are in the INTERNAL coordinate space of the fan-wrap container
+// (the container is rendered at 0.5 scale, so divide by 2 for screen pixels)
 // ─────────────────────────────────────────────────────────────────────────────
-const CARD_LEFT   = 222;   // bottom-left x of the reference card
-const CARD_TOP    = -210;  // top edge of the reference card  (increase = move down)
-const CARD_WIDTH  = 330;   // card width  in internal px
-const CARD_HEIGHT = 520;   // card height in internal px
-const CARD_ANGLE  = -17;   // rotation in degrees (positive = clockwise)
-
+const CARD_LEFT = 222;   // px from left of the hand container
+const CARD_TOP = -210;   // px from top  of the hand container  (increase = lower)
+const CARD_WIDTH = 330;   // px
+const CARD_HEIGHT = 520;   // px
+const CARD_ANGLE = -17;     // degrees  (positive = clockwise)
 // ─────────────────────────────────────────────────────────────────────────────
-// FAN STEP — how each successive card shifts relative to the one to its right
-// ─────────────────────────────────────────────────────────────────────────────
-const STEP_LEFT_PX  = 10;   // each card's bottom-left moves this many px to the left
-const STEP_ANGLE_DEG = 2;   // each card's angle decreases by this many degrees
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Build the per-card layout.
-// The reference card is always at index (N-1). Cards to its left are computed
-// recursively: each card's bottom-left = previous bottom-left - STEP_LEFT_PX,
-// and angle = previous angle - STEP_ANGLE_DEG.
-// Because all cards share the same height, top stays constant.
-// ─────────────────────────────────────────────────────────────────────────────
-function buildFan(count) {
-    return Array.from({ length: count }, (_, i) => {
-        const stepsFromRef = (count - 1) - i;   // 0 for reference card
-        return {
-            left:  CARD_LEFT  - stepsFromRef * STEP_LEFT_PX,
-            top:   CARD_TOP,                    // constant (same height for all)
-            angle: CARD_ANGLE - stepsFromRef * STEP_ANGLE_DEG,
-            zIndex: i + 1,                      // reference card has highest z
-        };
-    });
-}
 
 export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const [selectedCardId, setSelectedCardId] = useState(null);
 
     const selectedCard = cards.find((c) => c.id === selectedCardId) || null;
-    const fanCards     = cards.filter((c) => c.id !== selectedCardId);
+    const fanCards = cards.filter((c) => c.id !== selectedCardId);
 
     const selectCard = (cardId) => setSelectedCardId(cardId);
 
@@ -62,28 +38,29 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
         setSelectedCardId(null);
     };
 
-    const fanLayout = buildFan(fanCards.length);
-
     return (
         <div className="player-hand">
             <div className="player-hand__fan-wrap">
 
                 {/* ── Cards behind the hand image ──────────────────────── */}
                 {fanCards.map((card, i) => {
-                    const { left, top, angle, zIndex } = fanLayout[i];
+                    const left = CARD_LEFT + i * 30;
+                    const top = CARD_TOP - i * 10;
+                    const angle = CARD_ANGLE + i * 8;
+                    const zIndex = i + 2; // Card 0 (ref card) is z-index 2, Card 1 is z-index 3...
                     return (
                         <div
                             key={card.id || i}
                             style={{
-                                position:        "absolute",
-                                left:            `${left}px`,
-                                top:             `${top}px`,
-                                width:           `${CARD_WIDTH}px`,
-                                height:          `${CARD_HEIGHT}px`,
-                                transform:       `rotate(${angle}deg)`,
-                                transformOrigin: "0% 100%",   // bottom-left pivot
-                                zIndex,
-                                pointerEvents:   "auto",
+                                position: "absolute",
+                                left: `${left}px`,
+                                top: `${top}px`,
+                                width: `${CARD_WIDTH}px`,
+                                height: `${CARD_HEIGHT}px`,
+                                transform: `rotate(${angle}deg)`,
+                                transformOrigin: "0% 100%", // bottom-left pivot
+                                zIndex: zIndex,
+                                pointerEvents: "auto",
                             }}
                         >
                             <PlayingCard
