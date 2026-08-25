@@ -23,9 +23,9 @@
 .player-hand__card {
     position: absolute;
     left: calc(8% + var(--card-x, 0%));
-    top: calc(10% + var(--card-y, 0%));
-    width: clamp(56px, 15vw, 76px);
-    height: clamp(78px, 21vw, 106px);
+    top: calc(26% + var(--card-y, 0%));
+    width: clamp(112px, 28vw, 152px);
+    height: clamp(156px, 39vw, 212px);
     transform-origin: 50% 90%;
     transform: rotate(var(--card-rotate, 0deg));
     cursor: pointer;
@@ -34,8 +34,8 @@
 }
 
 .player-hand__card:hover {
-    transform: rotate(var(--card-rotate, 0deg)) translateY(-22px);
-    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.45);
+    transform: rotate(var(--card-rotate, 0deg)) translateY(-26px);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
     z-index: 9 !important;
 }
 
