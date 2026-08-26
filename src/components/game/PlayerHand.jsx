@@ -131,34 +131,38 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
             </div>
 
             {selectedCard && (
-                <div className="player-hand__selected-wrap">
-                    <PlayingCard
-                        rank={selectedCard.rank}
-                        suit={selectedCard.suit}
-                        className="player-hand__selected-card"
-                        onClick={handleReturnToHand}
-                        style={{
-                            zIndex: 1,
-                            position: "relative",
-                            left: `${RIGHT_CARD_X}px`,
-                            top: `${RIGHT_CARD_Y}px`,
-                            transform: `rotate(${RIGHT_CARD_ANGLE}deg)`,
-                        }}
-                    />
-                    <img
-                        src={handRight}
-                        alt=""
-                        aria-hidden="true"
-                        className="player-hand__hand-image player-hand__hand-image--right"
-                        style={{
-                            width: `${220 * (RIGHT_HAND_SCALE / 100)}px`,
-                            right: `${0 - RIGHT_HAND_X}px`,
-                            bottom: `${0 + RIGHT_HAND_Y}px`,
-                            zIndex: 10,
-                        }}
-                    />
-                    <ConfirmPlay onConfirm={handleConfirm} onCancel={handleReturnToHand} />
-                </div>
+                <>
+                    <div className="player-hand__selected-wrap">
+                        <PlayingCard
+                            rank={selectedCard.rank}
+                            suit={selectedCard.suit}
+                            className="player-hand__selected-card"
+                            onClick={handleReturnToHand}
+                            style={{
+                                zIndex: 1,
+                                position: "relative",
+                                left: `${RIGHT_CARD_X}px`,
+                                top: `${RIGHT_CARD_Y}px`,
+                                transform: `rotate(${RIGHT_CARD_ANGLE}deg)`,
+                            }}
+                        />
+                        <img
+                            src={handRight}
+                            alt=""
+                            aria-hidden="true"
+                            className="player-hand__hand-image player-hand__hand-image--right"
+                            style={{
+                                width: `${220 * (RIGHT_HAND_SCALE / 100)}px`,
+                                right: `${0 - RIGHT_HAND_X}px`,
+                                bottom: `${0 + RIGHT_HAND_Y}px`,
+                                zIndex: 10,
+                            }}
+                        />
+                    </div>
+                    <div className="player-hand__confirm-btn-container">
+                        <ConfirmPlay onConfirm={handleConfirm} onCancel={handleReturnToHand} />
+                    </div>
+                </>
             )}
         </div>
     );

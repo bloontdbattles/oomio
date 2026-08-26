@@ -139,6 +139,15 @@
     z-index: 10;
 }
 
+.player-hand__confirm-btn-container {
+    position: absolute;
+    bottom: 8vh;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    pointer-events: auto;
+}
+
 @media (max-width: 640px) {
     .player-hand__selected-wrap {
         right: 12px;
