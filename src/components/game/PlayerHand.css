@@ -137,11 +137,35 @@
     }
 }
 
-.player-hand__selected-card {
+.player-hand__selected-card.playing-card {
     position: relative;
+    width: 165px !important;
+    height: 260px !important;
+    border-radius: 8% !important;
+    padding: 12px 14px !important;
+    box-sizing: border-box;
     z-index: 2;
     cursor: pointer;
     margin-bottom: 60px;
+}
+
+/* Scaling up selected card interior elements for 165px width */
+.player-hand__selected-card .playing-card__rank {
+    font-size: 1.6rem !important;
+}
+
+.player-hand__selected-card .playing-card__suit-icon {
+    width: 19px !important;
+    height: 19px !important;
+}
+
+.player-hand__selected-card .playing-card__corner {
+    gap: 4px !important;
+}
+
+.player-hand__selected-card .playing-card__center {
+    width: 55px !important;
+    height: 55px !important;
 }
 
 .player-hand__hand-image--right {
