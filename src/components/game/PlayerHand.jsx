@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import PlayingCard from "./PlayingCard";
 import ConfirmPlay from "./ConfirmPlay";
 import handLeft from "../../assets/images/hand-left.png";
@@ -9,8 +9,12 @@ import "./PlayerHand.css";
 // ─────────────────────────────────────────────────────────────────────────────
 // ADJUST THESE to position / size / rotate the single reference card
 // All values are in the INTERNAL coordinate space of the fan-wrap container
-// (the container is rendered at 0.5 scale, so divide by 2 for screen pixels)
+// (divide value by REFERENCE_FAN_WIDTH to get fraction; multiply by rendered
+// width to convert to screen pixels at any viewport size)
 // ─────────────────────────────────────────────────────────────────────────────
+// LEFT HAND — base scale is 0.5 on desktop, which renders left hand cards
+// at exactly 165px × 260px (matching the right hand card).
+const BASE_SCALE = 0.5;
 const CARD_LEFT = 222;   // px from left of the hand container
 const CARD_TOP = -210;   // px from top  of the hand container  (increase = lower)
 const CARD_WIDTH = 330;   // px
@@ -36,6 +40,22 @@ const RIGHT_CARD_ANGLE = 0;   // degrees (positive = clockwise)
 
 export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const [selectedCardId, setSelectedCardId] = useState(null);
+    const [fanScale, setFanScale] = useState(BASE_SCALE);
+    const fanWrapRef = useRef(null);
+
+    // Dynamic scale helper: locks at 0.5 on desktop, scales down below 800px wide.
+    useEffect(() => {
+        const updateScale = () => {
+            if (window.innerWidth < 800) {
+                setFanScale(BASE_SCALE * (window.innerWidth / 800));
+            } else {
+                setFanScale(BASE_SCALE);
+            }
+        };
+        updateScale();
+        window.addEventListener("resize", updateScale);
+        return () => window.removeEventListener("resize", updateScale);
+    }, []);
 
     const selectedCard = cards.find((c) => c.id === selectedCardId) || null;
     const fanCards = cards.filter((c) => c.id !== selectedCardId);
@@ -57,7 +77,11 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
 
     return (
         <div className="player-hand">
-            <div className="player-hand__fan-wrap">
+            <div
+                    ref={fanWrapRef}
+                    className="player-hand__fan-wrap"
+                    style={{ transform: `scale(${fanScale})` }}
+                >
                 {/* ── Back hand image (behind cards) ─────────────────── */}
                 <img
                     src={handLeft2}
