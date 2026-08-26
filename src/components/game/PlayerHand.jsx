@@ -26,6 +26,14 @@ const RIGHT_HAND_X = 40;   // px offset from default right position (positive = 
 const RIGHT_HAND_Y = -10;   // px offset from default bottom position (positive = up, negative = down)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ADJUST THESE to position / angle the selected (right-side) card
+// ─────────────────────────────────────────────────────────────────────────────
+const RIGHT_CARD_X = -215;   // px — horizontal offset (positive = right, negative = left)
+const RIGHT_CARD_Y = -80;   // px — vertical offset   (positive = down, negative = up)
+const RIGHT_CARD_ANGLE = 0;   // degrees (positive = clockwise)
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const [selectedCardId, setSelectedCardId] = useState(null);
 
@@ -106,7 +114,11 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
                         className="player-hand__selected-card"
                         onClick={handleReturnToHand}
                         style={{
-                            zIndex: 1, // back layer relative to hand image
+                            zIndex: 1,
+                            position: "relative",
+                            left: `${RIGHT_CARD_X}px`,
+                            top: `${RIGHT_CARD_Y}px`,
+                            transform: `rotate(${RIGHT_CARD_ANGLE}deg)`,
                         }}
                     />
                     <img
@@ -118,7 +130,7 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
                             width: `${220 * (RIGHT_HAND_SCALE / 100)}px`,
                             right: `${0 - RIGHT_HAND_X}px`,
                             bottom: `${0 + RIGHT_HAND_Y}px`,
-                            zIndex: 10, // top layer
+                            zIndex: 10,
                         }}
                     />
                     <ConfirmPlay onConfirm={handleConfirm} onCancel={handleReturnToHand} />
