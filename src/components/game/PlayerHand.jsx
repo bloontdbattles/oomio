@@ -2,6 +2,7 @@ import { useState } from "react";
 import PlayingCard from "./PlayingCard";
 import ConfirmPlay from "./ConfirmPlay";
 import handLeft from "../../assets/images/hand-left.png";
+import handLeft2 from "../../assets/images/hand-left2.png";
 import handRight from "../../assets/images/hand-right.png";
 import "./PlayerHand.css";
 
@@ -41,6 +42,13 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
     return (
         <div className="player-hand">
             <div className="player-hand__fan-wrap">
+                {/* ── Back hand image (behind cards) ─────────────────── */}
+                <img
+                    src={handLeft2}
+                    alt=""
+                    aria-hidden="true"
+                    className="player-hand__hand-image player-hand__hand-image--left-back"
+                />
 
                 {/* ── Cards behind the hand image ──────────────────────── */}
                 {fanCards.map((card, i) => {

@@ -102,6 +102,15 @@
     z-index: 20;
 }
 
+.player-hand__hand-image--left-back {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    z-index: 1;
+}
+
 .player-hand__selected-wrap {
     position: absolute;
     bottom: 40px;
