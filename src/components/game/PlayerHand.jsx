@@ -18,6 +18,14 @@ const CARD_HEIGHT = 520;   // px
 const CARD_ANGLE = -17;     // degrees  (positive = clockwise)
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ADJUST THESE to position / size the right hand image (hand-right.png)
+// ─────────────────────────────────────────────────────────────────────────────
+const RIGHT_HAND_SCALE = 180; // % size (e.g., 100 = 100%, 120 = 120%)
+const RIGHT_HAND_X = 40;   // px offset from default right position (positive = right, negative = left)
+const RIGHT_HAND_Y = -10;   // px offset from default bottom position (positive = up, negative = down)
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const [selectedCardId, setSelectedCardId] = useState(null);
 
@@ -97,12 +105,21 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
                         suit={selectedCard.suit}
                         className="player-hand__selected-card"
                         onClick={handleReturnToHand}
+                        style={{
+                            zIndex: 1, // back layer relative to hand image
+                        }}
                     />
                     <img
                         src={handRight}
                         alt=""
                         aria-hidden="true"
                         className="player-hand__hand-image player-hand__hand-image--right"
+                        style={{
+                            width: `${220 * (RIGHT_HAND_SCALE / 100)}px`,
+                            right: `${0 - RIGHT_HAND_X}px`,
+                            bottom: `${0 + RIGHT_HAND_Y}px`,
+                            zIndex: 10, // top layer
+                        }}
                     />
                     <ConfirmPlay onConfirm={handleConfirm} onCancel={handleReturnToHand} />
                 </div>
