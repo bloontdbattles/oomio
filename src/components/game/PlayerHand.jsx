@@ -47,7 +47,8 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
     useEffect(() => {
         const updateScale = () => {
             if (window.innerWidth < 800) {
-                setFanScale(BASE_SCALE * (window.innerWidth / 800));
+                // Steeper scaling curve using exponent to prevent left & right overlap on mobile
+                setFanScale(BASE_SCALE * Math.pow(window.innerWidth / 800, 1.25));
             } else {
                 setFanScale(BASE_SCALE);
             }
@@ -132,7 +133,13 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
 
             {selectedCard && (
                 <>
-                    <div className="player-hand__selected-wrap">
+                    <div
+                        className="player-hand__selected-wrap"
+                        style={{
+                            transform: `scale(${fanScale / BASE_SCALE})`,
+                            transformOrigin: "bottom right",
+                        }}
+                    >
                         <PlayingCard
                             rank={selectedCard.rank}
                             suit={selectedCard.suit}

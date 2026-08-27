@@ -148,13 +148,3 @@
     pointer-events: auto;
 }
 
-@media (max-width: 640px) {
-    .player-hand__selected-wrap {
-        right: 12px;
-        width: 150px;
-    }
-
-    .player-hand__hand-image--right {
-        width: 160px;
-    }
-}
