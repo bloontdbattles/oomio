@@ -12,6 +12,48 @@ import player2Img from "../../assets/images/player2.png";
 import player3Img from "../../assets/images/player3.png";
 import "./GameTable.css";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURATION: ADJUST TABLE AND OPPONENT SIZES / POSITIONS HERE
+// ─────────────────────────────────────────────────────────────────────────────
+const TABLE_CONFIG = {
+    // Table Dimensions
+    width: "80%",           // Width of the table container (e.g., "90%" or "820px")
+    maxWidth: 1200,         // Maximum width in pixels
+    height: 500,           // Height of the table in pixels
+    marginTop: 60,         // Space above the table for opponent avatars
+    marginBottom: 220,      // Space below the table
+
+    // Table Perspective Shape
+    // The top edge of the trapezoid starts at topCornerWidth% and ends at (100 - topCornerWidth)%
+    // A smaller percentage makes the top edge wider (flatter look), larger makes it narrower (more perspective).
+    topCornerWidth: 35,    // percentage (%)
+
+    // Wood Border & Insets
+    woodBorderThickness: 10,  // top/bottom wood border thickness in pixels
+    woodBorderSideGap: 30,    // left/right wood border gap in pixels
+};
+
+const OPPONENT_CONFIG = {
+    // Opponent Avatar Dimensions
+    width: 140,            // width in pixels
+    height: 160,           // height in pixels
+
+    // Overlap: How many pixels the character's arm extends down onto the wood table surface
+    tableOverlap: 45,      // pixels
+
+    // Horizontal positions (percentages along the top edge of the table)
+    leftHorizontalPos: 18,  // %
+    topHorizontalPos: 50,   // %
+    rightHorizontalPos: 82, // %
+
+    // Fine-tuning offsets (X, Y in pixels) for each opponent seat image
+    leftOffset: { x: 0, y: 200 },
+    topOffset: { x: 0, y: 30 },
+    rightOffset: { x: 0, y: 200 },
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+
 
 const SUITS = ["hearts", "diamonds", "clubs", "spades"];
 const RANKS = [
@@ -36,7 +78,7 @@ export default function GameTable() {
     const [playedCards, setPlayedCards] = useState({});
     const [activeSeat, setActiveSeat] = useState("bottom");
     const [leadSuit, setLeadSuit] = useState(null);
-    
+
     const [team1Tricks, setTeam1Tricks] = useState(0); // bottom + top (Us)
     const [team2Tricks, setTeam2Tricks] = useState(0); // left + right (Them)
     const [team1Score, setTeam1Score] = useState(0);
@@ -151,7 +193,7 @@ export default function GameTable() {
     const playCard = useCallback((seat, card) => {
         setPlayedCards((prev) => {
             const updated = { ...prev, [seat]: card };
-            
+
             // Set lead suit if this is the first card in the trick
             if (Object.keys(prev).length === 0) {
                 setLeadSuit(card.suit);
@@ -254,12 +296,36 @@ export default function GameTable() {
             </div>
 
             {/* Table layout containing seats and center cards */}
-            <div className="game-table__arena">
+            <div
+                className="game-table__arena"
+                style={{
+                    "--table-width": TABLE_CONFIG.width,
+                    "--table-max-width": `${TABLE_CONFIG.maxWidth}px`,
+                    "--table-height": `${TABLE_CONFIG.height}px`,
+                    "--table-margin-top": `${TABLE_CONFIG.marginTop}px`,
+                    "--table-margin-bottom": `${TABLE_CONFIG.marginBottom}px`,
+                    "--table-top-corner": `${TABLE_CONFIG.topCornerWidth}%`,
+                    "--table-top-corner-right": `${100 - TABLE_CONFIG.topCornerWidth}%`,
+
+                    "--table-wood-border": `${TABLE_CONFIG.woodBorderThickness}px`,
+                    "--table-wood-side-gap": `${TABLE_CONFIG.woodBorderSideGap}px`,
+
+                    "--opp-width": `${OPPONENT_CONFIG.width}px`,
+                    "--opp-height": `${OPPONENT_CONFIG.height}px`,
+                    "--opp-overlap": `${OPPONENT_CONFIG.tableOverlap}px`,
+                }}
+            >
                 <div className="game-table__3d-table">
                     <div className="game-table__3d-table-wood" />
                     <div className="game-table__3d-table-felt" />
 
-                    <div className="game-table__seat-container game-table__seat-container--left">
+                    <div
+                        className="game-table__seat-container game-table__seat-container--left"
+                        style={{
+                            left: `${OPPONENT_CONFIG.leftHorizontalPos}%`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.leftOffset.x}px, ${OPPONENT_CONFIG.leftOffset.y}px)`
+                        }}
+                    >
                         <PlayerSeat
                             name="AI Left"
                             isAI={true}
@@ -269,7 +335,13 @@ export default function GameTable() {
                         />
                     </div>
 
-                    <div className="game-table__seat-container game-table__seat-container--top">
+                    <div
+                        className="game-table__seat-container game-table__seat-container--top"
+                        style={{
+                            left: `${OPPONENT_CONFIG.topHorizontalPos}%`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.topOffset.x}px, ${OPPONENT_CONFIG.topOffset.y}px)`
+                        }}
+                    >
                         <PlayerSeat
                             name="AI Top (Partner)"
                             isAI={true}
@@ -279,7 +351,13 @@ export default function GameTable() {
                         />
                     </div>
 
-                    <div className="game-table__seat-container game-table__seat-container--right">
+                    <div
+                        className="game-table__seat-container game-table__seat-container--right"
+                        style={{
+                            left: `${OPPONENT_CONFIG.rightHorizontalPos}%`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.rightOffset.x}px, ${OPPONENT_CONFIG.rightOffset.y}px)`
+                        }}
+                    >
                         <PlayerSeat
                             name="AI Right"
                             isAI={true}
