@@ -7,7 +7,11 @@ import TrumpDisplay from "./TrumpDisplay";
 import ScoreBoard from "./ScoreBoard";
 import BidPanel from "./BidPanel";
 import GameResult from "./GameResult";
+import player1Img from "../../assets/images/player1.png";
+import player2Img from "../../assets/images/player2.png";
+import player3Img from "../../assets/images/player3.png";
 import "./GameTable.css";
+
 
 const SUITS = ["hearts", "diamonds", "clubs", "spades"];
 const RANKS = [
@@ -238,10 +242,6 @@ export default function GameTable() {
 
     return (
         <div className="game-table">
-            <div className="game-table__background">
-                <div className="game-table__felt" />
-            </div>
-
             {/* Header widgets */}
             <div className="game-table__header-widgets">
                 <TrumpDisplay suit={trumpSuit} />
@@ -255,39 +255,53 @@ export default function GameTable() {
 
             {/* Table layout containing seats and center cards */}
             <div className="game-table__arena">
-                <PlayerSeat
-                    name="AI Top (Partner)"
-                    isAI={true}
-                    isActive={activeSeat === "top"}
-                    position="top"
-                />
-                
-                <div className="game-table__middle-row">
-                    <PlayerSeat
-                        name="AI Left"
-                        isAI={true}
-                        isActive={activeSeat === "left"}
-                        position="left"
-                    />
+                <div className="game-table__3d-table">
+                    <div className="game-table__3d-table-wood" />
+                    <div className="game-table__3d-table-felt" />
+
+                    <div className="game-table__seat-container game-table__seat-container--left">
+                        <PlayerSeat
+                            name="AI Left"
+                            isAI={true}
+                            isActive={activeSeat === "left"}
+                            position="left"
+                            avatarImg={player1Img}
+                        />
+                    </div>
+
+                    <div className="game-table__seat-container game-table__seat-container--top">
+                        <PlayerSeat
+                            name="AI Top (Partner)"
+                            isAI={true}
+                            isActive={activeSeat === "top"}
+                            position="top"
+                            avatarImg={player2Img}
+                        />
+                    </div>
+
+                    <div className="game-table__seat-container game-table__seat-container--right">
+                        <PlayerSeat
+                            name="AI Right"
+                            isAI={true}
+                            isActive={activeSeat === "right"}
+                            position="right"
+                            avatarImg={player3Img}
+                        />
+                    </div>
 
                     <div className="game-table__center">
                         <PlayedCards cards={playedCards} />
                     </div>
-
-                    <PlayerSeat
-                        name="AI Right"
-                        isAI={true}
-                        isActive={activeSeat === "right"}
-                        position="right"
-                    />
                 </div>
 
-                <PlayerSeat
-                    name={player.name}
-                    isAI={false}
-                    isActive={activeSeat === "bottom"}
-                    position="bottom"
-                />
+                <div className="game-table__bottom-seat-wrap">
+                    <PlayerSeat
+                        name={player.name}
+                        isAI={false}
+                        isActive={activeSeat === "bottom"}
+                        position="bottom"
+                    />
+                </div>
             </div>
 
             {/* Player controls */}
