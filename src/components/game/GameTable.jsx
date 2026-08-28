@@ -62,6 +62,51 @@ const OPPONENT_CONFIG = {
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// MOBILE CONFIGURATION: ADJUST TABLE AND OPPONENT SIZES / POSITIONS FOR MOBILE
+// (applies at screen width ≤ 768px)
+// ─────────────────────────────────────────────────────────────────────────────
+const MOBILE_TABLE_CONFIG = {
+    width: "95%",           // Width of the table container
+    maxWidth: 600,         // Maximum width in pixels
+    height: 440,           // Height of the table in pixels
+    marginTop: 200,         // Space above the table for opponent avatars
+    marginBottom: 180,     // Space below the table
+
+    topCornerWidth: 35,    // percentage (%)
+
+    woodBorderThickness: 6,   // top/bottom wood border thickness in pixels
+    woodBorderSideGap: 16,    // left/right wood border gap in pixels
+};
+
+const MOBILE_OPPONENT_CONFIG = {
+    baseWidth: 140,
+    baseHeight: 160,
+
+    left: {
+        scale: 180,             // size percentage
+        tableOverlap: 20,      // pixels
+        horizontalPos: 18,     // % position along top edge of table
+        offsetX: -30,            // fine-tuning X offset in pixels
+        offsetY: 200,          // fine-tuning Y offset in pixels
+    },
+    top: {
+        scale: 130,             // size percentage
+        tableOverlap: 20,      // pixels
+        horizontalPos: 50,     // % position along top edge of table
+        offsetX: 0,            // fine-tuning X offset in pixels
+        offsetY: 60,           // fine-tuning Y offset in pixels
+    },
+    right: {
+        scale: 180,             // size percentage
+        tableOverlap: 20,      // pixels
+        horizontalPos: 82,     // % position along top edge of table
+        offsetX: 30,            // fine-tuning X offset in pixels
+        offsetY: 200,          // fine-tuning Y offset in pixels
+    }
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
 
 
 const SUITS = ["hearts", "diamonds", "clubs", "spades"];
@@ -84,6 +129,18 @@ export default function GameTable() {
     const [trumpSuit, setTrumpSuit] = useState(null);
     const [playerHand, setPlayerHand] = useState([]);
     const [aiHands, setAiHands] = useState({ left: [], top: [], right: [] });
+
+    // Detect mobile screen width (≤ 768px) to switch config
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+
+    // Pick the correct config based on screen size
+    const tCfg = isMobile ? MOBILE_TABLE_CONFIG : TABLE_CONFIG;
+    const oCfg = isMobile ? MOBILE_OPPONENT_CONFIG : OPPONENT_CONFIG;
     const [playedCards, setPlayedCards] = useState({});
     const [activeSeat, setActiveSeat] = useState("bottom");
     const [leadSuit, setLeadSuit] = useState(null);
@@ -308,16 +365,16 @@ export default function GameTable() {
             <div
                 className="game-table__arena"
                 style={{
-                    "--table-width": TABLE_CONFIG.width,
-                    "--table-max-width": `${TABLE_CONFIG.maxWidth}px`,
-                    "--table-height": `${TABLE_CONFIG.height}px`,
-                    "--table-margin-top": `${TABLE_CONFIG.marginTop}px`,
-                    "--table-margin-bottom": `${TABLE_CONFIG.marginBottom}px`,
-                    "--table-top-corner": `${TABLE_CONFIG.topCornerWidth}%`,
-                    "--table-top-corner-right": `${100 - TABLE_CONFIG.topCornerWidth}%`,
+                    "--table-width": tCfg.width,
+                    "--table-max-width": `${tCfg.maxWidth}px`,
+                    "--table-height": `${tCfg.height}px`,
+                    "--table-margin-top": `${tCfg.marginTop}px`,
+                    "--table-margin-bottom": `${tCfg.marginBottom}px`,
+                    "--table-top-corner": `${tCfg.topCornerWidth}%`,
+                    "--table-top-corner-right": `${100 - tCfg.topCornerWidth}%`,
 
-                    "--table-wood-border": `${TABLE_CONFIG.woodBorderThickness}px`,
-                    "--table-wood-side-gap": `${TABLE_CONFIG.woodBorderSideGap}px`,
+                    "--table-wood-border": `${tCfg.woodBorderThickness}px`,
+                    "--table-wood-side-gap": `${tCfg.woodBorderSideGap}px`,
                 }}
             >
                 <div className="game-table__3d-table">
@@ -327,11 +384,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--left"
                         style={{
-                            left: `${OPPONENT_CONFIG.left.horizontalPos}%`,
-                            bottom: `calc(100% - ${OPPONENT_CONFIG.left.tableOverlap}px)`,
-                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.left.scale / 100)}px`,
-                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.left.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.left.offsetX}px, ${OPPONENT_CONFIG.left.offsetY}px)`
+                            left: `${oCfg.left.horizontalPos}%`,
+                            bottom: `calc(100% - ${oCfg.left.tableOverlap}px)`,
+                            "--opp-width": `${oCfg.baseWidth * (oCfg.left.scale / 100)}px`,
+                            "--opp-height": `${oCfg.baseHeight * (oCfg.left.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${oCfg.left.offsetX}px, ${oCfg.left.offsetY}px)`
                         }}
                     >
                         <PlayerSeat
@@ -346,11 +403,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--top"
                         style={{
-                            left: `${OPPONENT_CONFIG.top.horizontalPos}%`,
-                            bottom: `calc(100% - ${OPPONENT_CONFIG.top.tableOverlap}px)`,
-                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.top.scale / 100)}px`,
-                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.top.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.top.offsetX}px, ${OPPONENT_CONFIG.top.offsetY}px)`
+                            left: `${oCfg.top.horizontalPos}%`,
+                            bottom: `calc(100% - ${oCfg.top.tableOverlap}px)`,
+                            "--opp-width": `${oCfg.baseWidth * (oCfg.top.scale / 100)}px`,
+                            "--opp-height": `${oCfg.baseHeight * (oCfg.top.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${oCfg.top.offsetX}px, ${oCfg.top.offsetY}px)`
                         }}
                     >
                         <PlayerSeat
@@ -365,11 +422,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--right"
                         style={{
-                            left: `${OPPONENT_CONFIG.right.horizontalPos}%`,
-                            bottom: `calc(100% - ${OPPONENT_CONFIG.right.tableOverlap}px)`,
-                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.right.scale / 100)}px`,
-                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.right.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.right.offsetX}px, ${OPPONENT_CONFIG.right.offsetY}px)`
+                            left: `${oCfg.right.horizontalPos}%`,
+                            bottom: `calc(100% - ${oCfg.right.tableOverlap}px)`,
+                            "--opp-width": `${oCfg.baseWidth * (oCfg.right.scale / 100)}px`,
+                            "--opp-height": `${oCfg.baseHeight * (oCfg.right.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${oCfg.right.offsetX}px, ${oCfg.right.offsetY}px)`
                         }}
                     >
                         <PlayerSeat
