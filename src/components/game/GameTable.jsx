@@ -19,7 +19,7 @@ const TABLE_CONFIG = {
     // Table Dimensions
     width: "80%",           // Width of the table container (e.g., "90%" or "820px")
     maxWidth: 1200,         // Maximum width in pixels
-    height: 500,           // Height of the table in pixels
+    height: 450,           // Height of the table in pixels
     marginTop: 60,         // Space above the table for opponent avatars
     marginBottom: 220,      // Space below the table
 
@@ -34,22 +34,31 @@ const TABLE_CONFIG = {
 };
 
 const OPPONENT_CONFIG = {
-    // Opponent Avatar Dimensions
-    width: 140,            // width in pixels
-    height: 160,           // height in pixels
+    // Base dimensions for the player images (in pixels)
+    baseWidth: 140,
+    baseHeight: 160,
 
-    // Overlap: How many pixels the character's arm extends down onto the wood table surface
-    tableOverlap: 45,      // pixels
-
-    // Horizontal positions (percentages along the top edge of the table)
-    leftHorizontalPos: 18,  // %
-    topHorizontalPos: 50,   // %
-    rightHorizontalPos: 82, // %
-
-    // Fine-tuning offsets (X, Y in pixels) for each opponent seat image
-    leftOffset: { x: 0, y: 200 },
-    topOffset: { x: 0, y: 30 },
-    rightOffset: { x: 0, y: 200 },
+    left: {
+        scale: 200,            // size percentage (e.g. 100 = 100%, 120 = 120%)
+        tableOverlap: 45,      // pixels
+        horizontalPos: 18,     // % position along top edge of table
+        offsetX: 0,            // fine-tuning X offset in pixels
+        offsetY: 250,          // fine-tuning Y offset in pixels
+    },
+    top: {
+        scale: 130,            // size percentage (e.g. 100 = 100%, 120 = 120%)
+        tableOverlap: 45,      // pixels
+        horizontalPos: 50,     // % position along top edge of table
+        offsetX: 0,            // fine-tuning X offset in pixels
+        offsetY: 40,           // fine-tuning Y offset in pixels
+    },
+    right: {
+        scale: 200,            // size percentage (e.g. 100 = 100%, 120 = 120%)
+        tableOverlap: 45,      // pixels
+        horizontalPos: 82,     // % position along top edge of table
+        offsetX: 0,            // fine-tuning X offset in pixels
+        offsetY: 250,          // fine-tuning Y offset in pixels
+    }
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -309,10 +318,6 @@ export default function GameTable() {
 
                     "--table-wood-border": `${TABLE_CONFIG.woodBorderThickness}px`,
                     "--table-wood-side-gap": `${TABLE_CONFIG.woodBorderSideGap}px`,
-
-                    "--opp-width": `${OPPONENT_CONFIG.width}px`,
-                    "--opp-height": `${OPPONENT_CONFIG.height}px`,
-                    "--opp-overlap": `${OPPONENT_CONFIG.tableOverlap}px`,
                 }}
             >
                 <div className="game-table__3d-table">
@@ -322,8 +327,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--left"
                         style={{
-                            left: `${OPPONENT_CONFIG.leftHorizontalPos}%`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.leftOffset.x}px, ${OPPONENT_CONFIG.leftOffset.y}px)`
+                            left: `${OPPONENT_CONFIG.left.horizontalPos}%`,
+                            bottom: `calc(100% - ${OPPONENT_CONFIG.left.tableOverlap}px)`,
+                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.left.scale / 100)}px`,
+                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.left.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.left.offsetX}px, ${OPPONENT_CONFIG.left.offsetY}px)`
                         }}
                     >
                         <PlayerSeat
@@ -338,8 +346,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--top"
                         style={{
-                            left: `${OPPONENT_CONFIG.topHorizontalPos}%`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.topOffset.x}px, ${OPPONENT_CONFIG.topOffset.y}px)`
+                            left: `${OPPONENT_CONFIG.top.horizontalPos}%`,
+                            bottom: `calc(100% - ${OPPONENT_CONFIG.top.tableOverlap}px)`,
+                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.top.scale / 100)}px`,
+                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.top.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.top.offsetX}px, ${OPPONENT_CONFIG.top.offsetY}px)`
                         }}
                     >
                         <PlayerSeat
@@ -354,8 +365,11 @@ export default function GameTable() {
                     <div
                         className="game-table__seat-container game-table__seat-container--right"
                         style={{
-                            left: `${OPPONENT_CONFIG.rightHorizontalPos}%`,
-                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.rightOffset.x}px, ${OPPONENT_CONFIG.rightOffset.y}px)`
+                            left: `${OPPONENT_CONFIG.right.horizontalPos}%`,
+                            bottom: `calc(100% - ${OPPONENT_CONFIG.right.tableOverlap}px)`,
+                            "--opp-width": `${OPPONENT_CONFIG.baseWidth * (OPPONENT_CONFIG.right.scale / 100)}px`,
+                            "--opp-height": `${OPPONENT_CONFIG.baseHeight * (OPPONENT_CONFIG.right.scale / 100)}px`,
+                            transform: `translateX(-50%) translate(${OPPONENT_CONFIG.right.offsetX}px, ${OPPONENT_CONFIG.right.offsetY}px)`
                         }}
                     >
                         <PlayerSeat

@@ -56,7 +56,7 @@
         100% 100%,
         0% 100%
     );
-    z-index: 1;
+    z-index: 2;
 }
 
 /* Inner green felt surface - smaller to expose wood border, clipped similarly */
@@ -73,7 +73,7 @@
         100% 100%,
         0% 100%
     );
-    z-index: 2;
+    z-index: 3;
 }
 
 /* Placed played cards on top of felt in the middle */
@@ -91,7 +91,7 @@
 .game-table__seat-container {
     position: absolute;
     bottom: calc(100% - var(--opp-overlap, 45px)); /* Let characters sit on/above top edge of table */
-    z-index: 15;
+    z-index: 1;
     display: flex;
     justify-content: center;
 }
