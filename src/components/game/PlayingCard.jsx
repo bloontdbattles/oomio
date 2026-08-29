@@ -1,3 +1,6 @@
+import jackImg from "../../assets/images/card_jack.png";
+import queenImg from "../../assets/images/card_queen.png";
+import kingImg from "../../assets/images/card_king.png";
 import "./PlayingCard.css";
 
 const RED_SUITS = ["hearts", "diamonds"];
@@ -13,6 +16,13 @@ const SUIT_PATHS = {
         "M12 2a3.5 3.5 0 0 0-3.2 4.9A3.5 3.5 0 1 0 9.8 13H10l-1.6 6h7.2L14 13h.2a3.5 3.5 0 1 0 1-6.1A3.5 3.5 0 0 0 12 2Z",
     spades:
         "M12 2s7.5 5.6 9.6 10C23 15.7 21 19 17.8 19c-1.5 0-2.7-.7-3.5-1.6.2 1.6 1 3 2.7 3.6H9c1.7-.6 2.5-2 2.7-3.6-.8.9-2 1.6-3.5 1.6C5 19 3 15.7 2.4 12 4.5 7.6 12 2 12 2Z",
+};
+
+// Map rank → face card image (null = number card, use suit glyph instead)
+const FACE_CARD_IMAGES = {
+    J: jackImg,
+    Q: queenImg,
+    K: kingImg,
 };
 
 function SuitGlyph({ suit, className = "" }) {
@@ -35,6 +45,7 @@ export default function PlayingCard({
     ...props
 }) {
     const isRed = RED_SUITS.includes(suit);
+    const faceImg = FACE_CARD_IMAGES[rank] || null;
 
     return (
         <div
@@ -42,13 +53,25 @@ export default function PlayingCard({
             style={style}
             {...props}
         >
+            {/* Top-left corner: rank + suit */}
             <div className="playing-card__corner playing-card__corner--top">
                 <span className="playing-card__rank">{rank}</span>
                 <SuitGlyph suit={suit} />
             </div>
 
-            <SuitGlyph suit={suit} className="playing-card__center" />
+            {/* Center: face card image OR plain suit glyph */}
+            {faceImg ? (
+                <img
+                    src={faceImg}
+                    alt={`${rank} of ${suit}`}
+                    className="playing-card__face-art"
+                    draggable="false"
+                />
+            ) : (
+                <SuitGlyph suit={suit} className="playing-card__center" />
+            )}
 
+            {/* Bottom-right corner: rank + suit (rotated) */}
             <div className="playing-card__corner playing-card__corner--bottom">
                 <span className="playing-card__rank">{rank}</span>
                 <SuitGlyph suit={suit} />
