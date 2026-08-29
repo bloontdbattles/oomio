@@ -41,8 +41,14 @@
     height: 38px !important;
 }
 
-.player-hand__card .playing-card__corner {
-    gap: 8px !important;
+.player-hand__card .playing-card__corner--top {
+    top: 18px !important;
+    left: 22px !important;
+}
+
+.player-hand__card .playing-card__corner--bottom {
+    bottom: 18px !important;
+    right: 22px !important;
 }
 
 .player-hand__card .playing-card__center {
@@ -123,8 +129,14 @@
     height: 19px !important;
 }
 
-.player-hand__selected-card .playing-card__corner {
-    gap: 4px !important;
+.player-hand__selected-card .playing-card__corner--top {
+    top: 10px !important;
+    left: 12px !important;
+}
+
+.player-hand__selected-card .playing-card__corner--bottom {
+    bottom: 10px !important;
+    right: 12px !important;
 }
 
 .player-hand__selected-card .playing-card__center {
