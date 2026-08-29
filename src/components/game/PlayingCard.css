@@ -44,10 +44,12 @@
 }
 
 .playing-card__rank {
+    font-family: "Times New Roman", Times, serif;
     font-size: 1.15rem;
     font-weight: 800;
     line-height: 1;
 }
+
 
 .playing-card__suit-icon {
     width: 14px;
