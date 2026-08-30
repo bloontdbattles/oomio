@@ -55,6 +55,10 @@
 .playing-card__suit-icon {
     width: 14px;
     height: 14px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .playing-card__center {
@@ -65,7 +69,12 @@
     height: 50px;
     transform: translate(-50%, -50%);
     opacity: 0.9;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
+
 
 /* Face card full-bleed artwork (J / Q / K) */
 .playing-card__face-art {
