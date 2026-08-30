@@ -24,7 +24,12 @@
     transition: transform 0.18s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.18s ease;
     box-sizing: border-box;
     cursor: pointer;
+
+    /* Scaled custom properties */
+    --pip-size: 34px !important;
+    --center-pip-size: 110px !important;
 }
+
 
 .player-hand__card.playing-card:hover {
     transform: translateY(-30px);
@@ -117,7 +122,12 @@
     z-index: 1;
     cursor: pointer;
     margin-bottom: 60px;
+
+    /* Scaled custom properties */
+    --pip-size: 18px !important;
+    --center-pip-size: 55px !important;
 }
+
 
 /* Scaling up selected card interior elements for 165px width */
 .player-hand__selected-card .playing-card__rank {

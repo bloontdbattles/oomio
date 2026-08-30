@@ -12,7 +12,12 @@
     font-family: var(--font-display);
     user-select: none;
     -webkit-user-select: none;
+
+    /* Custom variable sizes for card scales */
+    --pip-size: 18px;
+    --center-pip-size: 50px;
 }
+
 
 .playing-card.is-red {
     color: #c23b3b;
@@ -65,8 +70,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 50px;
-    height: 50px;
+    width: var(--center-pip-size, 50px);
+    height: var(--center-pip-size, 50px);
     transform: translate(-50%, -50%);
     opacity: 0.9;
     object-fit: contain;
@@ -74,6 +79,7 @@
     user-select: none;
     -webkit-user-select: none;
 }
+
 
 
 /* Face card full-bleed artwork (J / Q / K) */
@@ -87,4 +93,57 @@
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
-}
+}
+
+/* --- THE GRID MAGIC FOR PIP CARDS --- */
+.playing-card__pips {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; /* 3 Columns */
+    width: 60%;
+    height: 70%;
+    margin: 15% auto; /* Centers the grid inside the card */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* 5-Row Grid for 7 and 8 */
+.playing-card__pips--7, 
+.playing-card__pips--8 {
+    grid-template-rows: repeat(5, 1fr);
+}
+
+/* 7-Row Grid for 9 and 10 */
+.playing-card__pips--9, 
+.playing-card__pips--10 {
+    grid-template-rows: repeat(7, 1fr);
+}
+
+/* Pip Settings */
+.playing-card__pips .pip {
+    width: var(--pip-size, 18px);
+    height: var(--pip-size, 18px);
+    justify-self: center;
+    align-self: center;
+}
+
+/* Columns */
+.playing-card__pips .l { grid-column: 1; }
+.playing-card__pips .m { grid-column: 2; }
+.playing-card__pips .r { grid-column: 3; }
+
+/* Rows */
+.playing-card__pips .r1 { grid-row: 1; }
+.playing-card__pips .r2 { grid-row: 2; }
+.playing-card__pips .r3 { grid-row: 3; }
+.playing-card__pips .r4 { grid-row: 4; }
+.playing-card__pips .r5 { grid-row: 5; }
+.playing-card__pips .r6 { grid-row: 6; }
+.playing-card__pips .r7 { grid-row: 7; }
+
+/* Invert lower pips */
+.playing-card__pips .rot { transform: rotate(180deg); }
+

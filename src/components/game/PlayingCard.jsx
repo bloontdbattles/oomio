@@ -37,6 +37,69 @@ function SuitIcon({ suit, className = "" }) {
     );
 }
 
+function renderPips(rank, suit) {
+    if (rank === "7") {
+        return (
+            <div className="playing-card__pips playing-card__pips--7">
+                <SuitIcon suit={suit} className="pip l r1" />
+                <SuitIcon suit={suit} className="pip l r3" />
+                <SuitIcon suit={suit} className="pip l r5 rot" />
+                <SuitIcon suit={suit} className="pip m r2" />
+                <SuitIcon suit={suit} className="pip r r1" />
+                <SuitIcon suit={suit} className="pip r r3" />
+                <SuitIcon suit={suit} className="pip r r5 rot" />
+            </div>
+        );
+    }
+    if (rank === "8") {
+        return (
+            <div className="playing-card__pips playing-card__pips--8">
+                <SuitIcon suit={suit} className="pip l r1" />
+                <SuitIcon suit={suit} className="pip l r3" />
+                <SuitIcon suit={suit} className="pip l r5 rot" />
+                <SuitIcon suit={suit} className="pip m r2" />
+                <SuitIcon suit={suit} className="pip m r4 rot" />
+                <SuitIcon suit={suit} className="pip r r1" />
+                <SuitIcon suit={suit} className="pip r r3" />
+                <SuitIcon suit={suit} className="pip r r5 rot" />
+            </div>
+        );
+    }
+    if (rank === "9") {
+        return (
+            <div className="playing-card__pips playing-card__pips--9">
+                <SuitIcon suit={suit} className="pip l r1" />
+                <SuitIcon suit={suit} className="pip l r3" />
+                <SuitIcon suit={suit} className="pip l r5 rot" />
+                <SuitIcon suit={suit} className="pip l r7 rot" />
+                <SuitIcon suit={suit} className="pip m r4" />
+                <SuitIcon suit={suit} className="pip r r1" />
+                <SuitIcon suit={suit} className="pip r r3" />
+                <SuitIcon suit={suit} className="pip r r5 rot" />
+                <SuitIcon suit={suit} className="pip r r7 rot" />
+            </div>
+        );
+    }
+    if (rank === "10") {
+        return (
+            <div className="playing-card__pips playing-card__pips--10">
+                <SuitIcon suit={suit} className="pip l r1" />
+                <SuitIcon suit={suit} className="pip l r3" />
+                <SuitIcon suit={suit} className="pip l r5 rot" />
+                <SuitIcon suit={suit} className="pip l r7 rot" />
+                <SuitIcon suit={suit} className="pip m r2" />
+                <SuitIcon suit={suit} className="pip m r6 rot" />
+                <SuitIcon suit={suit} className="pip r r1" />
+                <SuitIcon suit={suit} className="pip r r3" />
+                <SuitIcon suit={suit} className="pip r r5 rot" />
+                <SuitIcon suit={suit} className="pip r r7 rot" />
+            </div>
+        );
+    }
+    // Default (e.g. "A"): single center icon
+    return <SuitIcon suit={suit} className="playing-card__center" />;
+}
+
 export default function PlayingCard({
     rank,
     suit,
@@ -59,7 +122,7 @@ export default function PlayingCard({
                 <SuitIcon suit={suit} />
             </div>
 
-            {/* Center: face card image OR plain suit icon */}
+            {/* Center: face card image OR plain suit icon / pips */}
             {faceImg ? (
                 <img
                     src={faceImg}
@@ -68,7 +131,7 @@ export default function PlayingCard({
                     draggable="false"
                 />
             ) : (
-                <SuitIcon suit={suit} className="playing-card__center" />
+                renderPips(rank, suit)
             )}
 
             {/* Bottom-right corner: rank + suit (rotated) */}
@@ -78,4 +141,5 @@ export default function PlayingCard({
             </div>
         </div>
     );
-}
+}
+
