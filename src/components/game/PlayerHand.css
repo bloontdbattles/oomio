@@ -26,9 +26,10 @@
     cursor: pointer;
 
     /* Scaled custom properties */
-    --pip-size: 34px !important;
+    --pip-size: 51px !important;
     --center-pip-size: 110px !important;
 }
+
 
 
 .player-hand__card.playing-card:hover {
@@ -124,9 +125,10 @@
     margin-bottom: 60px;
 
     /* Scaled custom properties */
-    --pip-size: 18px !important;
+    --pip-size: 27px !important;
     --center-pip-size: 55px !important;
 }
+
 
 
 /* Scaling up selected card interior elements for 165px width */

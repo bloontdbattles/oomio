@@ -17,7 +17,7 @@
     width: 80px;
     height: 112px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    --pip-size: 10px;
+    --pip-size: 15px;
     --center-pip-size: 26px;
 }
 
@@ -49,7 +49,7 @@
     .played-cards__slot .playing-card {
         width: 60px;
         height: 84px;
-        --pip-size: 8px;
+        --pip-size: 12px;
         --center-pip-size: 20px;
     }
     .played-cards__slot--bottom { bottom: 10px; }
@@ -57,4 +57,5 @@
     .played-cards__slot--left { left: 10px; }
     .played-cards__slot--right { right: 10px; }
 }
+
 
