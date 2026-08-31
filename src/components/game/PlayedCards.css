@@ -46,16 +46,27 @@
         width: 220px;
         height: 220px;
     }
+
     .played-cards__slot .playing-card {
         width: 60px;
         height: 84px;
         --pip-size: 12px;
         --center-pip-size: 20px;
     }
-    .played-cards__slot--bottom { bottom: 10px; }
-    .played-cards__slot--top { top: 10px; }
-    .played-cards__slot--left { left: 10px; }
-    .played-cards__slot--right { right: 10px; }
+
+    .played-cards__slot--bottom {
+        bottom: 10px;
+    }
+
+    .played-cards__slot--top {
+        top: 10px;
+    }
+
+    .played-cards__slot--left {
+        left: 10px;
+    }
+
+    .played-cards__slot--right {
+        right: 10px;
+    }
 }
-
-
