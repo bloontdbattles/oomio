@@ -1,7 +1,7 @@
 .playing-card {
     position: relative;
     width: 152px;
-    height: 212px;
+    height: 239px;  /* 152 × (260/165) = 239 — exact same ratio as hand card */
     border-radius: 14px;
     background: linear-gradient(160deg, #ffffff, #f7f5ee);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.06);

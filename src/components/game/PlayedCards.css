@@ -1,7 +1,7 @@
 .played-cards {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 500px;
+    height: 500px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -13,60 +13,51 @@
     perspective: 800px;
 }
 
+/* Exactly 165 × 260 — identical to the hand card */
 .played-cards__slot .playing-card {
-    width: 80px;
-    height: 112px;
+    width: 165px;
+    height: 260px;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    --pip-size: 15px;
-    --center-pip-size: 26px;
+    --pip-size: 27px;
+    --center-pip-size: 55px;
 }
 
 .played-cards__slot--bottom {
-    bottom: 20px;
+    bottom: 40px;
     transform: translateY(0) rotate(-4deg);
 }
 
 .played-cards__slot--top {
-    top: 20px;
+    top: 40px;
     transform: translateY(0) rotate(6deg);
 }
 
 .played-cards__slot--left {
-    left: 20px;
+    left: 40px;
     transform: translateX(0) rotate(-12deg);
 }
 
 .played-cards__slot--right {
-    right: 20px;
+    right: 40px;
     transform: translateX(0) rotate(8deg);
 }
 
 @media (max-width: 600px) {
     .played-cards {
-        width: 220px;
-        height: 220px;
+        width: 320px;
+        height: 320px;
     }
 
+    /* 100 × 158 = exact 165:260 ratio at mobile size */
     .played-cards__slot .playing-card {
-        width: 60px;
-        height: 84px;
-        --pip-size: 12px;
-        --center-pip-size: 20px;
+        width: 100px;
+        height: 158px;
+        --pip-size: 16px;
+        --center-pip-size: 33px;
     }
 
-    .played-cards__slot--bottom {
-        bottom: 10px;
-    }
-
-    .played-cards__slot--top {
-        top: 10px;
-    }
-
-    .played-cards__slot--left {
-        left: 10px;
-    }
-
-    .played-cards__slot--right {
-        right: 10px;
-    }
+    .played-cards__slot--bottom { bottom: 20px; }
+    .played-cards__slot--top    { top: 20px; }
+    .played-cards__slot--left   { left: 20px; }
+    .played-cards__slot--right  { right: 20px; }
 }
