@@ -26,9 +26,11 @@
     cursor: pointer;
 
     /* Scaled custom properties */
-    --pip-size: 51px !important;
+    --pip-size: 68px !important;
     --center-pip-size: 110px !important;
 }
+
+
 
 
 
@@ -42,10 +44,12 @@
     font-size: 3.2rem !important;
 }
 
-.player-hand__card .playing-card__suit-icon {
-    width: 38px !important;
-    height: 38px !important;
+.player-hand__card .playing-card__corner .playing-card__suit-icon {
+    width: 76px !important;
+    height: 76px !important;
 }
+
+
 
 .player-hand__card .playing-card__corner--top {
     top: 18px !important;
@@ -125,9 +129,11 @@
     margin-bottom: 60px;
 
     /* Scaled custom properties */
-    --pip-size: 27px !important;
+    --pip-size: 36px !important;
     --center-pip-size: 55px !important;
 }
+
+
 
 
 
@@ -136,10 +142,12 @@
     font-size: 1.6rem !important;
 }
 
-.player-hand__selected-card .playing-card__suit-icon {
-    width: 19px !important;
-    height: 19px !important;
+.player-hand__selected-card .playing-card__corner .playing-card__suit-icon {
+    width: 38px !important;
+    height: 38px !important;
 }
+
+
 
 .player-hand__selected-card .playing-card__corner--top {
     top: 10px !important;
@@ -171,4 +179,3 @@
     z-index: 30;
     pointer-events: auto;
 }
-

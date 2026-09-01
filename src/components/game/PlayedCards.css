@@ -21,9 +21,10 @@
     width: 82px;
     height: 130px;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
-    --pip-size: 13px;
+    --pip-size: 19px;
     --center-pip-size: 27px;
 }
+
 
 .played-cards__slot--bottom {
     bottom: 30px;
@@ -55,12 +56,24 @@
     .played-cards__slot .playing-card {
         width: 50px;
         height: 79px;
-        --pip-size: 8px;
+        --pip-size: 12px;
         --center-pip-size: 16px;
     }
 
-    .played-cards__slot--bottom { bottom: 16px; }
-    .played-cards__slot--top    { top: 16px; }
-    .played-cards__slot--left   { left: 16px; }
-    .played-cards__slot--right  { right: 16px; }
+
+    .played-cards__slot--bottom {
+        bottom: 16px;
+    }
+
+    .played-cards__slot--top {
+        top: 16px;
+    }
+
+    .played-cards__slot--left {
+        left: 16px;
+    }
+
+    .played-cards__slot--right {
+        right: 16px;
+    }
 }
