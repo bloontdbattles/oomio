@@ -85,7 +85,11 @@
     justify-content: center;
     z-index: 5;
     pointer-events: none;
+    /* 3D perspective so child rotateX looks correct */
+    perspective: 600px;
+    perspective-origin: 50% 50%;
 }
+
 
 /* Opponent positioning at the top edge of trapezoid table wrapper */
 .game-table__seat-container {

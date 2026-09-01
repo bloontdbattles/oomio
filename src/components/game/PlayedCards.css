@@ -1,63 +1,66 @@
 .played-cards {
     position: relative;
-    width: 500px;
-    height: 500px;
+    width: 360px;
+    height: 360px;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* 3D tilt: makes the card area look like it's lying flat on the green felt */
+    transform: rotateX(30deg);
+    transform-style: preserve-3d;
 }
 
 .played-cards__slot {
     position: absolute;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    perspective: 800px;
 }
 
-/* Exactly 165 × 260 — identical to the hand card */
+/* 50% of 165×260 = 82×130 — same ratio, half size */
 .played-cards__slot .playing-card {
-    width: 165px;
-    height: 260px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-    --pip-size: 27px;
-    --center-pip-size: 55px;
+    width: 82px;
+    height: 130px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
+    --pip-size: 13px;
+    --center-pip-size: 27px;
 }
 
 .played-cards__slot--bottom {
-    bottom: 40px;
-    transform: translateY(0) rotate(-4deg);
+    bottom: 30px;
+    transform: rotate(-4deg);
 }
 
 .played-cards__slot--top {
-    top: 40px;
-    transform: translateY(0) rotate(6deg);
+    top: 30px;
+    transform: rotate(6deg);
 }
 
 .played-cards__slot--left {
-    left: 40px;
-    transform: translateX(0) rotate(-12deg);
+    left: 30px;
+    transform: rotate(-12deg);
 }
 
 .played-cards__slot--right {
-    right: 40px;
-    transform: translateX(0) rotate(8deg);
+    right: 30px;
+    transform: rotate(8deg);
 }
 
 @media (max-width: 600px) {
     .played-cards {
-        width: 320px;
-        height: 320px;
+        width: 240px;
+        height: 240px;
     }
 
-    /* 100 × 158 = exact 165:260 ratio at mobile size */
+    /* 50px × 79px — same 165:260 ratio at mobile */
     .played-cards__slot .playing-card {
-        width: 100px;
-        height: 158px;
-        --pip-size: 16px;
-        --center-pip-size: 33px;
+        width: 50px;
+        height: 79px;
+        --pip-size: 8px;
+        --center-pip-size: 16px;
     }
 
-    .played-cards__slot--bottom { bottom: 20px; }
-    .played-cards__slot--top    { top: 20px; }
-    .played-cards__slot--left   { left: 20px; }
-    .played-cards__slot--right  { right: 20px; }
+    .played-cards__slot--bottom { bottom: 16px; }
+    .played-cards__slot--top    { top: 16px; }
+    .played-cards__slot--left   { left: 16px; }
+    .played-cards__slot--right  { right: 16px; }
 }
