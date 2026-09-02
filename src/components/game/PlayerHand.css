@@ -45,10 +45,9 @@
 }
 
 .player-hand__card .playing-card__corner .playing-card__suit-icon {
-    width: 76px !important;
-    height: 76px !important;
+    width: 38px !important;
+    height: 38px !important;
 }
-
 
 
 .player-hand__card .playing-card__corner--top {
@@ -143,10 +142,9 @@
 }
 
 .player-hand__selected-card .playing-card__corner .playing-card__suit-icon {
-    width: 38px !important;
-    height: 38px !important;
+    width: 19px !important;
+    height: 19px !important;
 }
-
 
 
 .player-hand__selected-card .playing-card__corner--top {

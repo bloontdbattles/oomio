@@ -62,14 +62,13 @@
 
 
 .playing-card__suit-icon {
-    width: 28px;
-    height: 28px;
+    width: 16px;
+    height: 16px;
     object-fit: contain;
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
 }
-
 
 
 .playing-card__center {
@@ -104,12 +103,11 @@
 /* --- THE GRID MAGIC FOR PIP CARDS --- */
 .playing-card__pips {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    /* 3 Columns */
-    width: 70%;
+    grid-template-columns: 20% 1fr 1fr 1fr 20%;
+    /* Columns 1 & 5 = 20% (1/5 card width) empty spacers on left & right */
+    width: 100%;
     height: 74%;
-    margin: 13% auto;
-    /* Centers the grid inside the card */
+    margin: 13% 0;
 
     position: absolute;
     top: 0;
@@ -141,18 +139,17 @@
 
 /* Columns */
 .playing-card__pips .l {
-    grid-column: 1;
-    margin-left: 12.5%; /* 1/8 card width padding for 1st column */
+    grid-column: 2; /* 2nd column (after 1/5 left spacer) */
 }
 
-
 .playing-card__pips .m {
-    grid-column: 2;
+    grid-column: 3; /* 3rd column (center) */
 }
 
 .playing-card__pips .r {
-    grid-column: 3;
+    grid-column: 4; /* 4th column (before 1/5 right spacer) */
 }
+
 
 /* Rows */
 .playing-card__pips .r1 {
