@@ -61,7 +61,7 @@
 
 /* AI Player Seat styles */
 .player-seat--ai {
-    flex-direction: column !important; /* AI avatar image on top, name at bottom */
+    flex-direction: column-reverse !important; /* Username badge on top of head, avatar below */
     gap: 6px !important;
 }
 
@@ -92,9 +92,9 @@
 
 .player-seat--ai .player-seat__info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     background: rgba(3, 19, 10, 0.85);
     border: 1px solid rgba(246, 240, 222, 0.25);
     padding: 4px 10px;
@@ -102,7 +102,9 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     transition: border-color 0.3s ease;
+    z-index: 5;
 }
+
 
 .player-seat--ai.is-active .player-seat__info {
     border-color: var(--oomio-gold);
