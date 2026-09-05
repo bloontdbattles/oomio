@@ -18,9 +18,9 @@ import "./GameTable.css";
 const TABLE_CONFIG = {
     // Table Dimensions
     width: "80%",           // Width of the table container (e.g., "90%" or "820px")
-    maxWidth: 1200,         // Maximum width in pixels
-    height: 450,           // Height of the table in pixels
-    marginTop: 60,         // Space above the table for opponent avatars
+    maxWidth: 1100,         // Maximum width in pixels
+    height: 400,           // Height of the table in pixels
+    marginTop: 100,// Space above the table for opponent avatars
     marginBottom: 220,      // Space below the table
 
     // Table Perspective Shape
@@ -43,21 +43,21 @@ const OPPONENT_CONFIG = {
         tableOverlap: 45,      // pixels
         horizontalPos: 18,     // % position along top edge of table
         offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 250,          // fine-tuning Y offset in pixels
+        offsetY: 150,          // fine-tuning Y offset in pixels
     },
     top: {
         scale: 130,            // size percentage (e.g. 100 = 100%, 120 = 120%)
         tableOverlap: 45,      // pixels
         horizontalPos: 50,     // % position along top edge of table
         offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 40,           // fine-tuning Y offset in pixels
+        offsetY: -20,           // fine-tuning Y offset in pixels
     },
     right: {
         scale: 200,            // size percentage (e.g. 100 = 100%, 120 = 120%)
         tableOverlap: 45,      // pixels
         horizontalPos: 82,     // % position along top edge of table
         offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 250,          // fine-tuning Y offset in pixels
+        offsetY: 150,          // fine-tuning Y offset in pixels
     }
 };
 // ─────────────────────────────────────────────────────────────────────────────
