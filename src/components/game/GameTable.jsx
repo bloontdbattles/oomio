@@ -69,9 +69,9 @@ const OPPONENT_CONFIG = {
 const MOBILE_TABLE_CONFIG = {
     width: "95%",           // Width of the table container
     maxWidth: 600,         // Maximum width in pixels
-    height: 440,           // Height of the table in pixels
+    height: 400,           // Height of the table in pixels
     marginTop: 200,         // Space above the table for opponent avatars
-    marginBottom: 180,     // Space below the table
+    marginBottom: 280,     // Space below the table
 
     topCornerWidth: 35,    // percentage (%)
 
@@ -87,22 +87,22 @@ const MOBILE_OPPONENT_CONFIG = {
         scale: 180,             // size percentage
         tableOverlap: 20,      // pixels
         horizontalPos: 18,     // % position along top edge of table
-        offsetX: -30,            // fine-tuning X offset in pixels
-        offsetY: 200,          // fine-tuning Y offset in pixels
+        offsetX: -40,            // fine-tuning X offset in pixels
+        offsetY: 140,          // fine-tuning Y offset in pixels
     },
     top: {
         scale: 130,             // size percentage
         tableOverlap: 20,      // pixels
         horizontalPos: 50,     // % position along top edge of table
         offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 60,           // fine-tuning Y offset in pixels
+        offsetY: 0,           // fine-tuning Y offset in pixels
     },
     right: {
         scale: 180,             // size percentage
         tableOverlap: 20,      // pixels
         horizontalPos: 82,     // % position along top edge of table
-        offsetX: 30,            // fine-tuning X offset in pixels
-        offsetY: 200,          // fine-tuning Y offset in pixels
+        offsetX: 40,            // fine-tuning X offset in pixels
+        offsetY: 140,          // fine-tuning Y offset in pixels
     }
 };
 // ─────────────────────────────────────────────────────────────────────────────
