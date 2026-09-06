@@ -1,0 +1,119 @@
+.lobby {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: radial-gradient(
+    120% 90% at 50% -10%,
+    var(--oomio-green-500) 0%,
+    var(--oomio-green-600) 38%,
+    var(--oomio-green-900) 100%
+  );
+  color: var(--oomio-cream);
+  font-family: var(--font-body);
+}
+
+.lobby__texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  background-image: radial-gradient(
+    rgba(246, 240, 222, 0.1) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
+.lobby__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    120% 100% at 50% 50%,
+    transparent 40%,
+    var(--oomio-green-950) 130%
+  );
+}
+
+.lobby__content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 48px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.lobby__header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 26px;
+}
+
+.lobby__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(246, 240, 222, 0.6);
+  margin: 0 0 4px;
+}
+
+.lobby__code {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: 0.1em;
+  color: var(--oomio-gold);
+  margin: 0;
+}
+
+.lobby__count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: rgba(246, 240, 222, 0.75);
+  margin: 0;
+}
+
+.lobby__prompt {
+  font-size: 0.9rem;
+  color: var(--oomio-gold);
+  margin: 0 0 16px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.lobby__teams {
+  width: 100%;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.lobby__start.btn {
+  width: 100%;
+  max-width: 320px;
+  margin-top: auto;
+}
+
+.lobby__start.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 560px) {
+  .lobby__teams {
+    flex-direction: column;
+  }
+}
