@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import Avatar from "../components/common/Avatar";
+import LobbySettingsModal from "../components/lobby/LobbySettingsModal";
+import JoinLobbyModal from "../components/lobby/JoinLobbyModal";
 import "./GameMode.css";
 
 export default function GameMode() {
@@ -10,6 +12,8 @@ export default function GameMode() {
     const navigate = useNavigate();
     const [player, setPlayer] = useState(null);
     const [showFriendsOptions, setShowFriendsOptions] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [showJoinModal, setShowJoinModal] = useState(false);
 
     useEffect(() => {
         const stored = getPlayer();
@@ -21,6 +25,16 @@ export default function GameMode() {
     }, [navigate]);
 
     if (!player) return null;
+
+    const handleCreateLobby = (settings) => {
+        setShowSettingsModal(false);
+        navigate("/lobby", { state: { mode: "create", ...settings } });
+    };
+
+    const handleJoinLobby = (code) => {
+        setShowJoinModal(false);
+        navigate("/lobby", { state: { mode: "join", code } });
+    };
 
     return (
         <div className="game-mode">
@@ -96,7 +110,7 @@ export default function GameMode() {
                             <button
                                 type="button"
                                 className="mode-card mode-card--sub"
-                                onClick={() => navigate("/lobby?mode=create")}
+                                onClick={() => setShowSettingsModal(true)}
                             >
                                 <span className="mode-card__icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -110,7 +124,7 @@ export default function GameMode() {
                             <button
                                 type="button"
                                 className="mode-card mode-card--sub"
-                                onClick={() => navigate("/lobby?mode=join")}
+                                onClick={() => setShowJoinModal(true)}
                             >
                                 <span className="mode-card__icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -125,6 +139,18 @@ export default function GameMode() {
                     </div>
                 )}
             </main>
+
+            <LobbySettingsModal
+                isOpen={showSettingsModal}
+                onClose={() => setShowSettingsModal(false)}
+                onConfirm={handleCreateLobby}
+            />
+
+            <JoinLobbyModal
+                isOpen={showJoinModal}
+                onClose={() => setShowJoinModal(false)}
+                onJoin={handleJoinLobby}
+            />
         </div>
     );
 }
