@@ -1,0 +1,46 @@
+.lobby-settings__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin: 0 0 20px;
+    text-align: center;
+    color: var(--oomio-cream);
+}
+
+.lobby-settings__hint {
+    font-size: 0.8rem;
+    color: rgba(246, 240, 222, 0.6);
+    margin: 6px 0 18px;
+    line-height: 1.4;
+}
+
+.lobby-settings__options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.lobby-settings__option {
+    flex: 1;
+    min-width: 60px;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: 1px solid rgba(246, 240, 222, 0.25);
+    background: rgba(3, 19, 10, 0.3);
+    color: var(--oomio-cream);
+    font-family: var(--font-display);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.lobby-settings__option.is-selected {
+    background: rgba(232, 184, 75, 0.18);
+    border-color: var(--oomio-gold);
+    color: var(--oomio-gold);
+}
+
+.lobby-settings__confirm.btn {
+    width: 100%;
+}
