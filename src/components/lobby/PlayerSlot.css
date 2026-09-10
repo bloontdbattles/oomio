@@ -1,0 +1,117 @@
+.player-slot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(246, 240, 222, 0.15);
+    background: rgba(3, 19, 10, 0.3);
+    min-height: 60px;
+    position: relative;
+}
+
+.player-slot--empty {
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    border-style: dashed;
+    background: rgba(246, 240, 222, 0.04);
+}
+
+.player-slot__placeholder {
+    font-size: 0.8rem;
+    color: rgba(246, 240, 222, 0.45);
+    font-weight: 600;
+}
+
+.player-slot__add-bot,
+.player-slot__join {
+    border: none;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.player-slot__add-bot {
+    background: rgba(232, 184, 75, 0.15);
+    color: var(--oomio-gold);
+}
+
+.player-slot__add-bot:hover {
+    background: rgba(232, 184, 75, 0.28);
+}
+
+.player-slot__join {
+    background: rgba(246, 240, 222, 0.15);
+    color: var(--oomio-cream);
+}
+
+.player-slot__join:hover {
+    background: rgba(246, 240, 222, 0.28);
+}
+
+.player-slot__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.player-slot__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--oomio-cream);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-slot__tag {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--oomio-gold);
+    background: rgba(232, 184, 75, 0.15);
+    border-radius: 999px;
+    padding: 1px 8px;
+    width: fit-content;
+}
+
+.player-slot--bot .player-slot__tag {
+    color: rgba(246, 240, 222, 0.6);
+    background: rgba(246, 240, 222, 0.1);
+}
+
+.player-slot__actions {
+    display: flex;
+    gap: 6px;
+}
+
+.player-slot__action {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: rgba(246, 240, 222, 0.12);
+    color: var(--oomio-cream);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.player-slot__action:hover {
+    background: rgba(246, 240, 222, 0.22);
+}
+
+.player-slot__action--danger:hover {
+    background: rgba(194, 59, 59, 0.4);
+}
