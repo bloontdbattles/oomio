@@ -1,0 +1,39 @@
+.team-panel {
+    border-radius: 20px;
+    padding: 18px;
+    border: 1px solid rgba(246, 240, 222, 0.15);
+    background: linear-gradient(165deg, rgba(246, 240, 222, 0.06), rgba(3, 19, 10, 0.3));
+    flex: 1;
+    min-width: 220px;
+}
+
+.team-panel--red {
+    border-top: 3px solid #c23b3b;
+}
+
+.team-panel--blue {
+    border-top: 3px solid #2f7fd6;
+}
+
+.team-panel__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 0 0 14px;
+    text-align: center;
+    letter-spacing: 0.03em;
+}
+
+.team-panel--red .team-panel__title {
+    color: #e28a8a;
+}
+
+.team-panel--blue .team-panel__title {
+    color: #8ab8ea;
+}
+
+.team-panel__slots {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
