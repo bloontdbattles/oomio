@@ -5,10 +5,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
-    /* 3D tilt: makes the card area look like it's lying flat on the green felt */
-    transform: rotateX(30deg);
-    transform-style: preserve-3d;
 }
 
 .played-cards__slot {
@@ -16,15 +12,13 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 50% of 165×260 = 82×130 — same ratio, half size */
+/* 50% of 165×260 = 82.5×130 — same ratio, half size */
 .played-cards__slot .playing-card {
-    width: 82px;
+    width: 82.5px;
     height: 130px;
+    border-radius: 0 !important;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
-    --pip-size: 19px;
-    --center-pip-size: 27px;
 }
-
 
 .played-cards__slot--bottom {
     bottom: 30px;
@@ -52,14 +46,12 @@
         height: 240px;
     }
 
-    /* 50px × 79px — same 165:260 ratio at mobile */
+    /* 50px × 78.8px — same 165:260 ratio at mobile */
     .played-cards__slot .playing-card {
         width: 50px;
-        height: 79px;
-        --pip-size: 12px;
-        --center-pip-size: 16px;
+        height: 78.8px;
+        border-radius: 0 !important;
     }
-
 
     .played-cards__slot--bottom {
         bottom: 16px;

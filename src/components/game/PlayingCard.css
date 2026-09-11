@@ -3,7 +3,7 @@
     width: 165px;
     height: 260px;
     aspect-ratio: 165 / 260;
-    border-radius: 8.5cqw;
+    border-radius: 5cqw;
     background: linear-gradient(160deg, #ffffff, #f7f5ee);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
     display: flex;
