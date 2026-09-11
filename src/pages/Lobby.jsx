@@ -17,10 +17,7 @@ export default function Lobby() {
 
   const currentPlayer = useMemo(() => getPlayer(), []);
   const currentPlayerId = currentPlayer?.playerId || "you";
-  const roomCode = useMemo(
-    () => state.code || generateRoomCode(),
-    [state.code],
-  );
+  const roomCode = useMemo(() => state.code || generateRoomCode(), [state.code]);
 
   // Placeholder lobby state. Real version will sync through Firebase once
   // multiplayer (Phase 5) is wired in - for now everything lives in this
@@ -29,11 +26,7 @@ export default function Lobby() {
     if (isCreator) {
       return {
         red: [
-          {
-            id: currentPlayerId,
-            name: currentPlayer?.name || "You",
-            isHost: true,
-          },
+          { id: currentPlayerId, name: currentPlayer?.name || "You", isHost: true },
           null,
         ],
         blue: [null, null],
@@ -47,9 +40,7 @@ export default function Lobby() {
 
   const isSeated = useMemo(() => {
     if (isCreator) return true;
-    return [...teams.red, ...teams.blue].some(
-      (p) => p && p.id === currentPlayerId,
-    );
+    return [...teams.red, ...teams.blue].some((p) => p && p.id === currentPlayerId);
   }, [teams, isCreator, currentPlayerId]);
 
   const filledCount = [...teams.red, ...teams.blue].filter(Boolean).length;
@@ -86,17 +77,13 @@ export default function Lobby() {
 
   const handleMoveTeam = (playerId) => {
     setTeams((prev) => {
-      const fromColor = prev.red.some((p) => p && p.id === playerId)
-        ? "red"
-        : "blue";
+      const fromColor = prev.red.some((p) => p && p.id === playerId) ? "red" : "blue";
       const toColor = fromColor === "red" ? "blue" : "red";
       const toEmptyIndex = prev[toColor].findIndex((p) => !p);
       if (toEmptyIndex === -1) return prev; // other team is full, nothing to do
 
       const player = prev[fromColor].find((p) => p && p.id === playerId);
-      const nextFrom = prev[fromColor].map((p) =>
-        p && p.id === playerId ? null : p,
-      );
+      const nextFrom = prev[fromColor].map((p) => (p && p.id === playerId ? null : p));
       const nextTo = [...prev[toColor]];
       nextTo[toEmptyIndex] = player;
 
@@ -152,11 +139,7 @@ export default function Lobby() {
         </div>
 
         {isCreator && (
-          <Button
-            className="lobby__start"
-            onClick={handleStartGame}
-            disabled={!canStart}
-          >
+          <Button className="lobby__start" onClick={handleStartGame} disabled={!canStart}>
             {t("startGame")}
           </Button>
         )}
