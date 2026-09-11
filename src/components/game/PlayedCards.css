@@ -5,6 +5,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    /* 3D tilt: makes the card area look like it's lying flat on the green felt */
+    transform: rotateX(30deg);
+    transform-style: preserve-3d;
 }
 
 .played-cards__slot {
