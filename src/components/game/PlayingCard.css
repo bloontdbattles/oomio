@@ -1,26 +1,25 @@
 .playing-card {
     position: relative;
-    width: 152px;
-    height: 239px;
-    /* 152 × (260/165) = 239 — exact same ratio as hand card */
-    border-radius: 14px;
+    width: 165px;
+    height: 260px;
+    aspect-ratio: 165 / 260;
+    border-radius: 8.5cqw;
     background: linear-gradient(160deg, #ffffff, #f7f5ee);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.06);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 10px 12px;
+    padding: 0;
     font-family: var(--font-display);
     user-select: none;
     -webkit-user-select: none;
+    container-type: size;
+    box-sizing: border-box;
 
-    /* Custom variable sizes for card scales */
-    --pip-size: 36px;
-    --center-pip-size: 50px;
+    /* Scaled custom properties using container query units */
+    --pip-size: 21.8cqw;
+    --center-pip-size: 33.3cqw;
 }
-
-
-
 
 .playing-card.is-red {
     color: #c23b3b;
@@ -36,47 +35,43 @@
     flex-direction: column;
     align-items: center;
     line-height: 1;
-    gap: 3px;
+    gap: 1.2cqh;
     z-index: 2;
-    /* sit above face-art image */
 }
 
 .playing-card__corner--top {
-    top: 8px;
-    left: 10px;
+    top: 3.8cqh;
+    left: 6cqw;
 }
 
 .playing-card__corner--bottom {
-    bottom: 8px;
-    right: 10px;
+    bottom: 3.8cqh;
+    right: 6cqw;
     transform: rotate(180deg);
 }
 
 .playing-card__rank {
     font-family: var(--font-card-rank);
-    font-size: 1.15rem;
+    font-size: 15.5cqw;
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.95;
 }
 
-
-
-.playing-card__suit-icon {
-    width: 16px;
-    height: 16px;
+.playing-card__corner .playing-card__suit-icon {
+    width: 11.5cqw;
+    height: 11.5cqw;
     object-fit: contain;
     pointer-events: none;
     user-select: none;
     -webkit-user-select: none;
 }
 
-
 .playing-card__center {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: var(--center-pip-size, 50px);
-    height: var(--center-pip-size, 50px);
+    width: var(--center-pip-size, 33.3cqw);
+    height: var(--center-pip-size, 33.3cqw);
     transform: translate(-50%, -50%);
     opacity: 0.9;
     object-fit: contain;
@@ -84,8 +79,6 @@
     user-select: none;
     -webkit-user-select: none;
 }
-
-
 
 /* Face card full-bleed artwork (J / Q / K) */
 .playing-card__face-art {
@@ -106,14 +99,11 @@
     grid-template-columns: 20% 1fr 1fr 1fr 20%;
     /* Columns 1 & 5 = 20% (1/5 card width) empty spacers on left & right */
     width: 100%;
-    height: 74%;
-    margin: 13% 0;
-
+    height: 64cqh;
     position: absolute;
-    top: 0;
+    top: 18cqh;
     left: 0;
     right: 0;
-    bottom: 0;
     pointer-events: none;
 }
 
@@ -131,8 +121,8 @@
 
 /* Pip Settings */
 .playing-card__pips .pip {
-    width: var(--pip-size, 36px) !important;
-    height: var(--pip-size, 36px) !important;
+    width: var(--pip-size, 21.8cqw) !important;
+    height: var(--pip-size, 21.8cqw) !important;
     justify-self: center;
     align-self: center;
 }
@@ -149,7 +139,6 @@
 .playing-card__pips .r {
     grid-column: 4; /* 4th column (before 1/5 right spacer) */
 }
-
 
 /* Rows */
 .playing-card__pips .r1 {
