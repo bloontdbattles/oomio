@@ -117,6 +117,11 @@ const MOBILE_OPPONENT_CONFIG = {
 // AI difficulty applied to all bot seats. Can be made per-seat later.
 const AI_DIFFICULTY_LEVEL = AI_DIFFICULTY.MEDIUM;
 
+// Timing Delays (in ms)
+const AI_PLAY_DELAY_MS = 2000;       // Cooldown delay before AI plays a card (lets players see previous plays)
+const AI_TRUMP_DELAY_MS = 1500;      // Delay before AI selects trump
+const TRICK_CLEAR_DELAY_MS = 5000;    // Pause keeping completed 4-card trick on table for 5s before clearing
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /**
@@ -189,16 +194,15 @@ export default function GameTable() {
         return () => window.removeEventListener("resize", onResize);
     }, []);
 
-    // ── Effect A: Trick completion pause ──────────────────────────────────────
-    // When a trick is fully played, show it for 1500ms before clearing the table.
+    // ── Effect A & B: Unified Trick Display & Completion Pause ────────────────
+    // Manages live trick cards and holds all 4 completed cards on table for 5 seconds.
     useEffect(() => {
         const newLen = engineState.completedTricks.length;
 
-        // New round or fresh start — reset display state
+        // Reset display state on new round or fresh game
         if (
             engineState.phase === PHASES.TRUMP_SELECTION ||
-            engineState.phase === PHASES.DEALING ||
-            newLen === 0
+            engineState.phase === PHASES.DEALING
         ) {
             completedLenRef.current = 0;
             setPaused(false);
@@ -206,8 +210,8 @@ export default function GameTable() {
             return;
         }
 
+        // A trick just completed (newLen increased) — show all 4 cards for 5 seconds
         if (newLen > completedLenRef.current) {
-            // A trick just completed. Show it, then pause AI for 1500ms.
             const lastTrick = engineState.completedTricks[newLen - 1];
             setShownTrick(trickToPlayedCards(lastTrick));
             setPaused(true);
@@ -216,19 +220,15 @@ export default function GameTable() {
                 completedLenRef.current = newLen;
                 setPaused(false);
                 setShownTrick({});
-            }, 1500);
+            }, TRICK_CLEAR_DELAY_MS);
             return () => clearTimeout(timer);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [engineState.completedTricks, engineState.phase]);
 
-    // ── Effect B: Live trick display ──────────────────────────────────────────
-    // While a trick is in progress (not pausing after completion), mirror it live.
-    useEffect(() => {
-        if (!paused) {
+        // Mirror live trick while trick is in progress (if not in completion pause)
+        if (completedLenRef.current === newLen) {
             setShownTrick(trickToPlayedCards(engineState.currentTrick));
         }
-    }, [engineState.currentTrick, paused]);
+    }, [engineState.completedTricks, engineState.currentTrick, engineState.phase]);
 
     // ── Effect C: AI trump selection ──────────────────────────────────────────
     useEffect(() => {
@@ -244,7 +244,7 @@ export default function GameTable() {
             } catch (e) {
                 console.error("AI trump selection error:", e);
             }
-        }, 800);
+        }, AI_TRUMP_DELAY_MS);
         return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engineState.phase, engineState.trumpChooserSeat]);
@@ -286,7 +286,7 @@ export default function GameTable() {
             } catch (e) {
                 console.error("AI card play error:", e);
             }
-        }, 1000);
+        }, AI_PLAY_DELAY_MS);
         return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engineState.currentTurn, engineState.phase, paused]);
