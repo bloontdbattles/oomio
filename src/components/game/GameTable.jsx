@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useContext } from "react";
-import { getPlayer } from "../../utils/localStorage";
+import { useReducer, useEffect, useRef, useState, useCallback } from "react";
+import { getPlayer as getStoredPlayer } from "../../utils/localStorage";
 import PlayerSeat from "./PlayerSeat";
 import PlayedCards from "./PlayedCards";
 import PlayerHand from "./PlayerHand";
@@ -12,352 +12,371 @@ import player2Img from "../../assets/images/player2.png";
 import player3Img from "../../assets/images/player3.png";
 import "./GameTable.css";
 
+// ── Engine ────────────────────────────────────────────────────────────────────
+import {
+    gameReducer,
+    dealAction,
+    selectTrumpAction,
+    playCardAction,
+    startNextRoundAction,
+    createInitialState,
+} from "../../game/engine/gameReducer";
+import { PHASES } from "../../game/engine/gameState";
+import { isLegalMove } from "../../game/rules/cardRules";
+import { getAICard, getAITrump } from "../../game/ai/aiPlayer";
+import { AI_DIFFICULTY } from "../../game/ai/aiDifficulty";
+
+// ── Bridge (UI ↔ Engine adapters) ─────────────────────────────────────────────
+import {
+    SEAT_INDEX_TO_NAME,
+    SUIT_FULL_TO_CODE,
+    SUIT_CODE_TO_FULL,
+    addIdsToHands,
+    trickToPlayedCards,
+    handToDisplayCards,
+} from "../../game/bridge";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // CONFIGURATION: ADJUST TABLE AND OPPONENT SIZES / POSITIONS HERE
 // ─────────────────────────────────────────────────────────────────────────────
 const TABLE_CONFIG = {
-    // Table Dimensions
-    width: "80%",           // Width of the table container (e.g., "90%" or "820px")
-    maxWidth: 1100,         // Maximum width in pixels
-    height: 400,           // Height of the table in pixels
-    marginTop: 100,// Space above the table for opponent avatars
-    marginBottom: 220,      // Space below the table
-
-    // Table Perspective Shape
-    // The top edge of the trapezoid starts at topCornerWidth% and ends at (100 - topCornerWidth)%
-    // A smaller percentage makes the top edge wider (flatter look), larger makes it narrower (more perspective).
-    topCornerWidth: 35,    // percentage (%)
-
-    // Wood Border & Insets
-    woodBorderThickness: 10,  // top/bottom wood border thickness in pixels
-    woodBorderSideGap: 30,    // left/right wood border gap in pixels
+    width: "80%",
+    maxWidth: 1100,
+    height: 400,
+    marginTop: 100,
+    marginBottom: 220,
+    topCornerWidth: 35,
+    woodBorderThickness: 10,
+    woodBorderSideGap: 30,
 };
 
 const OPPONENT_CONFIG = {
-    // Base dimensions for the player images (in pixels)
     baseWidth: 140,
     baseHeight: 160,
-
     left: {
-        scale: 200,            // size percentage (e.g. 100 = 100%, 120 = 120%)
-        tableOverlap: 45,      // pixels
-        horizontalPos: 18,     // % position along top edge of table
-        offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 150,          // fine-tuning Y offset in pixels
+        scale: 200,
+        tableOverlap: 45,
+        horizontalPos: 18,
+        offsetX: 0,
+        offsetY: 150,
     },
     top: {
-        scale: 130,            // size percentage (e.g. 100 = 100%, 120 = 120%)
-        tableOverlap: 45,      // pixels
-        horizontalPos: 50,     // % position along top edge of table
-        offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: -20,           // fine-tuning Y offset in pixels
+        scale: 130,
+        tableOverlap: 45,
+        horizontalPos: 50,
+        offsetX: 0,
+        offsetY: -20,
     },
     right: {
-        scale: 200,            // size percentage (e.g. 100 = 100%, 120 = 120%)
-        tableOverlap: 45,      // pixels
-        horizontalPos: 82,     // % position along top edge of table
-        offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 150,          // fine-tuning Y offset in pixels
-    }
+        scale: 200,
+        tableOverlap: 45,
+        horizontalPos: 82,
+        offsetX: 0,
+        offsetY: 150,
+    },
 };
-// ─────────────────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MOBILE CONFIGURATION: ADJUST TABLE AND OPPONENT SIZES / POSITIONS FOR MOBILE
-// (applies at screen width ≤ 768px)
-// ─────────────────────────────────────────────────────────────────────────────
 const MOBILE_TABLE_CONFIG = {
-    width: "95%",           // Width of the table container
-    maxWidth: 600,         // Maximum width in pixels
-    height: 400,           // Height of the table in pixels
-    marginTop: 200,         // Space above the table for opponent avatars
-    marginBottom: 280,     // Space below the table
-
-    topCornerWidth: 35,    // percentage (%)
-
-    woodBorderThickness: 6,   // top/bottom wood border thickness in pixels
-    woodBorderSideGap: 16,    // left/right wood border gap in pixels
+    width: "95%",
+    maxWidth: 600,
+    height: 400,
+    marginTop: 200,
+    marginBottom: 280,
+    topCornerWidth: 35,
+    woodBorderThickness: 6,
+    woodBorderSideGap: 16,
 };
 
 const MOBILE_OPPONENT_CONFIG = {
     baseWidth: 140,
     baseHeight: 160,
-
     left: {
-        scale: 180,             // size percentage
-        tableOverlap: 20,      // pixels
-        horizontalPos: 18,     // % position along top edge of table
-        offsetX: -40,            // fine-tuning X offset in pixels
-        offsetY: 140,          // fine-tuning Y offset in pixels
+        scale: 180,
+        tableOverlap: 20,
+        horizontalPos: 18,
+        offsetX: -40,
+        offsetY: 140,
     },
     top: {
-        scale: 130,             // size percentage
-        tableOverlap: 20,      // pixels
-        horizontalPos: 50,     // % position along top edge of table
-        offsetX: 0,            // fine-tuning X offset in pixels
-        offsetY: 0,           // fine-tuning Y offset in pixels
+        scale: 130,
+        tableOverlap: 20,
+        horizontalPos: 50,
+        offsetX: 0,
+        offsetY: 0,
     },
     right: {
-        scale: 180,             // size percentage
-        tableOverlap: 20,      // pixels
-        horizontalPos: 82,     // % position along top edge of table
-        offsetX: 40,            // fine-tuning X offset in pixels
-        offsetY: 140,          // fine-tuning Y offset in pixels
-    }
+        scale: 180,
+        tableOverlap: 20,
+        horizontalPos: 82,
+        offsetX: 40,
+        offsetY: 140,
+    },
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
+// AI difficulty applied to all bot seats. Can be made per-seat later.
+const AI_DIFFICULTY_LEVEL = AI_DIFFICULTY.MEDIUM;
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-const SUITS = ["hearts", "diamonds", "clubs", "spades"];
-const RANKS = [
-    { rank: "7", value: 7 },
-    { rank: "8", value: 8 },
-    { rank: "9", value: 9 },
-    { rank: "10", value: 10 },
-    { rank: "J", value: 11 },
-    { rank: "Q", value: 12 },
-    { rank: "K", value: 13 },
-    { rank: "A", value: 14 }
-];
+/**
+ * Hide other players' hands before passing state to AI.
+ * AI must only see its own hand + public information (trump, currentTrick, completedTricks).
+ */
+function buildAIViewState(state, mySeat) {
+    return {
+        ...state,
+        players: state.players.map((p) =>
+            p.seat === mySeat ? p : { ...p, hand: [] }
+        ),
+    };
+}
 
-const SEAT_ORDER = ["bottom", "left", "top", "right"];
+/**
+ * Wrapped reducer that:
+ *  - Injects stable card IDs after dealing (for UI selection tracking)
+ *  - Handles a synthetic RESET action for game-over restarts
+ */
+function gameReducerWithIds(state, action) {
+    if (action.type === "RESET") {
+        const fresh = createInitialState();
+        const dealt = gameReducer(fresh, dealAction());
+        return { ...dealt, players: addIdsToHands(dealt.players) };
+    }
+    const next = gameReducer(state, action);
+    if (action.type === "DEAL" || action.type === "START_NEXT_ROUND") {
+        return { ...next, players: addIdsToHands(next.players) };
+    }
+    return next;
+}
 
+/** Initialize the reducer already in TRUMP_SELECTION (skip DEALING phase). */
+function initEngineState() {
+    const base = createInitialState();
+    const dealt = gameReducer(base, dealAction());
+    return { ...dealt, players: addIdsToHands(dealt.players) };
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function GameTable() {
-    const [player, setPlayer] = useState({ name: "Player" });
-    const [gameState, setGameState] = useState("bidding"); // bidding | playing | result
-    const [trumpSuit, setTrumpSuit] = useState(null);
-    const [playerHand, setPlayerHand] = useState([]);
-    const [aiHands, setAiHands] = useState({ left: [], top: [], right: [] });
+    const [engineState, dispatch] = useReducer(
+        gameReducerWithIds,
+        undefined,
+        initEngineState
+    );
 
-    // Detect mobile screen width (≤ 768px) to switch config
+    const [playerName, setPlayerName] = useState("Player");
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    // Trick display: hold the last completed trick visible for 1500ms before clearing
+    const [shownTrick, setShownTrick] = useState({});
+    const [paused, setPaused] = useState(false);
+    const completedLenRef = useRef(0);
+
+    const tCfg = isMobile ? MOBILE_TABLE_CONFIG : TABLE_CONFIG;
+    const oCfg = isMobile ? MOBILE_OPPONENT_CONFIG : OPPONENT_CONFIG;
+
+    // ── Load player name ──────────────────────────────────────────────────────
+    useEffect(() => {
+        const stored = getStoredPlayer();
+        if (stored?.name) setPlayerName(stored.name);
+    }, []);
+
+    // ── Responsive ────────────────────────────────────────────────────────────
     useEffect(() => {
         const onResize = () => setIsMobile(window.innerWidth <= 768);
         window.addEventListener("resize", onResize);
         return () => window.removeEventListener("resize", onResize);
     }, []);
 
-    // Pick the correct config based on screen size
-    const tCfg = isMobile ? MOBILE_TABLE_CONFIG : TABLE_CONFIG;
-    const oCfg = isMobile ? MOBILE_OPPONENT_CONFIG : OPPONENT_CONFIG;
-    const [playedCards, setPlayedCards] = useState({});
-    const [activeSeat, setActiveSeat] = useState("bottom");
-    const [leadSuit, setLeadSuit] = useState(null);
-
-    const [team1Tricks, setTeam1Tricks] = useState(0); // bottom + top (Us)
-    const [team2Tricks, setTeam2Tricks] = useState(0); // left + right (Them)
-    const [team1Score, setTeam1Score] = useState(0);
-    const [team2Score, setTeam2Score] = useState(0);
-
-    // Initialise player name from local storage
+    // ── Effect A: Trick completion pause ──────────────────────────────────────
+    // When a trick is fully played, show it for 1500ms before clearing the table.
     useEffect(() => {
-        const stored = getPlayer();
-        if (stored) {
-            setPlayer(stored);
-        }
-    }, []);
+        const newLen = engineState.completedTricks.length;
 
-    // Generate and deal cards
-    const startNewRound = useCallback(() => {
-        // Create 32-card deck for Omi
-        const deck = [];
-        let idCounter = 1;
-        SUITS.forEach((suit) => {
-            RANKS.forEach(({ rank, value }) => {
-                deck.push({ id: idCounter++, rank, suit, value });
-            });
-        });
-
-        // Shuffle deck
-        const shuffled = [...deck].sort(() => Math.random() - 0.5);
-
-        // Deal 8 cards to each player
-        setPlayerHand(shuffled.slice(0, 8).sort((a, b) => a.value - b.value));
-        setAiHands({
-            left: shuffled.slice(8, 16),
-            top: shuffled.slice(16, 24),
-            right: shuffled.slice(24, 32)
-        });
-
-        setPlayedCards({});
-        setLeadSuit(null);
-        setTeam1Tricks(0);
-        setTeam2Tricks(0);
-        setTrumpSuit(null);
-        setGameState("bidding");
-        setActiveSeat("bottom");
-    }, []);
-
-    useEffect(() => {
-        startNewRound();
-    }, [startNewRound]);
-
-    // Handle Bidding
-    const handleSelectTrump = (suit) => {
-        setTrumpSuit(suit);
-        setGameState("playing");
-    };
-
-    // Evaluate who won the trick
-    const evaluateTrick = useCallback((currentPlayed) => {
-        let winningSeat = null;
-        let highestCard = null;
-
-        Object.entries(currentPlayed).forEach(([seat, card]) => {
-            if (!highestCard) {
-                highestCard = card;
-                winningSeat = seat;
-                return;
-            }
-
-            // Check if trump card played
-            const isCardTrump = card.suit === trumpSuit;
-            const isHighestTrump = highestCard.suit === trumpSuit;
-
-            if (isCardTrump && !isHighestTrump) {
-                highestCard = card;
-                winningSeat = seat;
-            } else if (isCardTrump && isHighestTrump) {
-                if (card.value > highestCard.value) {
-                    highestCard = card;
-                    winningSeat = seat;
-                }
-            } else if (!isCardTrump && !isHighestTrump) {
-                // If neither is trump, card must match lead suit to compete
-                if (card.suit === leadSuit && highestCard.suit === leadSuit) {
-                    if (card.value > highestCard.value) {
-                        highestCard = card;
-                        winningSeat = seat;
-                    }
-                } else if (card.suit === leadSuit && highestCard.suit !== leadSuit) {
-                    highestCard = card;
-                    winningSeat = seat;
-                }
-            }
-        });
-
-        // Award trick points
-        const isTeam1 = ["bottom", "top"].includes(winningSeat);
-        setTimeout(() => {
-            if (isTeam1) {
-                setTeam1Tricks((t) => t + 1);
-            } else {
-                setTeam2Tricks((t) => t + 1);
-            }
-
-            // Clear table
-            setPlayedCards({});
-            setLeadSuit(null);
-
-            // Winner of trick starts next trick
-            setActiveSeat(winningSeat);
-        }, 1500);
-    }, [trumpSuit, leadSuit]);
-
-    // Play a card from any seat
-    const playCard = useCallback((seat, card) => {
-        setPlayedCards((prev) => {
-            const updated = { ...prev, [seat]: card };
-
-            // Set lead suit if this is the first card in the trick
-            if (Object.keys(prev).length === 0) {
-                setLeadSuit(card.suit);
-            }
-
-            // Check if trick is complete (4 cards played)
-            if (Object.keys(updated).length === 4) {
-                evaluateTrick(updated);
-            } else {
-                // Clockwise turn selection
-                const currentIndex = SEAT_ORDER.indexOf(seat);
-                const nextIndex = (currentIndex + 1) % SEAT_ORDER.length;
-                setActiveSeat(SEAT_ORDER[nextIndex]);
-            }
-
-            return updated;
-        });
-    }, [evaluateTrick]);
-
-    // Simple AI card playing logic
-    useEffect(() => {
-        if (gameState !== "playing") return;
-        if (activeSeat === "bottom") return; // Wait for player
-
-        const timer = setTimeout(() => {
-            const hand = aiHands[activeSeat];
-            if (!hand || hand.length === 0) return;
-
-            // AI Card selection rule:
-            // 1. Must follow lead suit if possible
-            // 2. Otherwise play anything
-            let playableCards = hand.filter((c) => c.suit === leadSuit);
-            if (playableCards.length === 0) {
-                playableCards = hand; // Can't follow suit, play any card
-            }
-
-            // Choose a random valid card
-            const selectedCard = playableCards[Math.floor(Math.random() * playableCards.length)];
-
-            // Remove card from AI hand
-            setAiHands((prev) => ({
-                ...prev,
-                [activeSeat]: prev[activeSeat].filter((c) => c.id !== selectedCard.id)
-            }));
-
-            // Play the card
-            playCard(activeSeat, selectedCard);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, [activeSeat, aiHands, gameState, leadSuit, playCard]);
-
-    // Check for round completion
-    useEffect(() => {
-        const totalTricks = team1Tricks + team2Tricks;
-        if (totalTricks === 8) {
-            // Round over
-            setTimeout(() => {
-                const playerWon = team1Tricks > team2Tricks;
-                if (playerWon) {
-                    setTeam1Score((s) => s + 1);
-                } else {
-                    setTeam2Score((s) => s + 1);
-                }
-                setGameState("result");
-            }, 1000);
-        }
-    }, [team1Tricks, team2Tricks]);
-
-    // Handle user playing a card
-    const handlePlayCard = (card) => {
-        // Only allow playing during user's turn
-        if (activeSeat !== "bottom") return;
-
-        // Follow suit rule
-        const hasLeadSuit = playerHand.some((c) => c.suit === leadSuit);
-        if (leadSuit && hasLeadSuit && card.suit !== leadSuit) {
-            alert("You must follow suit!");
+        // New round or fresh start — reset display state
+        if (
+            engineState.phase === PHASES.TRUMP_SELECTION ||
+            engineState.phase === PHASES.DEALING ||
+            newLen === 0
+        ) {
+            completedLenRef.current = 0;
+            setPaused(false);
+            setShownTrick({});
             return;
         }
 
-        // Remove card from hand
-        setPlayerHand((prev) => prev.filter((c) => c.id !== card.id));
+        if (newLen > completedLenRef.current) {
+            // A trick just completed. Show it, then pause AI for 1500ms.
+            const lastTrick = engineState.completedTricks[newLen - 1];
+            setShownTrick(trickToPlayedCards(lastTrick));
+            setPaused(true);
 
-        // Play card
-        playCard("bottom", card);
-    };
+            const timer = setTimeout(() => {
+                completedLenRef.current = newLen;
+                setPaused(false);
+                setShownTrick({});
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [engineState.completedTricks, engineState.phase]);
 
+    // ── Effect B: Live trick display ──────────────────────────────────────────
+    // While a trick is in progress (not pausing after completion), mirror it live.
+    useEffect(() => {
+        if (!paused) {
+            setShownTrick(trickToPlayedCards(engineState.currentTrick));
+        }
+    }, [engineState.currentTrick, paused]);
+
+    // ── Effect C: AI trump selection ──────────────────────────────────────────
+    useEffect(() => {
+        if (engineState.phase !== PHASES.TRUMP_SELECTION) return;
+        if (engineState.trumpChooserSeat === 0) return; // Seat 0 = human
+
+        const mySeat = engineState.trumpChooserSeat;
+        const timer = setTimeout(() => {
+            try {
+                const aiView = buildAIViewState(engineState, mySeat);
+                const suit = getAITrump({ state: aiView, seat: mySeat });
+                dispatch(selectTrumpAction(mySeat, suit));
+            } catch (e) {
+                console.error("AI trump selection error:", e);
+            }
+        }, 800);
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [engineState.phase, engineState.trumpChooserSeat]);
+
+    // ── Effect D: AI card play ────────────────────────────────────────────────
+    // Fires when it is an AI seat's turn. Waits for post-trick pause to clear.
+    useEffect(() => {
+        if (paused) return;
+        if (engineState.phase !== PHASES.PLAYING) return;
+        if (engineState.currentTurn === 0) return; // Seat 0 = human
+
+        const mySeat = engineState.currentTurn;
+        const timer = setTimeout(() => {
+            // Re-check pause after delay (could have changed)
+            if (engineState.phase !== PHASES.PLAYING) return;
+
+            try {
+                const aiView = buildAIViewState(engineState, mySeat);
+                const card = getAICard({
+                    state: aiView,
+                    seat: mySeat,
+                    difficulty: AI_DIFFICULTY_LEVEL,
+                });
+
+                const player = engineState.players.find((p) => p.seat === mySeat);
+                if (
+                    player &&
+                    isLegalMove(
+                        player.hand,
+                        card,
+                        engineState.currentTrick,
+                        engineState.trumpSuit
+                    )
+                ) {
+                    dispatch(playCardAction(mySeat, card));
+                } else {
+                    console.error("AI attempted illegal move:", card);
+                }
+            } catch (e) {
+                console.error("AI card play error:", e);
+            }
+        }, 1000);
+        return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [engineState.currentTurn, engineState.phase, paused]);
+
+    // ── Human: select trump ───────────────────────────────────────────────────
+    const handleSelectTrump = useCallback(
+        (suitFullName) => {
+            const suitCode = SUIT_FULL_TO_CODE[suitFullName];
+            if (!suitCode) return;
+            // Human is always seat 0 and is always the first trumpChooser
+            dispatch(selectTrumpAction(0, suitCode));
+        },
+        []
+    );
+
+    // ── Human: play a card ────────────────────────────────────────────────────
+    const handlePlayCard = useCallback(
+        (displayCard) => {
+            if (engineState.phase !== PHASES.PLAYING) return;
+            if (engineState.currentTurn !== 0) return;
+
+            // displayCard has { id, rank, suit: "hearts" }
+            // Find the matching engine card by ID (engine card has suit: "H")
+            const player0 = engineState.players.find((p) => p.seat === 0);
+            if (!player0) return;
+            const engineCard = player0.hand.find((c) => c.id === displayCard.id);
+            if (!engineCard) return;
+
+            if (
+                !isLegalMove(
+                    player0.hand,
+                    engineCard,
+                    engineState.currentTrick,
+                    engineState.trumpSuit
+                )
+            ) {
+                alert("You must follow suit!");
+                return;
+            }
+            dispatch(playCardAction(0, engineCard));
+        },
+        [engineState]
+    );
+
+    // ── Play again / next round ───────────────────────────────────────────────
+    const handlePlayAgain = useCallback(() => {
+        if (engineState.phase === PHASES.GAME_END) {
+            dispatch({ type: "RESET" }); // Full restart, cats reset to [0,0]
+        } else {
+            dispatch(startNextRoundAction()); // Next round, cats preserved
+        }
+    }, [engineState.phase]);
+
+    // ── Derived UI values ─────────────────────────────────────────────────────
+    const trumpSuitDisplay = SUIT_CODE_TO_FULL[engineState.trumpSuit] ?? null;
+
+    // Human player's hand, converted to full suit names for PlayingCard component
+    const playerHand = handToDisplayCards(
+        engineState.players.find((p) => p.seat === 0)?.hand ?? []
+    );
+
+    const activeSeat = SEAT_INDEX_TO_NAME[engineState.currentTurn] ?? "bottom";
+
+    // Current round trick counts
+    const team0Tricks = engineState.trickWinners.filter((t) => t === 0).length;
+    const team1Tricks = engineState.trickWinners.filter((t) => t === 1).length;
+
+    // Last round result trick counts (for GameResult display)
+    const lastTrickCounts = engineState.lastRoundResult?.trickCounts ?? [0, 0];
+
+    // What to show in which overlay
+    const showBidPanel =
+        engineState.phase === PHASES.TRUMP_SELECTION &&
+        engineState.trumpChooserSeat === 0;
+    const showPlayerHand = engineState.phase === PHASES.PLAYING;
+    const showResult =
+        engineState.phase === PHASES.ROUND_END ||
+        engineState.phase === PHASES.GAME_END;
+
+    // ── Render ────────────────────────────────────────────────────────────────
     return (
         <div className="game-table">
             {/* Header widgets */}
             <div className="game-table__header-widgets">
-                <TrumpDisplay suit={trumpSuit} />
+                <TrumpDisplay suit={trumpSuitDisplay} />
                 <ScoreBoard
-                    team1Tricks={team1Tricks}
-                    team2Tricks={team2Tricks}
-                    team1Score={team1Score}
-                    team2Score={team2Score}
+                    team1Tricks={team0Tricks}
+                    team2Tricks={team1Tricks}
+                    team1Score={engineState.cats[0]}
+                    team2Score={engineState.cats[1]}
                 />
             </div>
 
@@ -372,7 +391,6 @@ export default function GameTable() {
                     "--table-margin-bottom": `${tCfg.marginBottom}px`,
                     "--table-top-corner": `${tCfg.topCornerWidth}%`,
                     "--table-top-corner-right": `${100 - tCfg.topCornerWidth}%`,
-
                     "--table-wood-border": `${tCfg.woodBorderThickness}px`,
                     "--table-wood-side-gap": `${tCfg.woodBorderSideGap}px`,
                 }}
@@ -381,6 +399,7 @@ export default function GameTable() {
                     <div className="game-table__3d-table-wood" />
                     <div className="game-table__3d-table-felt" />
 
+                    {/* Left AI (engine seat 1) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--left"
                         style={{
@@ -388,7 +407,7 @@ export default function GameTable() {
                             bottom: `calc(100% - ${oCfg.left.tableOverlap}px)`,
                             "--opp-width": `${oCfg.baseWidth * (oCfg.left.scale / 100)}px`,
                             "--opp-height": `${oCfg.baseHeight * (oCfg.left.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${oCfg.left.offsetX}px, ${oCfg.left.offsetY}px)`
+                            transform: `translateX(-50%) translate(${oCfg.left.offsetX}px, ${oCfg.left.offsetY}px)`,
                         }}
                     >
                         <PlayerSeat
@@ -400,6 +419,7 @@ export default function GameTable() {
                         />
                     </div>
 
+                    {/* Top AI (engine seat 2 — partner) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--top"
                         style={{
@@ -407,7 +427,7 @@ export default function GameTable() {
                             bottom: `calc(100% - ${oCfg.top.tableOverlap}px)`,
                             "--opp-width": `${oCfg.baseWidth * (oCfg.top.scale / 100)}px`,
                             "--opp-height": `${oCfg.baseHeight * (oCfg.top.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${oCfg.top.offsetX}px, ${oCfg.top.offsetY}px)`
+                            transform: `translateX(-50%) translate(${oCfg.top.offsetX}px, ${oCfg.top.offsetY}px)`,
                         }}
                     >
                         <PlayerSeat
@@ -419,6 +439,7 @@ export default function GameTable() {
                         />
                     </div>
 
+                    {/* Right AI (engine seat 3) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--right"
                         style={{
@@ -426,7 +447,7 @@ export default function GameTable() {
                             bottom: `calc(100% - ${oCfg.right.tableOverlap}px)`,
                             "--opp-width": `${oCfg.baseWidth * (oCfg.right.scale / 100)}px`,
                             "--opp-height": `${oCfg.baseHeight * (oCfg.right.scale / 100)}px`,
-                            transform: `translateX(-50%) translate(${oCfg.right.offsetX}px, ${oCfg.right.offsetY}px)`
+                            transform: `translateX(-50%) translate(${oCfg.right.offsetX}px, ${oCfg.right.offsetY}px)`,
                         }}
                     >
                         <PlayerSeat
@@ -438,14 +459,16 @@ export default function GameTable() {
                         />
                     </div>
 
+                    {/* Played cards on the felt */}
                     <div className="game-table__center">
-                        <PlayedCards cards={playedCards} />
+                        <PlayedCards cards={shownTrick} />
                     </div>
                 </div>
 
+                {/* Human seat (engine seat 0) */}
                 <div className="game-table__bottom-seat-wrap">
                     <PlayerSeat
-                        name={player.name}
+                        name={playerName}
                         isAI={false}
                         isActive={activeSeat === "bottom"}
                         position="bottom"
@@ -453,27 +476,30 @@ export default function GameTable() {
                 </div>
             </div>
 
-            {/* Player controls */}
+            {/* Player hand */}
             <div className="game-table__footer">
-                {gameState === "playing" && (
-                    <PlayerHand cards={playerHand} onConfirmPlay={handlePlayCard} />
+                {showPlayerHand && (
+                    <PlayerHand
+                        cards={playerHand}
+                        onConfirmPlay={handlePlayCard}
+                    />
                 )}
             </div>
 
-            {/* Bidding Overlay */}
-            {gameState === "bidding" && (
+            {/* Bidding overlay — only when human is the trump chooser */}
+            {showBidPanel && (
                 <div className="game-table__overlay">
                     <BidPanel onSelectTrump={handleSelectTrump} />
                 </div>
             )}
 
-            {/* Round result Overlay */}
-            {gameState === "result" && (
+            {/* Round/game result overlay */}
+            {showResult && (
                 <GameResult
-                    playerWon={team1Tricks > team2Tricks}
-                    team1Score={team1Tricks}
-                    team2Score={team2Tricks}
-                    onPlayAgain={startNewRound}
+                    playerWon={engineState.lastRoundResult?.winnerTeam === 0}
+                    team1Score={lastTrickCounts[0]}
+                    team2Score={lastTrickCounts[1]}
+                    onPlayAgain={handlePlayAgain}
                 />
             )}
         </div>
