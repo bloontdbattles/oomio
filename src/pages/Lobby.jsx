@@ -1,99 +1,135 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
-import { generateId } from "../utils/generateId";
-import { generateRoomCode } from "../utils/generateRoomCode";
+import {
+  subscribeToLobby,
+  seatPlayer,
+  addBot,
+  removePlayer,
+  movePlayerToTeam,
+  startGame,
+} from "../firebase/lobbyService";
+import { trackPresence } from "../firebase/presenceService";
 import TeamPanel from "../components/lobby/TeamPanel";
 import Button from "../components/common/Button";
 import "./Lobby.css";
+
+const EMPTY_TEAM = [null, null];
 
 export default function Lobby() {
   const { t } = useContext(LanguageContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state || {};
-  const isCreator = state.mode === "create";
+  const { code } = location.state || {};
 
   const currentPlayer = useMemo(() => getPlayer(), []);
   const currentPlayerId = currentPlayer?.playerId || "you";
-  const roomCode = useMemo(() => state.code || generateRoomCode(), [state.code]);
 
-  // Placeholder lobby state. Real version will sync through Firebase once
-  // multiplayer (Phase 5) is wired in - for now everything lives in this
-  // component so the host controls / seat picking can be tried locally.
-  const [teams, setTeams] = useState(() => {
-    if (isCreator) {
-      return {
-        red: [
-          { id: currentPlayerId, name: currentPlayer?.name || "You", isHost: true },
-          null,
-        ],
-        blue: [null, null],
-      };
+  const [lobby, setLobby] = useState(null);
+  const [notFound, setNotFound] = useState(false);
+
+  // No room code in the URL/nav state at all - shouldn't normally happen
+  // since GameMode always creates/verifies a code before navigating here.
+  useEffect(() => {
+    if (!code) {
+      navigate("/game-mode", { replace: true });
     }
-    return {
-      red: [{ id: "demo-host", name: "Host Player", isHost: true }, null],
-      blue: [null, null],
+  }, [code, navigate]);
+
+  // Subscribe to live lobby updates, and track this player's presence so
+  // the lobby can clean up after them if they close the tab.
+  useEffect(() => {
+    if (!code) return;
+
+    const unsubscribeLobby = subscribeToLobby(code, (data) => {
+      if (!data) {
+        setNotFound(true);
+        return;
+      }
+      setLobby(data);
+    });
+
+    const unsubscribePresence = trackPresence(code, currentPlayerId);
+
+    return () => {
+      unsubscribeLobby();
+      unsubscribePresence();
     };
-  });
+  }, [code, currentPlayerId]);
+
+  // Firebase drops empty objects/arrays entirely, so a team with no
+  // players at all won't even have a `red`/`blue` key yet - normalize
+  // that into a fixed-length [seat0, seat1] array for rendering.
+  const teams = useMemo(() => {
+    const toSlots = (teamObj) => {
+      if (!teamObj) return [...EMPTY_TEAM];
+      return [teamObj[0] || null, teamObj[1] || null];
+    };
+    return {
+      red: toSlots(lobby?.teams?.red),
+      blue: toSlots(lobby?.teams?.blue),
+    };
+  }, [lobby]);
+
+  const isHost = lobby?.hostId === currentPlayerId;
 
   const isSeated = useMemo(() => {
-    if (isCreator) return true;
     return [...teams.red, ...teams.blue].some((p) => p && p.id === currentPlayerId);
-  }, [teams, isCreator, currentPlayerId]);
+  }, [teams, currentPlayerId]);
 
   const filledCount = [...teams.red, ...teams.blue].filter(Boolean).length;
-  const canStart = isCreator && filledCount === 4;
+  const canStart = isHost && filledCount === 4;
 
-  const updateTeam = (color, updater) => {
-    setTeams((prev) => ({ ...prev, [color]: updater(prev[color]) }));
-  };
-
-  const handleJoinSlot = (color, index) => {
-    if (isCreator || isSeated) return;
-    updateTeam(color, (slots) => {
-      const next = [...slots];
-      next[index] = { id: currentPlayerId, name: currentPlayer?.name || "You" };
-      return next;
+  const handleJoinSlot = (team, index) => {
+    if (isSeated) return;
+    seatPlayer(code, team, index, {
+      id: currentPlayerId,
+      name: currentPlayer?.name || "You",
     });
   };
 
-  const handleAddBot = (color, index) => {
-    if (!isCreator) return;
-    updateTeam(color, (slots) => {
-      const next = [...slots];
-      next[index] = { id: generateId("bot"), name: t("oomiBot"), isBot: true };
-      return next;
-    });
+  const handleAddBot = (team, index) => {
+    if (!isHost) return;
+    addBot(code, team, index, t("oomiBot"));
   };
 
   const handleKick = (playerId) => {
-    setTeams((prev) => ({
-      red: prev.red.map((p) => (p && p.id === playerId ? null : p)),
-      blue: prev.blue.map((p) => (p && p.id === playerId ? null : p)),
-    }));
+    if (!isHost) return;
+    const team = teams.red.some((p) => p && p.id === playerId) ? "red" : "blue";
+    const index = teams[team].findIndex((p) => p && p.id === playerId);
+    if (index !== -1) removePlayer(code, team, index);
   };
 
   const handleMoveTeam = (playerId) => {
-    setTeams((prev) => {
-      const fromColor = prev.red.some((p) => p && p.id === playerId) ? "red" : "blue";
-      const toColor = fromColor === "red" ? "blue" : "red";
-      const toEmptyIndex = prev[toColor].findIndex((p) => !p);
-      if (toEmptyIndex === -1) return prev; // other team is full, nothing to do
+    if (!isHost) return;
+    const fromTeam = teams.red.some((p) => p && p.id === playerId) ? "red" : "blue";
+    const toTeam = fromTeam === "red" ? "blue" : "red";
+    const fromIndex = teams[fromTeam].findIndex((p) => p && p.id === playerId);
+    const toIndex = teams[toTeam].findIndex((p) => !p);
+    if (fromIndex === -1 || toIndex === -1) return; // other team full, nothing to do
 
-      const player = prev[fromColor].find((p) => p && p.id === playerId);
-      const nextFrom = prev[fromColor].map((p) => (p && p.id === playerId ? null : p));
-      const nextTo = [...prev[toColor]];
-      nextTo[toEmptyIndex] = player;
-
-      return { ...prev, [fromColor]: nextFrom, [toColor]: nextTo };
-    });
+    const player = teams[fromTeam][fromIndex];
+    movePlayerToTeam(code, fromTeam, fromIndex, toTeam, toIndex, player);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
+    await startGame(code);
     navigate("/game");
   };
+
+  if (notFound) {
+    return (
+      <div className="lobby">
+        <div className="lobby__content">
+          <p className="lobby__prompt">{t("lobbyNotFound")}</p>
+          <Button onClick={() => navigate("/game-mode")}>{t("back")}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!lobby) return null; // brief loading flash while the first snapshot arrives
 
   return (
     <div className="lobby">
@@ -104,22 +140,20 @@ export default function Lobby() {
         <header className="lobby__header">
           <div>
             <p className="lobby__label">{t("roomCode")}</p>
-            <p className="lobby__code">{roomCode}</p>
+            <p className="lobby__code">{code}</p>
           </div>
           <p className="lobby__count">{filledCount} / 4</p>
         </header>
 
-        {!isCreator && !isSeated && (
-          <p className="lobby__prompt">{t("pickYourTeam")}</p>
-        )}
+        {!isSeated && <p className="lobby__prompt">{t("pickYourTeam")}</p>}
 
         <div className="lobby__teams">
           <TeamPanel
             teamName={t("redTeam")}
             teamColor="red"
             slots={teams.red}
-            isHost={isCreator}
-            allowSelfJoin={!isCreator && !isSeated}
+            isHost={isHost}
+            allowSelfJoin={!isSeated}
             onAddBot={(i) => handleAddBot("red", i)}
             onJoinSlot={(i) => handleJoinSlot("red", i)}
             onKick={handleKick}
@@ -129,8 +163,8 @@ export default function Lobby() {
             teamName={t("blueTeam")}
             teamColor="blue"
             slots={teams.blue}
-            isHost={isCreator}
-            allowSelfJoin={!isCreator && !isSeated}
+            isHost={isHost}
+            allowSelfJoin={!isSeated}
             onAddBot={(i) => handleAddBot("blue", i)}
             onJoinSlot={(i) => handleJoinSlot("blue", i)}
             onKick={handleKick}
@@ -138,7 +172,7 @@ export default function Lobby() {
           />
         </div>
 
-        {isCreator && (
+        {isHost && (
           <Button className="lobby__start" onClick={handleStartGame} disabled={!canStart}>
             {t("startGame")}
           </Button>
