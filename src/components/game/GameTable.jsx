@@ -163,7 +163,15 @@ function initEngineState() {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function GameTable() {
+export default function GameTable({
+    players: externalPlayers,
+    hand: externalHand,
+    plays: externalPlays,
+    trumpSuit: externalTrumpSuit,
+    activeSeat: externalActiveSeat,
+    onConfirmPlay: externalOnConfirmPlay,
+    isMultiplayer = false,
+}) {
     const [engineState, dispatch] = useReducer(
         gameReducerWithIds,
         undefined,
@@ -197,6 +205,7 @@ export default function GameTable() {
     // ── Effect A & B: Unified Trick Display & Completion Pause ────────────────
     // Manages live trick cards and holds all 4 completed cards on table for 5 seconds.
     useEffect(() => {
+        if (isMultiplayer) return;
         const newLen = engineState.completedTricks.length;
 
         // Reset display state on new round or fresh game
@@ -232,6 +241,7 @@ export default function GameTable() {
 
     // ── Effect C: AI trump selection ──────────────────────────────────────────
     useEffect(() => {
+        if (isMultiplayer) return;
         if (engineState.phase !== PHASES.TRUMP_SELECTION) return;
         if (engineState.trumpChooserSeat === 0) return; // Seat 0 = human
 
@@ -252,6 +262,7 @@ export default function GameTable() {
     // ── Effect D: AI card play ────────────────────────────────────────────────
     // Fires when it is an AI seat's turn. Waits for post-trick pause to clear.
     useEffect(() => {
+        if (isMultiplayer) return;
         if (paused) return;
         if (engineState.phase !== PHASES.PLAYING) return;
         if (engineState.currentTurn === 0) return; // Seat 0 = human
@@ -341,16 +352,38 @@ export default function GameTable() {
     }, [engineState.phase]);
 
     // ── Derived UI values ─────────────────────────────────────────────────────
-    const trumpSuitDisplay = SUIT_CODE_TO_FULL[engineState.trumpSuit] ?? null;
+    const trumpSuitDisplay = isMultiplayer
+        ? externalTrumpSuit
+        : (SUIT_CODE_TO_FULL[engineState.trumpSuit] ?? null);
 
     // Human player's hand, converted to full suit names for PlayingCard component
-    const playerHand = handToDisplayCards(
-        engineState.players.find((p) => p.seat === 0)?.hand ?? []
-    );
+    const currentHand = isMultiplayer
+        ? (externalHand || [])
+        : handToDisplayCards(
+            engineState.players.find((p) => p.seat === 0)?.hand ?? []
+        );
 
-    const activeSeat = SEAT_INDEX_TO_NAME[engineState.currentTurn] ?? "bottom";
+    const currentActiveSeat = isMultiplayer
+        ? externalActiveSeat
+        : (SEAT_INDEX_TO_NAME[engineState.currentTurn] ?? "bottom");
 
-    // Current round trick counts
+    const currentConfirmPlay = isMultiplayer ? externalOnConfirmPlay : handlePlayCard;
+
+    // Player seat information
+    const leftPlayer = isMultiplayer
+        ? externalPlayers?.find((p) => p.seat === "left")
+        : null;
+    const topPlayer = isMultiplayer
+        ? externalPlayers?.find((p) => p.seat === "top")
+        : null;
+    const rightPlayer = isMultiplayer
+        ? externalPlayers?.find((p) => p.seat === "right")
+        : null;
+    const bottomPlayer = isMultiplayer
+        ? externalPlayers?.find((p) => p.seat === "bottom")
+        : null;
+
+    // Current round trick counts (singleplayer)
     const team0Tricks = engineState.trickWinners.filter((t) => t === 0).length;
     const team1Tricks = engineState.trickWinners.filter((t) => t === 1).length;
 
@@ -359,12 +392,14 @@ export default function GameTable() {
 
     // What to show in which overlay
     const showBidPanel =
+        !isMultiplayer &&
         engineState.phase === PHASES.TRUMP_SELECTION &&
         engineState.trumpChooserSeat === 0;
-    const showPlayerHand = engineState.phase === PHASES.PLAYING;
+    const showPlayerHand = isMultiplayer ? true : engineState.phase === PHASES.PLAYING;
     const showResult =
-        engineState.phase === PHASES.ROUND_END ||
-        engineState.phase === PHASES.GAME_END;
+        !isMultiplayer &&
+        (engineState.phase === PHASES.ROUND_END ||
+            engineState.phase === PHASES.GAME_END);
 
     // ── Render ────────────────────────────────────────────────────────────────
     return (
@@ -377,6 +412,7 @@ export default function GameTable() {
                     team2Tricks={team1Tricks}
                     team1Score={engineState.cats[0]}
                     team2Score={engineState.cats[1]}
+                    players={isMultiplayer ? externalPlayers : undefined}
                 />
             </div>
 
@@ -399,7 +435,7 @@ export default function GameTable() {
                     <div className="game-table__3d-table-wood" />
                     <div className="game-table__3d-table-felt" />
 
-                    {/* Left AI (engine seat 1) */}
+                    {/* Left Seat (engine seat 1 / multiplayer left) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--left"
                         style={{
@@ -411,15 +447,15 @@ export default function GameTable() {
                         }}
                     >
                         <PlayerSeat
-                            name="AI Left"
-                            isAI={true}
-                            isActive={activeSeat === "left"}
+                            name={leftPlayer?.name || "AI Left"}
+                            isAI={leftPlayer ? leftPlayer.isAI : true}
+                            isActive={currentActiveSeat === "left"}
                             position="left"
-                            avatarImg={player1Img}
+                            avatarImg={leftPlayer?.avatar || player1Img}
                         />
                     </div>
 
-                    {/* Top AI (engine seat 2 — partner) */}
+                    {/* Top Seat (engine seat 2 / partner / multiplayer top) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--top"
                         style={{
@@ -431,15 +467,15 @@ export default function GameTable() {
                         }}
                     >
                         <PlayerSeat
-                            name="AI Top (Partner)"
-                            isAI={true}
-                            isActive={activeSeat === "top"}
+                            name={topPlayer?.name || "AI Top (Partner)"}
+                            isAI={topPlayer ? topPlayer.isAI : true}
+                            isActive={currentActiveSeat === "top"}
                             position="top"
-                            avatarImg={player2Img}
+                            avatarImg={topPlayer?.avatar || player2Img}
                         />
                     </div>
 
-                    {/* Right AI (engine seat 3) */}
+                    {/* Right Seat (engine seat 3 / multiplayer right) */}
                     <div
                         className="game-table__seat-container game-table__seat-container--right"
                         style={{
@@ -451,26 +487,29 @@ export default function GameTable() {
                         }}
                     >
                         <PlayerSeat
-                            name="AI Right"
-                            isAI={true}
-                            isActive={activeSeat === "right"}
+                            name={rightPlayer?.name || "AI Right"}
+                            isAI={rightPlayer ? rightPlayer.isAI : true}
+                            isActive={currentActiveSeat === "right"}
                             position="right"
-                            avatarImg={player3Img}
+                            avatarImg={rightPlayer?.avatar || player3Img}
                         />
                     </div>
 
                     {/* Played cards on the felt */}
                     <div className="game-table__center">
-                        <PlayedCards cards={shownTrick} />
+                        <PlayedCards
+                            cards={isMultiplayer ? undefined : shownTrick}
+                            plays={isMultiplayer ? externalPlays : undefined}
+                        />
                     </div>
                 </div>
 
-                {/* Human seat (engine seat 0) */}
+                {/* Bottom Seat (engine seat 0 / human / multiplayer bottom) */}
                 <div className="game-table__bottom-seat-wrap">
                     <PlayerSeat
-                        name={playerName}
-                        isAI={false}
-                        isActive={activeSeat === "bottom"}
+                        name={bottomPlayer?.name || playerName}
+                        isAI={bottomPlayer ? bottomPlayer.isAI : false}
+                        isActive={currentActiveSeat === "bottom"}
                         position="bottom"
                     />
                 </div>
@@ -480,20 +519,20 @@ export default function GameTable() {
             <div className="game-table__footer">
                 {showPlayerHand && (
                     <PlayerHand
-                        cards={playerHand}
-                        onConfirmPlay={handlePlayCard}
+                        cards={currentHand}
+                        onConfirmPlay={currentConfirmPlay}
                     />
                 )}
             </div>
 
-            {/* Bidding overlay — only when human is the trump chooser */}
+            {/* Bidding overlay — singleplayer only */}
             {showBidPanel && (
                 <div className="game-table__overlay">
                     <BidPanel onSelectTrump={handleSelectTrump} />
                 </div>
             )}
 
-            {/* Round/game result overlay */}
+            {/* Round/game result overlay — singleplayer only */}
             {showResult && (
                 <GameResult
                     playerWon={engineState.lastRoundResult?.winnerTeam === 0}

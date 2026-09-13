@@ -1,11 +1,18 @@
 {
-    "rules": {
-        "lobbies": {
-            "$code": {
-                ".read": true,
-                ".write": true,
-                ".validate": "newData.hasChildren(['createdAt', 'hostId', 'status', 'teams'])"
-            }
-        }
+  "rules": {
+    "lobbies": {
+      "$code": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['createdAt', 'hostId', 'status', 'teams'])"
+      }
+    },
+    "games": {
+      "$code": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['status', 'seats', 'hands'])"
+      }
     }
+  }
 }

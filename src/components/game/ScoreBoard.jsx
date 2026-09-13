@@ -1,6 +1,15 @@
 import "./ScoreBoard.css";
 
-export default function ScoreBoard({ team1Tricks = 0, team2Tricks = 0, team1Score = 0, team2Score = 0 }) {
+export default function ScoreBoard({
+    team1Tricks = 0,
+    team2Tricks = 0,
+    team1Score = 0,
+    team2Score = 0,
+    players,
+}) {
+    const t1Score = players ? (players.find((p) => p.seat === "bottom")?.score ?? 0) : team1Score;
+    const t2Score = players ? (players.find((p) => p.seat === "left")?.score ?? 0) : team2Score;
+
     return (
         <div className="scoreboard">
             <div className="scoreboard__header">Scoreboard</div>
@@ -14,7 +23,7 @@ export default function ScoreBoard({ team1Tricks = 0, team2Tricks = 0, team1Scor
                         </div>
                         <div className="scoreboard__stat">
                             <span className="scoreboard__stat-label">Points</span>
-                            <span className="scoreboard__stat-val">{team1Score}</span>
+                            <span className="scoreboard__stat-val">{t1Score}</span>
                         </div>
                     </div>
                 </div>
@@ -30,7 +39,7 @@ export default function ScoreBoard({ team1Tricks = 0, team2Tricks = 0, team1Scor
                         </div>
                         <div className="scoreboard__stat">
                             <span className="scoreboard__stat-label">Points</span>
-                            <span className="scoreboard__stat-val">{team2Score}</span>
+                            <span className="scoreboard__stat-val">{t2Score}</span>
                         </div>
                     </div>
                 </div>

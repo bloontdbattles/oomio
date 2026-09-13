@@ -10,6 +10,7 @@ import {
   movePlayerToTeam,
   startGame,
 } from "../firebase/lobbyService";
+import { initializeGame } from "../firebase/gameService";
 import { trackPresence } from "../firebase/presenceService";
 import TeamPanel from "../components/lobby/TeamPanel";
 import Button from "../components/common/Button";
@@ -114,8 +115,9 @@ export default function Lobby() {
   };
 
   const handleStartGame = async () => {
+    await initializeGame(code, teams);
     await startGame(code);
-    navigate("/game");
+    navigate("/game", { state: { code } });
   };
 
   if (notFound) {

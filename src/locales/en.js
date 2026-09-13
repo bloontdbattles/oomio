@@ -27,4 +27,11 @@ export default {
   redTeam: "Red Team",
   blueTeam: "Blue Team",
   oomiBot: "Oomi Bot",
+  pickTrump: "Pick Trump Suit",
+  waitingForTrump: "Waiting for trump selection...",
+  roundDraw: "Round ended in a draw",
+  redWins: "Red Team wins the round!",
+  blueWins: "Blue Team wins the round!",
+  roundOver: "Round Over",
+  nextRound: "Next Round",
 };

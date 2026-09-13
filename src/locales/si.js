@@ -27,4 +27,11 @@ export default {
   redTeam: "රතු කණ්ඩායම",
   blueTeam: "නිල් කණ්ඩායම",
   oomiBot: "Oomi Bot",
+  pickTrump: "Trump suit එක තෝරන්න",
+  waitingForTrump: "Trump තේරීමක් බලාපොරොත්තුවෙන්...",
+  roundDraw: "වටය සම විය",
+  redWins: "රතු කණ්ඩායම ජයග්‍රහණය කළේය!",
+  blueWins: "නිල් කණ්ඩායම ජයග්‍රහණය කළේය!",
+  roundOver: "වටය අවසන්",
+  nextRound: "ඊළඟ වටය",
 };

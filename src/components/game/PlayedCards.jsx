@@ -1,11 +1,16 @@
 import PlayingCard from "./PlayingCard";
 import "./PlayedCards.css";
 
-export default function PlayedCards({ cards = {} }) {
+export default function PlayedCards({ cards = {}, plays }) {
     // cards: { bottom?: card, top?: card, left?: card, right?: card }
+    // plays: [{ seat: "bottom"|"left"|"top"|"right", card: { rank, suit } }]
+    const activeCards = plays
+        ? plays.reduce((acc, p) => ({ ...acc, [p.seat]: p.card }), {})
+        : cards;
+
     return (
         <div className="played-cards">
-            {Object.entries(cards).map(([position, card]) => {
+            {Object.entries(activeCards).map(([position, card]) => {
                 if (!card) return null;
                 return (
                     <div

@@ -1,0 +1,33 @@
+.round-over {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 19, 10, 0.65);
+  padding: 24px;
+}
+
+.round-over__panel {
+  background: linear-gradient(165deg, var(--oomio-green-700), var(--oomio-green-900));
+  border: 1px solid rgba(246, 240, 222, 0.15);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.round-over__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--oomio-cream);
+  margin: 0 0 10px;
+}
+
+.round-over__message {
+  font-size: 0.95rem;
+  color: rgba(246, 240, 222, 0.8);
+  margin: 0 0 22px;
+}
