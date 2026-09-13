@@ -8,8 +8,11 @@ export default function PlayerSeat({ name, isAI, isActive, position, avatarImg }
             className={`player-seat player-seat--${position} ${isActive ? "is-active" : ""} ${isAI ? "player-seat--ai" : ""}`}
         >
             <div className="player-seat__avatar-wrap">
-                {isAI && avatarImg ? (
-                    <img src={avatarImg} alt={name} className="player-seat__character-image" />
+                {avatarImg ? (
+                    <>
+                        <img src={avatarImg} alt={name} className="player-seat__character-image" />
+                        <TurnIndicator show={isActive} />
+                    </>
                 ) : (
                     <>
                         <Avatar name={name} size={52} />
@@ -17,17 +20,10 @@ export default function PlayerSeat({ name, isAI, isActive, position, avatarImg }
                     </>
                 )}
             </div>
-            {isAI ? (
-                <div className="player-seat__info">
-                    <span className="player-seat__name">{name}</span>
-                    <span className="player-seat__badge">AI</span>
-                </div>
-            ) : (
-                <>
-                    <span className="player-seat__name">{name}</span>
-                    {isAI && <span className="player-seat__badge">AI</span>}
-                </>
-            )}
+            <div className="player-seat__info">
+                <span className="player-seat__name">{name}</span>
+                {isAI && <span className="player-seat__badge">AI</span>}
+            </div>
         </div>
     );
 }

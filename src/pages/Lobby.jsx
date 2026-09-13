@@ -59,6 +59,14 @@ export default function Lobby() {
     };
   }, [code, currentPlayerId]);
 
+  // When host starts game (lobby.status becomes "playing"), automatically navigate
+  // all connected players in the lobby to /game.
+  useEffect(() => {
+    if (lobby?.status === "playing" && code) {
+      navigate("/game", { state: { code } });
+    }
+  }, [lobby?.status, code, navigate]);
+
   // Firebase drops empty objects/arrays entirely, so a team with no
   // players at all won't even have a `red`/`blue` key yet - normalize
   // that into a fixed-length [seat0, seat1] array for rendering.

@@ -24,7 +24,7 @@ const SUIT_ICONS = {
     spades: spadeIcon,
 };
 
-function SuitIcon({ suit, className = "" }) {
+export function SuitIcon({ suit, className = "" }) {
     const iconSrc = SUIT_ICONS[suit];
     if (!iconSrc) return null;
     return (
@@ -36,6 +36,8 @@ function SuitIcon({ suit, className = "" }) {
         />
     );
 }
+
+export const SuitGlyph = SuitIcon;
 
 function renderPips(rank, suit) {
     if (rank === "7") {
