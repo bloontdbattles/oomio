@@ -16,10 +16,10 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Laptop: 82.5×130 × 125% = 103px × 162.5px */
+/* Desktop / Laptop: 82.5×130 × 150% = 123.75px × 195px */
 .played-cards__slot .playing-card {
-    width: 103px;
-    height: 162.5px;
+    width: 123.75px;
+    height: 195px;
     border-radius: 2px !important;
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.55);
 }

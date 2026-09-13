@@ -118,8 +118,8 @@ const MOBILE_OPPONENT_CONFIG = {
 const AI_DIFFICULTY_LEVEL = AI_DIFFICULTY.MEDIUM;
 
 // Timing Delays (in ms)
-const AI_PLAY_DELAY_MS = 2000;       // Cooldown delay before AI plays a card (lets players see previous plays)
-const AI_TRUMP_DELAY_MS = 1500;      // Delay before AI selects trump
+const AI_PLAY_DELAY_MS = 3000;       // Cooldown delay before AI selects & plays a card (3s)
+const AI_TRUMP_DELAY_MS = 2000;      // Delay before AI selects trump (2s)
 const TRICK_CLEAR_DELAY_MS = 5000;    // Pause keeping completed 4-card trick on table for 5s before clearing
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
