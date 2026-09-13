@@ -3,9 +3,10 @@ import TurnIndicator from "./TurnIndicator";
 import "./PlayerSeat.css";
 
 export default function PlayerSeat({ name, isAI, isActive, position, avatarImg }) {
+    const isOpponentSeat = position !== "bottom" || !!avatarImg;
     return (
         <div
-            className={`player-seat player-seat--${position} ${isActive ? "is-active" : ""} ${isAI ? "player-seat--ai" : ""}`}
+            className={`player-seat player-seat--${position} ${isActive ? "is-active" : ""} ${isAI ? "player-seat--ai" : ""} ${isOpponentSeat ? "player-seat--opponent" : ""}`}
         >
             <div className="player-seat__avatar-wrap">
                 {avatarImg ? (
