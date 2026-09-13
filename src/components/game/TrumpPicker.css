@@ -1,0 +1,63 @@
+.trump-picker {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(3, 19, 10, 0.65);
+    padding: 24px;
+}
+
+.trump-picker__panel {
+    background: linear-gradient(165deg, var(--oomio-green-700), var(--oomio-green-900));
+    border: 1px solid rgba(246, 240, 222, 0.15);
+    border-radius: 20px;
+    padding: 32px 28px;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6);
+    text-align: center;
+}
+
+.trump-picker__title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--oomio-cream);
+    margin: 0 0 22px;
+}
+
+.trump-picker__options {
+    display: flex;
+    gap: 14px;
+}
+
+.trump-picker__option {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    border: 1px solid rgba(246, 240, 222, 0.2);
+    background: rgba(3, 19, 10, 0.35);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.trump-picker__option:hover {
+    transform: translateY(-3px);
+    border-color: var(--oomio-gold);
+}
+
+.trump-picker__icon {
+    width: 30px;
+    height: 30px;
+}
+
+.trump-picker__option--red .trump-picker__icon {
+    color: #e05a5a;
+}
+
+.trump-picker__option--black .trump-picker__icon {
+    color: var(--oomio-cream);
+}
