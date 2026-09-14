@@ -21,3 +21,10 @@ export function trackPresence(code, playerId) {
         }
     });
 }
+
+export function subscribeToPresence(code, callback) {
+    const presenceRef = ref(db, `lobbies/${code}/presence`);
+    return onValue(presenceRef, (snap) => {
+        callback(snap.exists() ? snap.val() : {});
+    });
+}

@@ -36,10 +36,18 @@ function toFull(suit) { return CODE_TO_FULL[suit] ?? suit; }
 function convertCard(card) { return { rank: card.rank, suit: toCode(card.suit) }; }
 
 /**
- * Returns true when the occupant of `seat` is a bot.
+ * Returns true when the occupant of `seat` is a bot OR is a disconnected real player.
  */
-export function isBotSeat(game, seat) {
-    return !!game?.seats?.[seat]?.isBot;
+export function isBotSeat(game, seat, presence = null) {
+    const player = game?.seats?.[seat];
+    if (!player) return false;
+    if (player.isBot) return true;
+
+    // If presence state has loaded (is not null/undefined), check if real player disconnected
+    if (presence !== null && presence !== undefined && player.id && !presence[player.id]) {
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -92,18 +100,18 @@ function buildAIState(game, mySeat) {
 
 /**
  * Checks the current Firebase game state and fires the appropriate bot action
- * (trump selection or card play) when the active seat belongs to a bot.
+ * (trump selection or card play) when the active seat belongs to a bot or disconnected player.
  *
  * Returns a cancel function so the caller can clear a pending timer on
  * the next state update.
  */
-export function runBotTurn(code, game) {
+export function runBotTurn(code, game, presence = null) {
     if (!game) return () => {};
 
     // ── Trump selection phase ─────────────────────────────────────────────
     if (game.status === "selecting-trump") {
         const pickerSeat = game.trumpPickerSeat;
-        if (!isBotSeat(game, pickerSeat)) return () => {};
+        if (!isBotSeat(game, pickerSeat, presence)) return () => {};
 
         const turnKey = `trump-${code}-${game.roundNumber}-${pickerSeat}`;
         if (lastFiredTurnKey === turnKey) return () => {};
@@ -130,7 +138,7 @@ export function runBotTurn(code, game) {
     // ── Playing phase ─────────────────────────────────────────────────────
     if (game.status === "playing") {
         const currentSeat = game.currentTurnSeat;
-        if (!isBotSeat(game, currentSeat)) return () => {};
+        if (!isBotSeat(game, currentSeat, presence)) return () => {};
 
         // Build a unique key for this exact turn to prevent double-firing.
         const trickLen = (game.trick || []).length;

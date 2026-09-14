@@ -449,6 +449,7 @@ export default function GameTable({
                         <PlayerSeat
                             name={leftPlayer?.name || "AI Left"}
                             isAI={leftPlayer ? leftPlayer.isAI : true}
+                            isDisconnected={leftPlayer?.isDisconnected}
                             isActive={currentActiveSeat === "left"}
                             position="left"
                             avatarImg={leftPlayer?.avatar || player1Img}
@@ -469,6 +470,7 @@ export default function GameTable({
                         <PlayerSeat
                             name={topPlayer?.name || "AI Top (Partner)"}
                             isAI={topPlayer ? topPlayer.isAI : true}
+                            isDisconnected={topPlayer?.isDisconnected}
                             isActive={currentActiveSeat === "top"}
                             position="top"
                             avatarImg={topPlayer?.avatar || player2Img}
@@ -489,6 +491,7 @@ export default function GameTable({
                         <PlayerSeat
                             name={rightPlayer?.name || "AI Right"}
                             isAI={rightPlayer ? rightPlayer.isAI : true}
+                            isDisconnected={rightPlayer?.isDisconnected}
                             isActive={currentActiveSeat === "right"}
                             position="right"
                             avatarImg={rightPlayer?.avatar || player3Img}
@@ -509,6 +512,7 @@ export default function GameTable({
                     <PlayerSeat
                         name={bottomPlayer?.name || playerName}
                         isAI={bottomPlayer ? bottomPlayer.isAI : false}
+                        isDisconnected={bottomPlayer?.isDisconnected}
                         isActive={currentActiveSeat === "bottom"}
                         position="bottom"
                     />

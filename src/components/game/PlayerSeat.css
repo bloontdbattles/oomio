@@ -47,6 +47,11 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.player-seat__badge--dc {
+    background: #e74c3c;
+    color: #ffffff;
+}
+
 .player-seat--top {
     flex-direction: column-reverse;
 }

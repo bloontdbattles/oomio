@@ -4,18 +4,23 @@ import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import { subscribeToGame, selectTrump, playCard, startNextRound } from "../firebase/gameService";
 import { runBotTurn } from "../firebase/botRunner";
+import { trackPresence, subscribeToPresence } from "../firebase/presenceService";
 import GameTable from "../components/game/GameTable";
 import TrumpPicker from "../components/game/TrumpPicker";
 import Button from "../components/common/Button";
 import player1 from "../assets/images/player1.png";
 import player2 from "../assets/images/player2.png";
 import player3 from "../assets/images/player3.png";
+import dc1 from "../assets/images/dc1.png";
+import dc2 from "../assets/images/dc2.png";
+import dc3 from "../assets/images/dc3.png";
 import "./Game.css";
 
 // Seat 0 is always "me" once rotated - offset 1/2/3 map to left/top/right
 // so partners (offset 2, seat+2 mod 4) naturally land opposite me.
 const POSITIONS = ["bottom", "left", "top", "right"];
 const OPPONENT_AVATARS = [player1, player2, player3];
+const DISCONNECTED_AVATARS = [dc1, dc2, dc3];
 
 function seatToPosition(mySeat, seat) {
   return POSITIONS[(seat - mySeat + 4) % 4];
@@ -29,6 +34,7 @@ export default function Game() {
   const myId = currentPlayer?.playerId || "you";
 
   const [game, setGame] = useState(null);
+  const [presence, setPresence] = useState(null);
 
   // ── Trick display: hold last completed trick visible for 5s ───────────
   // When Firebase clears trick[] after the 4th card, we freeze the display
@@ -46,12 +52,23 @@ export default function Game() {
     return unsubscribe;
   }, [code]);
 
-  // ── Bot runner: fire AI moves when a bot seat's turn arrives ──────────
+  // ── Track own presence & subscribe to room presence map ──────────────
+  useEffect(() => {
+    if (!code || !myId) return;
+    const unsubTrack = trackPresence(code, myId);
+    const unsubSub = subscribeToPresence(code, setPresence);
+    return () => {
+      unsubTrack();
+      unsubSub();
+    };
+  }, [code, myId]);
+
+  // ── Bot runner: fire AI moves when a bot or disconnected seat's turn arrives ──────────
   useEffect(() => {
     if (!code || !game) return;
-    const cancel = runBotTurn(code, game);
+    const cancel = runBotTurn(code, game, presence);
     return cancel;
-  }, [code, game]);
+  }, [code, game, presence]);
 
   // ── Mirror live trick / hold completed trick for 5s ───────────────────
   useEffect(() => {
@@ -114,12 +131,21 @@ export default function Game() {
     const seat = Number(seatStr);
     const position = seatToPosition(mySeat, seat);
     const opponentIndex = ["left", "top", "right"].indexOf(position);
+
+    const isBot = !!player?.isBot;
+    const isDisconnected = !isBot && player?.id && presence !== null && !presence[player.id];
+
+    const normalAvatar = opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined;
+    const dcAvatar = opponentIndex !== -1 ? DISCONNECTED_AVATARS[opponentIndex] : undefined;
+    const avatar = position === "bottom" ? undefined : (isDisconnected ? dcAvatar : normalAvatar);
+
     return {
       id: player?.id || `seat-${seat}`,
       name: player?.name || "",
-      isAI: !!player?.isBot,
+      isAI: isBot || isDisconnected,
       seat: position,
-      avatar: position === "bottom" ? undefined : OPPONENT_AVATARS[opponentIndex],
+      avatar,
+      isDisconnected,
       score: game.scores?.[player?.team] || 0,
     };
   });
