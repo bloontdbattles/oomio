@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
@@ -30,6 +30,16 @@ export default function Game() {
 
   const [game, setGame] = useState(null);
 
+  // ── Trick display: hold last completed trick visible for 5s ───────────
+  // When Firebase clears trick[] after the 4th card, we freeze the display
+  // so all 4 players can see the last card before the table clears.
+  const TRICK_HOLD_MS = 5000;
+  const completedLenRef = useRef(0);
+  const [shownPlays, setShownPlays] = useState([]);
+  // mySeat ref: kept up-to-date each render so the trick-hold effect never
+  // has a stale seat value without needing to be a dependency.
+  const mySeatRef = useRef(-1);
+
   useEffect(() => {
     if (!code) return;
     const unsubscribe = subscribeToGame(code, setGame);
@@ -42,6 +52,46 @@ export default function Game() {
     const cancel = runBotTurn(code, game);
     return cancel;
   }, [code, game]);
+
+  // ── Mirror live trick / hold completed trick for 5s ───────────────────
+  useEffect(() => {
+    if (!game) return;
+
+    const newLen = (game.trickHistory || []).length;
+
+    // New round started or trump-selection reset — clear state
+    if (game.status === "selecting-trump") {
+      completedLenRef.current = 0;
+      setShownPlays([]);
+      return;
+    }
+
+    // A trick just completed (trickHistory grew) — freeze those 4 cards
+    if (newLen > completedLenRef.current) {
+      const lastTrick = game.trickHistory[newLen - 1];
+      const frozenPlays = (lastTrick?.plays || []).map((play) => ({
+        seat: seatToPosition(mySeatRef.current, play.seat),
+        card: play.card,
+      }));
+      setShownPlays(frozenPlays);
+
+      const timer = setTimeout(() => {
+        completedLenRef.current = newLen;
+        setShownPlays([]);
+      }, TRICK_HOLD_MS);
+      return () => clearTimeout(timer);
+    }
+
+    // No new completed trick — mirror the live in-progress trick
+    if (completedLenRef.current === newLen) {
+      const livePlays = (game.trick || []).map((play) => ({
+        seat: seatToPosition(mySeatRef.current, play.seat),
+        card: play.card,
+      }));
+      setShownPlays(livePlays);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [game?.trickHistory, game?.trick, game?.status]);
 
   // No room code = direct "Play with AI" navigation - keep showing the
   // local AI table until real bot logic exists.
@@ -57,6 +107,8 @@ export default function Game() {
   if (!mySeatEntry) return null; // shouldn't happen once the round is dealt
 
   const mySeat = Number(mySeatEntry[0]);
+  // Update the ref every render so trick-hold effect always has the latest seat.
+  mySeatRef.current = mySeat;
 
   const players = Object.entries(game.seats || {}).map(([seatStr, player]) => {
     const seat = Number(seatStr);
@@ -78,10 +130,8 @@ export default function Game() {
     suit: card.suit,
   }));
 
-  const plays = (game.trick || []).map((play) => ({
-    seat: seatToPosition(mySeat, play.seat),
-    card: play.card,
-  }));
+  // shownPlays is managed by the trick-hold useEffect above;
+  // no need to recompute plays inline here.
 
   const activeSeatPosition =
     game.status === "selecting-trump"
@@ -112,7 +162,7 @@ export default function Game() {
       <GameTable
         players={players}
         hand={myHand}
-        plays={plays}
+        plays={shownPlays}
         trumpSuit={game.trumpSuit || "hearts"}
         activeSeat={activeSeatPosition}
         onConfirmPlay={handleConfirmPlay}
