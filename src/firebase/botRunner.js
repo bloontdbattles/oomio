@@ -22,6 +22,7 @@ const BOT_DIFFICULTY = AI_DIFFICULTY.MEDIUM;
 // Delays (ms) — match the singleplayer feel in GameTable.jsx
 const BOT_TRUMP_DELAY_MS = 2000;
 const BOT_PLAY_DELAY_MS = 3000;
+const TRICK_HOLD_MS = 5000;
 
 // Prevent the same turn from firing twice (race guard).
 let lastFiredTurnKey = null;
@@ -118,7 +119,12 @@ export function runBotTurn(code, game) {
             }
         }, BOT_TRUMP_DELAY_MS);
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            if (lastFiredTurnKey === turnKey) {
+                lastFiredTurnKey = null;
+            }
+        };
     }
 
     // ── Playing phase ─────────────────────────────────────────────────────
@@ -131,6 +137,13 @@ export function runBotTurn(code, game) {
         const turnKey = `play-${code}-${game.roundNumber}-${currentSeat}-${trickLen}`;
         if (lastFiredTurnKey === turnKey) return () => {};
         lastFiredTurnKey = turnKey;
+
+        // If a trick just completed, wait for the 5-second trick-hold to finish
+        // before starting the bot's normal think delay.
+        const isFirstCardOfNewTrick = trickLen === 0 && (game.trickHistory || []).length > 0;
+        const delay = isFirstCardOfNewTrick
+            ? TRICK_HOLD_MS + BOT_PLAY_DELAY_MS
+            : BOT_PLAY_DELAY_MS;
 
         const timer = setTimeout(async () => {
             try {
@@ -145,9 +158,14 @@ export function runBotTurn(code, game) {
             } catch (e) {
                 console.error("[BotRunner] Card play error:", e);
             }
-        }, BOT_PLAY_DELAY_MS);
+        }, delay);
 
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+            if (lastFiredTurnKey === turnKey) {
+                lastFiredTurnKey = null;
+            }
+        };
     }
 
     return () => {};
