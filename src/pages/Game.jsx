@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import { subscribeToGame, selectTrump, playCard, startNextRound } from "../firebase/gameService";
+import { runBotTurn } from "../firebase/botRunner";
 import GameTable from "../components/game/GameTable";
 import TrumpPicker from "../components/game/TrumpPicker";
 import Button from "../components/common/Button";
@@ -34,6 +35,13 @@ export default function Game() {
     const unsubscribe = subscribeToGame(code, setGame);
     return unsubscribe;
   }, [code]);
+
+  // ── Bot runner: fire AI moves when a bot seat's turn arrives ──────────
+  useEffect(() => {
+    if (!code || !game) return;
+    const cancel = runBotTurn(code, game);
+    return cancel;
+  }, [code, game]);
 
   // No room code = direct "Play with AI" navigation - keep showing the
   // local AI table until real bot logic exists.
