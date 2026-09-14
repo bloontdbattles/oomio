@@ -123,7 +123,7 @@ export default function Lobby() {
   };
 
   const handleStartGame = async () => {
-    await initializeGame(code, teams);
+    await initializeGame(code, teams, lobby?.hostId || currentPlayerId);
     await startGame(code);
     navigate("/game", { state: { code } });
   };

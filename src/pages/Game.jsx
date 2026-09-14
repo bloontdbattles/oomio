@@ -140,12 +140,52 @@ export default function Game() {
     return <GameTable />;
   }
 
-  if (!game) return null;
+  if (!game) {
+    return (
+      <div className="game-loading">
+        <div className="game-loading__spinner" />
+        <p className="game-loading__text">{t("joining")}...</p>
+      </div>
+    );
+  }
 
-  const mySeatEntry = Object.entries(game.seats || {}).find(
+  // 1. Try matching by exact playerId
+  let mySeatEntry = Object.entries(game.seats || {}).find(
     ([, player]) => player?.id === myId
   );
-  if (!mySeatEntry) return null;
+
+  // 2. If not matched by ID, try matching by player name (for players rejoining after app restart or name re-entry)
+  if (!mySeatEntry && currentPlayer?.name) {
+    const normName = currentPlayer.name.trim().toLowerCase();
+    mySeatEntry = Object.entries(game.seats || {}).find(
+      ([, player]) => player?.name && player.name.trim().toLowerCase() === normName
+    );
+    if (mySeatEntry) {
+      const seatNum = Number(mySeatEntry[0]);
+      reclaimPlayerSeat(code, seatNum, myId, currentPlayer.name);
+    }
+  }
+
+  // 3. If still not matched, check if there is a disconnected real player seat to reclaim
+  if (!mySeatEntry && presence !== null) {
+    const disconnectedSeatEntry = Object.entries(game.seats || {}).find(
+      ([, p]) => !p?.isBot && p?.id && !presence[p.id]
+    );
+    if (disconnectedSeatEntry) {
+      mySeatEntry = disconnectedSeatEntry;
+      const seatNum = Number(mySeatEntry[0]);
+      reclaimPlayerSeat(code, seatNum, myId, currentPlayer?.name || "Player");
+    }
+  }
+
+  if (!mySeatEntry) {
+    return (
+      <div className="game-loading">
+        <p className="game-loading__text">{t("lobbyNotFound")}</p>
+        <Button onClick={() => navigate("/game-mode")}>{t("back")}</Button>
+      </div>
+    );
+  }
 
   const mySeat = Number(mySeatEntry[0]);
   mySeatRef.current = mySeat;
