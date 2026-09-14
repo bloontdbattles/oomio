@@ -70,7 +70,7 @@ function buildSeats(teams) {
  * with seat 0 as the first trump picker. Call this once, when the host
  * presses Start Game in the lobby.
  */
-export async function initializeGame(code, teams) {
+export async function initializeGame(code, teams, hostId = null) {
     await update(gameRef(code), {
         status: "selecting-trump",
         seats: buildSeats(teams),
@@ -84,6 +84,7 @@ export async function initializeGame(code, teams) {
         matchScore: { red: 0, blue: 0 },
         roundNumber: 1,
         roundWinner: null,
+        hostId: hostId || null,
         createdAt: Date.now(),
     });
 }
@@ -207,4 +208,32 @@ export async function startNextRound(code) {
         },
         roundWinner: null,
     });
+}
+
+/**
+ * Converts a disconnected human player's seat to a bot permanently so the AI takes over.
+ */
+export async function replacePlayerWithBot(code, seat, botName = "Oomi Bot") {
+    await update(gameRef(code), {
+        [`seats/${seat}/isBot`]: true,
+        [`seats/${seat}/name`]: botName,
+    });
+}
+
+/**
+ * Restores a player to their seat when they rejoin using the room code.
+ */
+export async function reclaimPlayerSeat(code, seat, playerId, playerName) {
+    await update(gameRef(code), {
+        [`seats/${seat}/isBot`]: false,
+        [`seats/${seat}/id`]: playerId,
+        [`seats/${seat}/name`]: playerName,
+    });
+}
+
+/**
+ * Migrates host status to a new player ID if the previous host disconnects.
+ */
+export async function migrateHost(code, newHostId) {
+    await update(gameRef(code), { hostId: newHostId });
 }

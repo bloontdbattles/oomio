@@ -31,3 +31,47 @@
   color: rgba(246, 240, 222, 0.8);
   margin: 0 0 22px;
 }
+
+/* Disconnect notification top bar */
+.game-dc-bar {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(16, 42, 28, 0.92);
+  border: 1px solid var(--oomio-gold, #e8b84b);
+  border-radius: 30px;
+  padding: 8px 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  color: var(--oomio-cream, #f6f0de);
+  font-size: 0.85rem;
+}
+
+.game-dc-bar__code {
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--oomio-gold, #e8b84b);
+  letter-spacing: 0.05em;
+}
+
+.game-dc-bar__btn {
+  background: rgba(232, 184, 75, 0.2);
+  border: 1px solid var(--oomio-gold, #e8b84b);
+  color: var(--oomio-gold, #e8b84b);
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.game-dc-bar__btn:hover {
+  background: var(--oomio-gold, #e8b84b);
+  color: #102a1c;
+}

@@ -2,11 +2,20 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
-import { subscribeToGame, selectTrump, playCard, startNextRound } from "../firebase/gameService";
+import {
+  subscribeToGame,
+  selectTrump,
+  playCard,
+  startNextRound,
+  replacePlayerWithBot,
+  reclaimPlayerSeat,
+  migrateHost,
+} from "../firebase/gameService";
 import { runBotTurn } from "../firebase/botRunner";
 import { trackPresence, subscribeToPresence } from "../firebase/presenceService";
 import GameTable from "../components/game/GameTable";
 import TrumpPicker from "../components/game/TrumpPicker";
+import DisconnectModal from "../components/game/DisconnectModal";
 import Button from "../components/common/Button";
 import player1 from "../assets/images/player1.png";
 import player2 from "../assets/images/player2.png";
@@ -35,15 +44,12 @@ export default function Game() {
 
   const [game, setGame] = useState(null);
   const [presence, setPresence] = useState(null);
+  const [dismissedDcModal, setDismissedDcModal] = useState(false);
 
   // ── Trick display: hold last completed trick visible for 5s ───────────
-  // When Firebase clears trick[] after the 4th card, we freeze the display
-  // so all 4 players can see the last card before the table clears.
   const TRICK_HOLD_MS = 5000;
   const completedLenRef = useRef(0);
   const [shownPlays, setShownPlays] = useState([]);
-  // mySeat ref: kept up-to-date each render so the trick-hold effect never
-  // has a stale seat value without needing to be a dependency.
   const mySeatRef = useRef(-1);
 
   useEffect(() => {
@@ -63,7 +69,30 @@ export default function Game() {
     };
   }, [code, myId]);
 
-  // ── Bot runner: fire AI moves when a bot or disconnected seat's turn arrives ──────────
+  // ── Host Migration: Transfer host role if host disconnects ────────────
+  useEffect(() => {
+    if (!code || !game || !presence) return;
+
+    const activeHostId = game.hostId || Object.values(game.seats || {})[0]?.id;
+    const isHostOnline = activeHostId && presence[activeHostId];
+
+    if (!isHostOnline) {
+      const connectedHumanSeats = Object.entries(game.seats || {})
+        .map(([seatStr, p]) => ({ seat: Number(seatStr), ...p }))
+        .filter((p) => !p.isBot && p.id && presence[p.id]);
+
+      if (connectedHumanSeats.length > 0) {
+        connectedHumanSeats.sort((a, b) => a.seat - b.seat);
+        const nextHostId = connectedHumanSeats[0].id;
+
+        if (myId === nextHostId && game.hostId !== myId) {
+          migrateHost(code, myId);
+        }
+      }
+    }
+  }, [code, game, presence, myId]);
+
+  // ── Bot runner: fire AI moves when a bot seat's turn arrives ──────────
   useEffect(() => {
     if (!code || !game) return;
     const cancel = runBotTurn(code, game, presence);
@@ -76,14 +105,12 @@ export default function Game() {
 
     const newLen = (game.trickHistory || []).length;
 
-    // New round started or trump-selection reset — clear state
     if (game.status === "selecting-trump") {
       completedLenRef.current = 0;
       setShownPlays([]);
       return;
     }
 
-    // A trick just completed (trickHistory grew) — freeze those 4 cards
     if (newLen > completedLenRef.current) {
       const lastTrick = game.trickHistory[newLen - 1];
       const frozenPlays = (lastTrick?.plays || []).map((play) => ({
@@ -99,7 +126,6 @@ export default function Game() {
       return () => clearTimeout(timer);
     }
 
-    // No new completed trick — mirror the live in-progress trick
     if (completedLenRef.current === newLen) {
       const livePlays = (game.trick || []).map((play) => ({
         seat: seatToPosition(mySeatRef.current, play.seat),
@@ -110,22 +136,34 @@ export default function Game() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game?.trickHistory, game?.trick, game?.status]);
 
-  // No room code = direct "Play with AI" navigation - keep showing the
-  // local AI table until real bot logic exists.
   if (!code) {
     return <GameTable />;
   }
 
-  if (!game) return null; // waiting for the first snapshot
+  if (!game) return null;
 
   const mySeatEntry = Object.entries(game.seats || {}).find(
     ([, player]) => player?.id === myId
   );
-  if (!mySeatEntry) return null; // shouldn't happen once the round is dealt
+  if (!mySeatEntry) return null;
 
   const mySeat = Number(mySeatEntry[0]);
-  // Update the ref every render so trick-hold effect always has the latest seat.
   mySeatRef.current = mySeat;
+
+  // Automatically reclaim seat if player rejoined and seat was converted to bot
+  if (mySeatEntry[1]?.isBot) {
+    reclaimPlayerSeat(code, mySeat, myId, currentPlayer?.name || "Player");
+  }
+
+  const currentHostId = game.hostId || Object.values(game.seats || {})[0]?.id;
+  const isHost = currentHostId === myId;
+
+  // Detect disconnected real players
+  const disconnectedEntry = Object.entries(game.seats || {}).find(
+    ([, p]) => !p?.isBot && p?.id && presence !== null && !presence[p.id]
+  );
+  const disconnectedSeat = disconnectedEntry ? Number(disconnectedEntry[0]) : null;
+  const disconnectedPlayer = disconnectedEntry ? disconnectedEntry[1] : null;
 
   const players = Object.entries(game.seats || {}).map(([seatStr, player]) => {
     const seat = Number(seatStr);
@@ -156,9 +194,6 @@ export default function Game() {
     suit: card.suit,
   }));
 
-  // shownPlays is managed by the trick-hold useEffect above;
-  // no need to recompute plays inline here.
-
   const activeSeatPosition =
     game.status === "selecting-trump"
       ? seatToPosition(mySeat, game.trumpPickerSeat)
@@ -185,6 +220,22 @@ export default function Game() {
 
   return (
     <>
+      {disconnectedPlayer && (
+        <div className="game-dc-bar">
+          <span>⚠️ <strong>{disconnectedPlayer.name}</strong> disconnected</span>
+          <span className="game-dc-bar__code">Code: {code}</span>
+          {isHost && (
+            <button
+              type="button"
+              className="game-dc-bar__btn"
+              onClick={() => setDismissedDcModal(false)}
+            >
+              Host Options
+            </button>
+          )}
+        </div>
+      )}
+
       <GameTable
         players={players}
         hand={myHand}
@@ -211,6 +262,17 @@ export default function Game() {
           </div>
         </div>
       )}
+
+      {isHost && disconnectedPlayer && (
+        <DisconnectModal
+          isOpen={!dismissedDcModal}
+          playerName={disconnectedPlayer.name}
+          roomCode={code}
+          onWait={() => setDismissedDcModal(true)}
+          onReplaceWithBot={() => replacePlayerWithBot(code, disconnectedSeat, t("oomiBot"))}
+        />
+      )}
     </>
   );
 }
+

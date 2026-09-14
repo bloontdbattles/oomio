@@ -1,0 +1,121 @@
+.dc-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(3, 19, 10, 0.75);
+    backdrop-filter: blur(8px);
+    animation: dcFadeIn 0.25s ease-out;
+}
+
+.dc-modal {
+    width: 90%;
+    max-width: 440px;
+    background: linear-gradient(145deg, rgba(16, 42, 28, 0.95), rgba(6, 26, 16, 0.98));
+    border: 1px solid var(--oomio-gold, #e8b84b);
+    border-radius: 16px;
+    padding: 24px;
+    color: var(--oomio-cream, #f6f0de);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(232, 184, 75, 0.25);
+    text-align: center;
+}
+
+.dc-modal__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.dc-modal__icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(231, 76, 60, 0.15);
+    border: 1.5px solid #e74c3c;
+    color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dc-modal__title {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--oomio-gold, #e8b84b);
+    margin: 0;
+}
+
+.dc-modal__text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    color: rgba(246, 240, 222, 0.9);
+}
+
+.dc-modal__code-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px dashed rgba(232, 184, 75, 0.5);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 22px;
+}
+
+.dc-modal__code-label {
+    font-size: 0.85rem;
+    color: rgba(246, 240, 222, 0.7);
+}
+
+.dc-modal__code-value {
+    font-family: monospace;
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+    color: var(--oomio-gold, #e8b84b);
+}
+
+.dc-modal__copy-btn {
+    background: rgba(232, 184, 75, 0.15);
+    border: 1px solid var(--oomio-gold, #e8b84b);
+    color: var(--oomio-gold, #e8b84b);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dc-modal__copy-btn:hover {
+    background: var(--oomio-gold, #e8b84b);
+    color: #102a1c;
+}
+
+.dc-modal__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dc-modal__btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.95rem;
+}
+
+@keyframes dcFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

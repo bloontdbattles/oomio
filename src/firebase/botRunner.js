@@ -36,18 +36,10 @@ function toFull(suit) { return CODE_TO_FULL[suit] ?? suit; }
 function convertCard(card) { return { rank: card.rank, suit: toCode(card.suit) }; }
 
 /**
- * Returns true when the occupant of `seat` is a bot OR is a disconnected real player.
+ * Returns true when the occupant of `seat` is an AI bot.
  */
-export function isBotSeat(game, seat, presence = null) {
-    const player = game?.seats?.[seat];
-    if (!player) return false;
-    if (player.isBot) return true;
-
-    // If presence state has loaded (is not null/undefined), check if real player disconnected
-    if (presence !== null && presence !== undefined && player.id && !presence[player.id]) {
-        return true;
-    }
-    return false;
+export function isBotSeat(game, seat) {
+    return !!game?.seats?.[seat]?.isBot;
 }
 
 /**
