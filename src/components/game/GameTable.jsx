@@ -228,38 +228,48 @@ export default function GameTable({
 
         // A trick just completed (newLen increased) — show all 4 cards for 5 seconds
         if (newLen > completedLenRef.current) {
-            const lastTrick = engineState.completedTricks[newLen - 1];
-            const lastWinnerSeat = engineState.trickWinners[newLen - 1];
-            const winPos = SEAT_INDEX_TO_NAME[lastWinnerSeat] ?? "bottom";
-
-            setShownTrick(trickToPlayedCards(lastTrick));
+            const lastCompleted = engineState.completedTricks[newLen - 1];
+            setShownTrick(lastCompleted?.trick ?? {});
             setPaused(true);
-            setWinnerPosition(winPos);
+            completedLenRef.current = newLen;
+
+            // Calculate winner position for animation
+            const winnerSeat = engineState.trickWinners[newLen - 1];
+            const winnerPos = SEAT_INDEX_TO_NAME[winnerSeat] ?? "bottom";
+            setWinnerPosition(null);
             setIsCollecting(false);
 
-            const sweepTimer = setTimeout(() => {
+            // Trigger collection animation at t=3s (holds 3s, moves 1s, clears at 5s)
+            const animTimer = setTimeout(() => {
+                setWinnerPosition(winnerPos);
                 setIsCollecting(true);
             }, 3000);
 
-            const clearTimer = setTimeout(() => {
-                completedLenRef.current = newLen;
+            const timer = setTimeout(() => {
                 setPaused(false);
                 setShownTrick({});
                 setIsCollecting(false);
                 setWinnerPosition(null);
-            }, TRICK_CLEAR_DELAY_MS);
+            }, 5000);
 
             return () => {
-                clearTimeout(sweepTimer);
-                clearTimeout(clearTimer);
+                clearTimeout(animTimer);
+                clearTimeout(timer);
             };
         }
 
-        // Mirror live trick while trick is in progress (if not in completion pause)
-        if (completedLenRef.current === newLen) {
-            setShownTrick(trickToPlayedCards(engineState.currentTrick));
+        // Live trick during play (if not paused)
+        if (!paused) {
+            setShownTrick(engineState.currentTrick ?? {});
         }
-    }, [engineState.completedTricks, engineState.currentTrick, engineState.phase, engineState.trickWinners, isMultiplayer]);
+    }, [
+        isMultiplayer,
+        engineState.completedTricks,
+        engineState.currentTrick,
+        engineState.phase,
+        engineState.trickWinners,
+        paused,
+    ]);
 
     // ── Effect C: AI trump selection ──────────────────────────────────────────
     useEffect(() => {
@@ -271,7 +281,13 @@ export default function GameTable({
         const timer = setTimeout(() => {
             try {
                 const aiView = buildAIViewState(engineState, mySeat);
-                const suit = getAITrump({ state: aiView, seat: mySeat });
+                const biddingView = {
+                    ...aiView,
+                    players: aiView.players.map((p) =>
+                        p.seat === mySeat ? { ...p, hand: p.hand.slice(0, 4) } : p
+                    ),
+                };
+                const suit = getAITrump({ state: biddingView, seat: mySeat });
                 dispatch(selectTrumpAction(mySeat, suit));
             } catch (e) {
                 console.error("AI trump selection error:", e);
@@ -379,10 +395,13 @@ export default function GameTable({
         : (SUIT_CODE_TO_FULL[engineState.trumpSuit] ?? null);
 
     // Human player's hand, converted to full suit names for PlayingCard component
+    // Shows only the first 4 cards during TRUMP_SELECTION, and full hand during PLAYING
     const currentHand = isMultiplayer
         ? (externalHand || [])
         : handToDisplayCards(
-            engineState.players.find((p) => p.seat === 0)?.hand ?? []
+            engineState.phase === PHASES.TRUMP_SELECTION
+                ? (engineState.players.find((p) => p.seat === 0)?.hand ?? []).slice(0, 4)
+                : (engineState.players.find((p) => p.seat === 0)?.hand ?? [])
         );
 
     const currentActiveSeat = isMultiplayer
@@ -417,7 +436,9 @@ export default function GameTable({
         !isMultiplayer &&
         engineState.phase === PHASES.TRUMP_SELECTION &&
         engineState.trumpChooserSeat === 0;
-    const showPlayerHand = isMultiplayer ? true : engineState.phase === PHASES.PLAYING;
+    const showPlayerHand = isMultiplayer
+        ? true
+        : (engineState.phase === PHASES.PLAYING || engineState.phase === PHASES.TRUMP_SELECTION);
     const showResult =
         !isMultiplayer &&
         (engineState.phase === PHASES.ROUND_END ||

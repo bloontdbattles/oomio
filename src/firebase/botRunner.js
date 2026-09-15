@@ -38,8 +38,11 @@ function convertCard(card) { return { rank: card.rank, suit: toCode(card.suit) }
 /**
  * Returns true when the occupant of `seat` is an AI bot.
  */
-export function isBotSeat(game, seat) {
-    return !!game?.seats?.[seat]?.isBot;
+export function isBotSeat(game, seat, presence = null) {
+    const isBot = !!game?.seats?.[seat]?.isBot;
+    const player = game?.seats?.[seat];
+    const isDisconnected = !isBot && player?.id && presence !== null && presence[player.id] === false;
+    return isBot || isDisconnected;
 }
 
 /**
@@ -109,10 +112,11 @@ export function runBotTurn(code, game, presence = null) {
         if (lastFiredTurnKey === turnKey) return () => {};
         lastFiredTurnKey = turnKey;
 
-        const hand = game.hands?.[pickerSeat] || [];
+        const rawHand = game.hands?.[pickerSeat] || [];
+        const biddingHand = rawHand.slice(0, 4); // AI bids based ONLY on its first 4 cards
         const timer = setTimeout(async () => {
             try {
-                const suit = chooseTrump(hand.map(convertCard)); // convert to single-letter codes
+                const suit = chooseTrump(biddingHand.map(convertCard)); // convert to single-letter codes
                 await selectTrump(code, pickerSeat, toFull(suit)); // convert back to full name
             } catch (e) {
                 console.error("[BotRunner] Trump selection error:", e);

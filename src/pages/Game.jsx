@@ -248,7 +248,9 @@ export default function Game() {
     };
   });
 
-  const myHand = (game.hands?.[mySeat] || []).map((card) => ({
+  const rawHand = game.hands?.[mySeat] || [];
+  const handToDisplay = game.status === "selecting-trump" ? rawHand.slice(0, 4) : rawHand;
+  const myHand = handToDisplay.map((card) => ({
     id: `${card.rank}-${card.suit}`,
     rank: card.rank,
     suit: card.suit,
