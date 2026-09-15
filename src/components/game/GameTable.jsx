@@ -5,7 +5,7 @@ import PlayedCards from "./PlayedCards";
 import PlayerHand from "./PlayerHand";
 import TrumpDisplay from "./TrumpDisplay";
 import ScoreBoard from "./ScoreBoard";
-import BidPanel from "./BidPanel";
+import TrumpPicker from "./TrumpPicker";
 import GameResult from "./GameResult";
 import player1Img from "../../assets/images/player1.png";
 import player2Img from "../../assets/images/player2.png";
@@ -229,7 +229,9 @@ export default function GameTable({
         // A trick just completed (newLen increased) — show all 4 cards for 5 seconds
         if (newLen > completedLenRef.current) {
             const lastCompleted = engineState.completedTricks[newLen - 1];
-            setShownTrick(lastCompleted?.trick ?? {});
+            // completedTricks stores the raw trick array — convert it to {position: card} format
+            const lastTrickArr = Array.isArray(lastCompleted) ? lastCompleted : (lastCompleted?.trick ?? []);
+            setShownTrick(trickToPlayedCards(lastTrickArr));
             setPaused(true);
             completedLenRef.current = newLen;
 
@@ -260,7 +262,7 @@ export default function GameTable({
 
         // Live trick during play (if not paused)
         if (!paused) {
-            setShownTrick(engineState.currentTrick ?? {});
+            setShownTrick(trickToPlayedCards(engineState.currentTrick ?? []));
         }
     }, [
         isMultiplayer,
@@ -294,7 +296,7 @@ export default function GameTable({
             }
         }, AI_TRUMP_DELAY_MS);
         return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engineState.phase, engineState.trumpChooserSeat]);
 
     // ── Effect D: AI card play ────────────────────────────────────────────────
@@ -337,7 +339,7 @@ export default function GameTable({
             }
         }, AI_PLAY_DELAY_MS);
         return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engineState.currentTurn, engineState.phase, paused]);
 
     // ── Human: select trump ───────────────────────────────────────────────────
@@ -436,6 +438,10 @@ export default function GameTable({
         !isMultiplayer &&
         engineState.phase === PHASES.TRUMP_SELECTION &&
         engineState.trumpChooserSeat === 0;
+    const showWaitingTrump =
+        !isMultiplayer &&
+        engineState.phase === PHASES.TRUMP_SELECTION &&
+        engineState.trumpChooserSeat !== 0;
     const showPlayerHand = isMultiplayer
         ? true
         : (engineState.phase === PHASES.PLAYING || engineState.phase === PHASES.TRUMP_SELECTION);
@@ -576,9 +582,10 @@ export default function GameTable({
 
             {/* Bidding overlay — singleplayer only */}
             {showBidPanel && (
-                <div className="game-table__overlay">
-                    <BidPanel onSelectTrump={handleSelectTrump} />
-                </div>
+                <TrumpPicker isMyTurn={true} onSelect={handleSelectTrump} />
+            )}
+            {showWaitingTrump && (
+                <TrumpPicker isMyTurn={false} />
             )}
 
             {/* Round/game result overlay — singleplayer only */}
