@@ -171,6 +171,8 @@ export default function GameTable({
     activeSeat: externalActiveSeat,
     onConfirmPlay: externalOnConfirmPlay,
     isMultiplayer = false,
+    winnerPosition: externalWinnerPosition,
+    isCollecting: externalIsCollecting,
 }) {
     const [engineState, dispatch] = useReducer(
         gameReducerWithIds,
@@ -181,9 +183,11 @@ export default function GameTable({
     const [playerName, setPlayerName] = useState("Player");
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-    // Trick display: hold the last completed trick visible for 1500ms before clearing
+    // Trick display: hold the last completed trick visible for 5s before clearing
     const [shownTrick, setShownTrick] = useState({});
     const [paused, setPaused] = useState(false);
+    const [winnerPosition, setWinnerPosition] = useState(null);
+    const [isCollecting, setIsCollecting] = useState(false);
     const completedLenRef = useRef(0);
 
     const tCfg = isMobile ? MOBILE_TABLE_CONFIG : TABLE_CONFIG;
@@ -204,6 +208,7 @@ export default function GameTable({
 
     // ── Effect A & B: Unified Trick Display & Completion Pause ────────────────
     // Manages live trick cards and holds all 4 completed cards on table for 5 seconds.
+    // At 3s, triggers a 1s animation collecting cards to the trick winner's seat.
     useEffect(() => {
         if (isMultiplayer) return;
         const newLen = engineState.completedTricks.length;
@@ -216,28 +221,45 @@ export default function GameTable({
             completedLenRef.current = 0;
             setPaused(false);
             setShownTrick({});
+            setIsCollecting(false);
+            setWinnerPosition(null);
             return;
         }
 
         // A trick just completed (newLen increased) — show all 4 cards for 5 seconds
         if (newLen > completedLenRef.current) {
             const lastTrick = engineState.completedTricks[newLen - 1];
+            const lastWinnerSeat = engineState.trickWinners[newLen - 1];
+            const winPos = SEAT_INDEX_TO_NAME[lastWinnerSeat] ?? "bottom";
+
             setShownTrick(trickToPlayedCards(lastTrick));
             setPaused(true);
+            setWinnerPosition(winPos);
+            setIsCollecting(false);
 
-            const timer = setTimeout(() => {
+            const sweepTimer = setTimeout(() => {
+                setIsCollecting(true);
+            }, 3000);
+
+            const clearTimer = setTimeout(() => {
                 completedLenRef.current = newLen;
                 setPaused(false);
                 setShownTrick({});
+                setIsCollecting(false);
+                setWinnerPosition(null);
             }, TRICK_CLEAR_DELAY_MS);
-            return () => clearTimeout(timer);
+
+            return () => {
+                clearTimeout(sweepTimer);
+                clearTimeout(clearTimer);
+            };
         }
 
         // Mirror live trick while trick is in progress (if not in completion pause)
         if (completedLenRef.current === newLen) {
             setShownTrick(trickToPlayedCards(engineState.currentTrick));
         }
-    }, [engineState.completedTricks, engineState.currentTrick, engineState.phase]);
+    }, [engineState.completedTricks, engineState.currentTrick, engineState.phase, engineState.trickWinners, isMultiplayer]);
 
     // ── Effect C: AI trump selection ──────────────────────────────────────────
     useEffect(() => {
@@ -503,6 +525,8 @@ export default function GameTable({
                         <PlayedCards
                             cards={isMultiplayer ? undefined : shownTrick}
                             plays={isMultiplayer ? externalPlays : undefined}
+                            winnerPosition={isMultiplayer ? externalWinnerPosition : winnerPosition}
+                            isCollecting={isMultiplayer ? externalIsCollecting : isCollecting}
                         />
                     </div>
                 </div>

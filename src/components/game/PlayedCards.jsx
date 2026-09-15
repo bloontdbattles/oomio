@@ -1,15 +1,17 @@
 import PlayingCard from "./PlayingCard";
 import "./PlayedCards.css";
 
-export default function PlayedCards({ cards = {}, plays }) {
+export default function PlayedCards({ cards = {}, plays, winnerPosition, isCollecting }) {
     // cards: { bottom?: card, top?: card, left?: card, right?: card }
     // plays: [{ seat: "bottom"|"left"|"top"|"right", card: { rank, suit } }]
     const activeCards = plays
         ? plays.reduce((acc, p) => ({ ...acc, [p.seat]: p.card }), {})
         : cards;
 
+    const collectingClass = isCollecting && winnerPosition ? `is-collecting is-collecting--to-${winnerPosition}` : "";
+
     return (
-        <div className="played-cards">
+        <div className={`played-cards ${collectingClass}`}>
             {Object.entries(activeCards).map(([position, card]) => {
                 if (!card) return null;
                 return (

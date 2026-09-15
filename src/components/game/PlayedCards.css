@@ -13,7 +13,29 @@
 
 .played-cards__slot {
     position: absolute;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+/* 1-second collection animation towards the trick winner's seat */
+.played-cards.is-collecting .played-cards__slot {
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    opacity: 0 !important;
+}
+
+.played-cards.is-collecting--to-bottom .played-cards__slot {
+    transform: translateY(240px) scale(0.3) rotate(0deg) !important;
+}
+
+.played-cards.is-collecting--to-top .played-cards__slot {
+    transform: translateY(-240px) scale(0.3) rotate(0deg) !important;
+}
+
+.played-cards.is-collecting--to-left .played-cards__slot {
+    transform: translateX(-260px) scale(0.3) rotate(0deg) !important;
+}
+
+.played-cards.is-collecting--to-right .played-cards__slot {
+    transform: translateX(260px) scale(0.3) rotate(0deg) !important;
 }
 
 /* Desktop / Laptop: 82.5×130 × 150% = 123.75px × 195px */
@@ -72,5 +94,21 @@
 
     .played-cards__slot--right {
         right: 16px;
+    }
+
+    .played-cards.is-collecting--to-bottom .played-cards__slot {
+        transform: translateY(170px) scale(0.3) rotate(0deg) !important;
+    }
+
+    .played-cards.is-collecting--to-top .played-cards__slot {
+        transform: translateY(-170px) scale(0.3) rotate(0deg) !important;
+    }
+
+    .played-cards.is-collecting--to-left .played-cards__slot {
+        transform: translateX(-170px) scale(0.3) rotate(0deg) !important;
+    }
+
+    .played-cards.is-collecting--to-right .played-cards__slot {
+        transform: translateX(170px) scale(0.3) rotate(0deg) !important;
     }
 }

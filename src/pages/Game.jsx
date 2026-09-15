@@ -48,8 +48,11 @@ export default function Game() {
 
   // ── Trick display: hold last completed trick visible for 5s ───────────
   const TRICK_HOLD_MS = 5000;
+  const TRICK_SWEEP_START_MS = 3000;
   const completedLenRef = useRef(0);
   const [shownPlays, setShownPlays] = useState([]);
+  const [winnerPosition, setWinnerPosition] = useState(null);
+  const [isCollecting, setIsCollecting] = useState(false);
   const mySeatRef = useRef(-1);
 
   useEffect(() => {
@@ -100,6 +103,7 @@ export default function Game() {
   }, [code, game, presence]);
 
   // ── Mirror live trick / hold completed trick for 5s ───────────────────
+  // At 3s (TRICK_SWEEP_START_MS), triggers 1s animation collecting cards to trick winner.
   useEffect(() => {
     if (!game) return;
 
@@ -108,6 +112,8 @@ export default function Game() {
     if (game.status === "selecting-trump") {
       completedLenRef.current = 0;
       setShownPlays([]);
+      setIsCollecting(false);
+      setWinnerPosition(null);
       return;
     }
 
@@ -117,13 +123,27 @@ export default function Game() {
         seat: seatToPosition(mySeatRef.current, play.seat),
         card: play.card,
       }));
-      setShownPlays(frozenPlays);
+      const winPos = seatToPosition(mySeatRef.current, lastTrick?.winnerSeat);
 
-      const timer = setTimeout(() => {
+      setShownPlays(frozenPlays);
+      setWinnerPosition(winPos);
+      setIsCollecting(false);
+
+      const sweepTimer = setTimeout(() => {
+        setIsCollecting(true);
+      }, TRICK_SWEEP_START_MS);
+
+      const clearTimer = setTimeout(() => {
         completedLenRef.current = newLen;
         setShownPlays([]);
+        setIsCollecting(false);
+        setWinnerPosition(null);
       }, TRICK_HOLD_MS);
-      return () => clearTimeout(timer);
+
+      return () => {
+        clearTimeout(sweepTimer);
+        clearTimeout(clearTimer);
+      };
     }
 
     if (completedLenRef.current === newLen) {
@@ -284,6 +304,8 @@ export default function Game() {
         activeSeat={activeSeatPosition}
         onConfirmPlay={handleConfirmPlay}
         isMultiplayer={true}
+        winnerPosition={winnerPosition}
+        isCollecting={isCollecting}
       />
 
       {game.status === "selecting-trump" && (
