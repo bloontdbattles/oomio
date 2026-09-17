@@ -9,7 +9,8 @@ export default function LanguageSwitcher() {
     <div className="lang-switch" role="group" aria-label="Language">
       <button
         type="button"
-        className={`lang-switch__option ${lang === "en" ? "is-active" : ""}`}
+        lang="en"
+        className={`lang-switch__option lang-switch__option--en ${lang === "en" ? "is-active" : ""}`}
         onClick={() => setLang("en")}
       >
         EN
@@ -17,7 +18,8 @@ export default function LanguageSwitcher() {
       <span className="lang-switch__divider">/</span>
       <button
         type="button"
-        className={`lang-switch__option ${lang === "si" ? "is-active" : ""}`}
+        lang="si"
+        className={`lang-switch__option lang-switch__option--si ${lang === "si" ? "is-active" : ""}`}
         onClick={() => setLang("si")}
       >
         සිං

@@ -33,9 +33,18 @@
   color: var(--oomio-cream);
 }
 
+.lang-switch__option--en {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.lang-switch__option--si {
+  font-family: 'SinhalaFont', 'Inter', sans-serif;
+}
+
 .lang-switch__divider {
   color: rgba(246, 240, 222, 0.3);
   font-size: 0.75rem;
+  font-family: 'Inter', sans-serif !important;
 }
 
 .lang-switch__option:focus-visible {

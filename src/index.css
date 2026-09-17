@@ -8,6 +8,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'SinhalaFont';
+  src: url('./assets/fonts/font2.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0D80-U+0DFF, U+25CC;
+}
 
 :root {
   /* Oomio custom theme variables */
@@ -54,6 +62,24 @@
   }
 }
 
+/* Use font2 (SinhalaFont) strictly for Sinhala letters when Sinhala language is selected */
+:root[lang="si"], [lang="si"] {
+  --font-body: 'SinhalaFont', 'Inter', sans-serif;
+  --font-display: 'SinhalaFont', 'Outfit', sans-serif;
+}
+
+/* Ensure user input fields always use normal fonts and not font2 */
+input, textarea, select {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Words tagged with <word> in locale files or with no-font2 class explicitly use normal fonts */
+.no-font2,
+[data-no-font2],
+.no-font2 * {
+  font-family: 'Inter', sans-serif !important;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
@@ -98,20 +124,24 @@ h1 {
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;
+
   @media (max-width: 1024px) {
     font-size: 36px;
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
   margin: 0 0 8px;
+
   @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -162,4 +192,3 @@ code {
 .btn--primary:active {
   transform: translateY(1px);
 }
-
