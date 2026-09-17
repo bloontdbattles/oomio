@@ -68,9 +68,14 @@
   --font-display: 'SinhalaFont', 'Outfit', sans-serif;
 }
 
-/* Ensure user input fields always use normal fonts and not font2 */
+/* Ensure user typed inputs always use normal fonts and not font2 */
 input, textarea, select {
   font-family: 'Inter', sans-serif !important;
+}
+
+:root[lang="si"] input::placeholder,
+:root[lang="si"] textarea::placeholder {
+  font-family: 'SinhalaFont', 'Inter', sans-serif !important;
 }
 
 /* Words tagged with <word> in locale files or with no-font2 class explicitly use normal fonts */
@@ -78,6 +83,21 @@ input, textarea, select {
 [data-no-font2],
 .no-font2 * {
   font-family: 'Inter', sans-serif !important;
+}
+
+/* Exclude player names, scoreboard box, and top-left trump text from font2 */
+.player-seat__name,
+.player-seat__badge,
+.player-seat__info,
+.player-slot__name,
+.player-name,
+.player-seat__info * {
+  font-family: 'Outfit', 'Inter', sans-serif !important;
+}
+
+.scoreboard,
+.scoreboard * {
+  font-family: 'Outfit', 'Inter', sans-serif !important;
 }
 
 @media (prefers-color-scheme: dark) {
