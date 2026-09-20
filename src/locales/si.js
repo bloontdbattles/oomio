@@ -22,7 +22,7 @@ export default {
   lobbySettings: "<Lobby> iewlfiqï",
   turnTimer: "jdr ghsukh",
   turnTimerHint: "ie' jdrhla i|ydu ld, iSudjla ilikak",
-  roomCode: "ldur la;h",
+  roomCode: "<Lobby Code> ",
   pickYourTeam: "nTf.a lKavdhu f;darkak",
   redTeam: "r;= lKavdhu",
   blueTeam: "ks,a lKavdhu",

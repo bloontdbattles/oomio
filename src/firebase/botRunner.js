@@ -24,8 +24,8 @@ const BOT_TRUMP_DELAY_MS = 2000;
 const BOT_PLAY_DELAY_MS = 3000;
 const TRICK_HOLD_MS = 5000;
 
-// Prevent the same turn from firing twice (race guard).
-let lastFiredTurnKey = null;
+// Active bot turn timers map: turnKey -> timerId
+const activeTimers = new Map();
 
 // Suit translation: Firebase uses full names, aiStrategy uses single-letter codes
 const FULL_TO_CODE = { hearts: "H", diamonds: "D", clubs: "C", spades: "S" };
@@ -96,80 +96,81 @@ function buildAIState(game, mySeat) {
 /**
  * Checks the current Firebase game state and fires the appropriate bot action
  * (trump selection or card play) when the active seat belongs to a bot or disconnected player.
- *
- * Returns a cancel function so the caller can clear a pending timer on
- * the next state update.
  */
 export function runBotTurn(code, game, presence = null) {
     if (!game) return () => {};
 
+    let currentTurnKey = null;
+
     // ── Trump selection phase ─────────────────────────────────────────────
     if (game.status === "selecting-trump") {
         const pickerSeat = game.trumpPickerSeat;
-        if (!isBotSeat(game, pickerSeat, presence)) return () => {};
+        if (isBotSeat(game, pickerSeat, presence)) {
+            currentTurnKey = `trump-${code}-${game.roundNumber || 1}-${pickerSeat}`;
 
-        const turnKey = `trump-${code}-${game.roundNumber}-${pickerSeat}`;
-        if (lastFiredTurnKey === turnKey) return () => {};
-        lastFiredTurnKey = turnKey;
+            if (!activeTimers.has(currentTurnKey)) {
+                const rawHand = game.hands?.[pickerSeat] || [];
+                const biddingHand = rawHand.slice(0, 4); // AI bids based ONLY on its first 4 cards
 
-        const rawHand = game.hands?.[pickerSeat] || [];
-        const biddingHand = rawHand.slice(0, 4); // AI bids based ONLY on its first 4 cards
-        const timer = setTimeout(async () => {
-            try {
-                const suit = chooseTrump(biddingHand.map(convertCard)); // convert to single-letter codes
-                await selectTrump(code, pickerSeat, toFull(suit)); // convert back to full name
-            } catch (e) {
-                console.error("[BotRunner] Trump selection error:", e);
+                const timerId = setTimeout(async () => {
+                    activeTimers.delete(currentTurnKey);
+                    try {
+                        const suit = chooseTrump(biddingHand.map(convertCard)); // convert to single-letter codes
+                        await selectTrump(code, pickerSeat, toFull(suit)); // convert back to full name
+                    } catch (e) {
+                        console.error("[BotRunner] Trump selection error:", e);
+                    }
+                }, BOT_TRUMP_DELAY_MS);
+
+                activeTimers.set(currentTurnKey, timerId);
             }
-        }, BOT_TRUMP_DELAY_MS);
-
-        return () => {
-            clearTimeout(timer);
-            if (lastFiredTurnKey === turnKey) {
-                lastFiredTurnKey = null;
-            }
-        };
+        }
     }
 
     // ── Playing phase ─────────────────────────────────────────────────────
-    if (game.status === "playing") {
+    else if (game.status === "playing") {
         const currentSeat = game.currentTurnSeat;
-        if (!isBotSeat(game, currentSeat, presence)) return () => {};
+        if (isBotSeat(game, currentSeat, presence)) {
+            const trickLen = (game.trick || []).length;
+            currentTurnKey = `play-${code}-${game.roundNumber || 1}-${currentSeat}-${trickLen}`;
 
-        // Build a unique key for this exact turn to prevent double-firing.
-        const trickLen = (game.trick || []).length;
-        const turnKey = `play-${code}-${game.roundNumber}-${currentSeat}-${trickLen}`;
-        if (lastFiredTurnKey === turnKey) return () => {};
-        lastFiredTurnKey = turnKey;
+            if (!activeTimers.has(currentTurnKey)) {
+                // If a trick just completed, wait for the 5-second trick-hold to finish
+                // before starting the bot's normal think delay.
+                const isFirstCardOfNewTrick = trickLen === 0 && (game.trickHistory || []).length > 0;
+                const delay = isFirstCardOfNewTrick
+                    ? TRICK_HOLD_MS + BOT_PLAY_DELAY_MS
+                    : BOT_PLAY_DELAY_MS;
 
-        // If a trick just completed, wait for the 5-second trick-hold to finish
-        // before starting the bot's normal think delay.
-        const isFirstCardOfNewTrick = trickLen === 0 && (game.trickHistory || []).length > 0;
-        const delay = isFirstCardOfNewTrick
-            ? TRICK_HOLD_MS + BOT_PLAY_DELAY_MS
-            : BOT_PLAY_DELAY_MS;
+                const timerId = setTimeout(async () => {
+                    activeTimers.delete(currentTurnKey);
+                    try {
+                        const aiState = buildAIState(game, currentSeat);
+                        const card = chooseCard({
+                            state: aiState,
+                            mySeat: currentSeat,
+                            difficulty: BOT_DIFFICULTY,
+                        });
+                        // card.suit is a single-letter code — convert back to full name for Firebase
+                        await playCard(code, currentSeat, { rank: card.rank, suit: toFull(card.suit) });
+                    } catch (e) {
+                        console.error("[BotRunner] Card play error:", e);
+                    }
+                }, delay);
 
-        const timer = setTimeout(async () => {
-            try {
-                const aiState = buildAIState(game, currentSeat);
-                const card = chooseCard({
-                    state: aiState,
-                    mySeat: currentSeat,
-                    difficulty: BOT_DIFFICULTY,
-                });
-                // card.suit is a single-letter code — convert back to full name for Firebase
-                await playCard(code, currentSeat, { rank: card.rank, suit: toFull(card.suit) });
-            } catch (e) {
-                console.error("[BotRunner] Card play error:", e);
+                activeTimers.set(currentTurnKey, timerId);
             }
-        }, delay);
+        }
+    }
 
-        return () => {
-            clearTimeout(timer);
-            if (lastFiredTurnKey === turnKey) {
-                lastFiredTurnKey = null;
+    // ── Cleanup stale timers for other turns ──────────────────────────────
+    for (const [key, timerId] of activeTimers.entries()) {
+        if (key.startsWith(`trump-${code}-`) || key.startsWith(`play-${code}-`)) {
+            if (key !== currentTurnKey) {
+                clearTimeout(timerId);
+                activeTimers.delete(key);
             }
-        };
+        }
     }
 
     return () => {};
