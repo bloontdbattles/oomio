@@ -79,6 +79,7 @@ export function gameReducer(state, action) {
             const winnerTeam = getTrickWinnerTeam(updatedTrick, state.trumpSuit);
             const completedTricks = [...state.completedTricks, updatedTrick];
             const trickWinners = [...state.trickWinners, winnerTeam];
+            const trickWinnerSeats = [...(state.trickWinnerSeats || []), winnerSeat];
 
             const cardsRemaining = updatedPlayers.some((p) => p.hand.length > 0);
 
@@ -89,6 +90,7 @@ export function gameReducer(state, action) {
                     currentTrick: [],
                     completedTricks,
                     trickWinners,
+                    trickWinnerSeats,
                     currentTurn: winnerSeat,
                 };
             }
@@ -111,6 +113,7 @@ export function gameReducer(state, action) {
                 currentTrick: [],
                 completedTricks,
                 trickWinners,
+                trickWinnerSeats,
                 cats: newCats,
                 lastRoundResult: roundResult,
                 phase: gameOver ? PHASES.GAME_END : PHASES.ROUND_END,
@@ -137,6 +140,7 @@ export function gameReducer(state, action) {
                 currentTrick: [],
                 completedTricks: [],
                 trickWinners: [],
+                trickWinnerSeats: [],
                 lastRoundResult: null,
             };
 

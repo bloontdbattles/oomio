@@ -23,6 +23,7 @@ import {
 } from "../../game/engine/gameReducer";
 import { PHASES } from "../../game/engine/gameState";
 import { isLegalMove } from "../../game/rules/cardRules";
+import { getTrickWinnerIndex } from "../../game/rules/trickRules";
 import { getAICard, getAITrump } from "../../game/ai/aiPlayer";
 import { AI_DIFFICULTY } from "../../game/ai/aiDifficulty";
 
@@ -242,7 +243,7 @@ export default function GameTable({
             setPaused(true);
 
             // Calculate winner position for animation
-            const winnerSeat = engineState.trickWinners[newLen - 1];
+            const winnerSeat = engineState.trickWinnerSeats?.[newLen - 1] ?? getTrickWinnerIndex(lastTrickArr, engineState.trumpSuit);
             const winnerPos = SEAT_INDEX_TO_NAME[winnerSeat] ?? "bottom";
             setWinnerPosition(null);
             setIsCollecting(false);
