@@ -206,12 +206,14 @@ export default function GameTable({
         return () => window.removeEventListener("resize", onResize);
     }, []);
 
+    const sweepTimerRef = useRef(null);
+    const clearTimerRef = useRef(null);
+
     // ── Effect A & B: Unified Trick Display & Completion Pause ────────────────
     // Manages live trick cards and holds all 4 completed cards on table for 5 seconds.
     // At 3s, triggers a 1s animation collecting cards to the trick winner's seat.
     useEffect(() => {
         if (isMultiplayer) return;
-        const newLen = engineState.completedTricks.length;
 
         // Reset display state on new round or fresh game
         if (
@@ -219,6 +221,8 @@ export default function GameTable({
             engineState.phase === PHASES.DEALING
         ) {
             completedLenRef.current = 0;
+            if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
+            if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
             setPaused(false);
             setShownTrick({});
             setIsCollecting(false);
@@ -226,14 +230,16 @@ export default function GameTable({
             return;
         }
 
+        const newLen = engineState.completedTricks.length;
+
         // A trick just completed (newLen increased) — show all 4 cards for 5 seconds
         if (newLen > completedLenRef.current) {
+            completedLenRef.current = newLen;
             const lastCompleted = engineState.completedTricks[newLen - 1];
-            // completedTricks stores the raw trick array — convert it to {position: card} format
             const lastTrickArr = Array.isArray(lastCompleted) ? lastCompleted : (lastCompleted?.trick ?? []);
+
             setShownTrick(trickToPlayedCards(lastTrickArr));
             setPaused(true);
-            completedLenRef.current = newLen;
 
             // Calculate winner position for animation
             const winnerSeat = engineState.trickWinners[newLen - 1];
@@ -241,36 +247,33 @@ export default function GameTable({
             setWinnerPosition(null);
             setIsCollecting(false);
 
+            if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
+            if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+
             // Trigger collection animation at t=3s (holds 3s, moves 1s, clears at 5s)
-            const animTimer = setTimeout(() => {
+            sweepTimerRef.current = setTimeout(() => {
                 setWinnerPosition(winnerPos);
                 setIsCollecting(true);
             }, 3000);
 
-            const timer = setTimeout(() => {
+            clearTimerRef.current = setTimeout(() => {
                 setPaused(false);
                 setShownTrick({});
                 setIsCollecting(false);
                 setWinnerPosition(null);
             }, 5000);
-
-            return () => {
-                clearTimeout(animTimer);
-                clearTimeout(timer);
-            };
+            return;
         }
 
         // Live trick during play (if not paused)
-        if (!paused) {
+        if (!paused && engineState.phase === PHASES.PLAYING) {
             setShownTrick(trickToPlayedCards(engineState.currentTrick ?? []));
         }
     }, [
         isMultiplayer,
-        engineState.completedTricks,
+        engineState.completedTricks.length,
         engineState.currentTrick,
         engineState.phase,
-        engineState.trickWinners,
-        paused,
     ]);
 
     // ── Effect C: AI trump selection ──────────────────────────────────────────

@@ -102,22 +102,28 @@ export default function Game() {
     return cancel;
   }, [code, game, presence]);
 
+  const sweepTimerRef = useRef(null);
+  const clearTimerRef = useRef(null);
+
   // ── Mirror live trick / hold completed trick for 5s ───────────────────
   // At 3s (TRICK_SWEEP_START_MS), triggers 1s animation collecting cards to trick winner.
   useEffect(() => {
     if (!game) return;
 
-    const newLen = (game.trickHistory || []).length;
-
     if (game.status === "selecting-trump") {
       completedLenRef.current = 0;
+      if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
+      if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
       setShownPlays([]);
       setIsCollecting(false);
       setWinnerPosition(null);
       return;
     }
 
+    const newLen = (game.trickHistory || []).length;
+
     if (newLen > completedLenRef.current) {
+      completedLenRef.current = newLen;
       const lastTrick = game.trickHistory[newLen - 1];
       const frozenPlays = (lastTrick?.plays || []).map((play) => ({
         seat: seatToPosition(mySeatRef.current, play.seat),
@@ -126,24 +132,23 @@ export default function Game() {
       const winPos = seatToPosition(mySeatRef.current, lastTrick?.winnerSeat);
 
       setShownPlays(frozenPlays);
-      setWinnerPosition(winPos);
       setIsCollecting(false);
+      setWinnerPosition(null);
 
-      const sweepTimer = setTimeout(() => {
+      if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
+      if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+
+      sweepTimerRef.current = setTimeout(() => {
+        setWinnerPosition(winPos);
         setIsCollecting(true);
       }, TRICK_SWEEP_START_MS);
 
-      const clearTimer = setTimeout(() => {
-        completedLenRef.current = newLen;
+      clearTimerRef.current = setTimeout(() => {
         setShownPlays([]);
         setIsCollecting(false);
         setWinnerPosition(null);
       }, TRICK_HOLD_MS);
-
-      return () => {
-        clearTimeout(sweepTimer);
-        clearTimeout(clearTimer);
-      };
+      return;
     }
 
     if (completedLenRef.current === newLen) {
@@ -153,8 +158,7 @@ export default function Game() {
       }));
       setShownPlays(livePlays);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game?.trickHistory, game?.trick, game?.status]);
+  }, [game?.trickHistory?.length, game?.trick, game?.status]);
 
   if (!code) {
     return <GameTable />;
