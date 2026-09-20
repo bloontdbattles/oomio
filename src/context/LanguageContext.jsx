@@ -4,17 +4,16 @@ import si from "../locales/si";
 
 const dictionaries = { en, si };
 
-function parseTaggedText(text, options = {}) {
-  if (typeof text !== "string" || !text.includes("<")) return text;
+function parseTaggedText(text, isSinhala, options = {}) {
+  if (typeof text !== "string") return text;
 
   if (options.plain) {
     return text.replace(/<([^>]+)>/g, "$1");
   }
 
   const parts = text.split(/(<[^>]+>)/g);
-  if (parts.length === 1) return text;
 
-  return parts.map((part, index) => {
+  const renderedParts = parts.map((part, index) => {
     if (part.startsWith("<") && part.endsWith(">")) {
       const content = part.slice(1, -1);
       return (
@@ -25,6 +24,12 @@ function parseTaggedText(text, options = {}) {
     }
     return part;
   });
+
+  if (isSinhala) {
+    return <span className="si-text">{renderedParts}</span>;
+  }
+
+  return renderedParts.length === 1 ? renderedParts[0] : renderedParts;
 }
 
 export const LanguageContext = createContext({
@@ -49,9 +54,10 @@ export function LanguageProvider({ children }) {
 
   const t = useMemo(() => {
     const dict = dictionaries[lang] || dictionaries.en;
+    const isSinhala = lang === "si";
     return (key, options) => {
       const raw = dict[key] ?? dictionaries.en[key] ?? key;
-      return parseTaggedText(raw, options);
+      return parseTaggedText(raw, isSinhala, options);
     };
   }, [lang]);
 

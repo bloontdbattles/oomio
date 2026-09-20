@@ -62,10 +62,9 @@
   }
 }
 
-/* Use font2 (SinhalaFont) strictly for Sinhala letters when Sinhala language is selected */
-:root[lang="si"], [lang="si"] {
-  --font-body: 'SinhalaFont', 'Inter', sans-serif;
-  --font-display: 'SinhalaFont', 'Outfit', sans-serif;
+/* Apply font2 (SinhalaFont) exclusively to translated Sinhala text strings (.si-text) */
+.si-text {
+  font-family: 'SinhalaFont', 'Inter', sans-serif;
 }
 
 /* Ensure user typed inputs always use normal fonts and not font2 */
