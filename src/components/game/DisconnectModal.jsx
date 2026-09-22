@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { LanguageContext } from "../../context/LanguageContext";
 import Button from "../common/Button";
 import "./DisconnectModal.css";
 
@@ -9,6 +10,7 @@ export default function DisconnectModal({
     onWait,
     onReplaceWithBot,
 }) {
+    const { t } = useContext(LanguageContext);
     const [copied, setCopied] = useState(false);
 
     if (!isOpen) return null;
@@ -31,22 +33,22 @@ export default function DisconnectModal({
                             <line x1="1" y1="1" x2="23" y2="23" />
                         </svg>
                     </div>
-                    <h3 className="dc-modal__title">Player Disconnected</h3>
+                    <h3 className="dc-modal__title">{t("playerDisconnected")}</h3>
                 </div>
 
                 <p className="dc-modal__text">
-                    <strong>{playerName || "A player"}</strong> has lost connection to the game.
+                    <strong>{playerName || "A player"}</strong> {t("lostConnection")}
                 </p>
 
                 <div className="dc-modal__code-box">
-                    <span className="dc-modal__code-label">Room Code:</span>
+                    <span className="dc-modal__code-label">{t("roomCode")}:</span>
                     <strong className="dc-modal__code-value">{roomCode}</strong>
                     <button
                         type="button"
                         className="dc-modal__copy-btn"
                         onClick={handleCopyCode}
                     >
-                        {copied ? "Copied! ✓" : "Copy Code"}
+                        {copied ? t("copied") : t("copyCode")}
                     </button>
                 </div>
 
@@ -56,14 +58,14 @@ export default function DisconnectModal({
                         className="dc-modal__btn dc-modal__btn--wait"
                         onClick={onWait}
                     >
-                        Wait for Reconnect
+                        {t("waitForReconnect")}
                     </Button>
                     <Button
                         variant="primary"
                         className="dc-modal__btn dc-modal__btn--bot"
                         onClick={onReplaceWithBot}
                     >
-                        Replace with AI Bot
+                        {t("replaceWithBot")}
                     </Button>
                 </div>
             </div>
