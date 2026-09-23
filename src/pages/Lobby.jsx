@@ -100,7 +100,7 @@ export default function Lobby() {
 
   const handleAddBot = (team, index) => {
     if (!isHost) return;
-    addBot(code, team, index, t("oomiBot"));
+    addBot(code, team, index, t("oomiBot", { plain: true }));
   };
 
   const handleKick = (playerId) => {

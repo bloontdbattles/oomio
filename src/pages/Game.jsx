@@ -337,7 +337,7 @@ export default function Game() {
           playerName={disconnectedPlayer.name}
           roomCode={code}
           onWait={() => setDismissedDcModal(true)}
-          onReplaceWithBot={() => replacePlayerWithBot(code, disconnectedSeat, t("oomiBot"))}
+          onReplaceWithBot={() => replacePlayerWithBot(code, disconnectedSeat, t("oomiBot", { plain: true }))}
         />
       )}
     </>

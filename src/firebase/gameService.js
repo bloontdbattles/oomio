@@ -214,9 +214,13 @@ export async function startNextRound(code) {
  * Converts a disconnected human player's seat to a bot permanently so the AI takes over.
  */
 export async function replacePlayerWithBot(code, seat, botName = "Oomi Bot") {
+    let nameStr = "Oomi Bot";
+    if (typeof botName === "string" && botName.trim()) {
+        nameStr = botName;
+    }
     await update(gameRef(code), {
         [`seats/${seat}/isBot`]: true,
-        [`seats/${seat}/name`]: botName,
+        [`seats/${seat}/name`]: nameStr,
     });
 }
 

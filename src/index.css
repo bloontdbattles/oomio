@@ -84,7 +84,7 @@ input, textarea, select {
   font-family: 'Inter', sans-serif !important;
 }
 
-/* Exclude player names, scoreboard box, and top-left trump text from font2 */
+/* Exclude player names, scoreboard box, card ranks, and room codes from font2 */
 .player-seat__name,
 .player-seat__badge,
 .player-seat__info,
@@ -96,6 +96,16 @@ input, textarea, select {
 
 .scoreboard,
 .scoreboard * {
+  font-family: 'Outfit', 'Inter', sans-serif !important;
+}
+
+.playing-card__rank {
+  font-family: 'CardRank', 'Times New Roman', serif !important;
+}
+
+.dc-modal__code-value,
+.lobby__code,
+.game-dc-bar__code {
   font-family: 'Outfit', 'Inter', sans-serif !important;
 }
 

@@ -71,9 +71,13 @@ export async function seatPlayer(code, team, slotIndex, player) {
 }
 
 export async function addBot(code, team, slotIndex, botName) {
+    let nameStr = "Oomi Bot";
+    if (typeof botName === "string" && botName.trim()) {
+        nameStr = botName;
+    }
     return seatPlayer(code, team, slotIndex, {
         id: `bot-${Math.random().toString(36).slice(2, 8)}`,
-        name: botName,
+        name: nameStr,
         isBot: true,
     });
 }
