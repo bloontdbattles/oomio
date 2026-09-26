@@ -65,9 +65,37 @@
     position: relative;
     z-index: 2;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     padding: 24px clamp(16px, 5vw, 48px);
     transition: opacity 0.4s ease;
+}
+
+.home__about-btn {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--oomio-cream);
+    background: rgba(246, 240, 222, 0.1);
+    border: 1px solid rgba(246, 240, 222, 0.2);
+    border-radius: 999px;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.home__about-btn:hover {
+    background: rgba(246, 240, 222, 0.2);
+    border-color: var(--oomio-gold);
+    color: var(--oomio-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.home__about-btn:active {
+    transform: translateY(0);
 }
 
 .home--transitioning .home__top {

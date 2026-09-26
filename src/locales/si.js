@@ -47,4 +47,5 @@ export default {
   copied: "msgm;a úh ✓",
   waitForReconnect: "kej; iïnkaëlrKh n,dfmdfrd;a;=fjka isákak",
   replaceWithBot: "<AI Bot> iu. bj;a lrkak",
+  about: "wms .ek",
 };

@@ -47,4 +47,5 @@ export default {
   copied: "Copied! ✓",
   waitForReconnect: "Wait for Reconnect",
   replaceWithBot: "Replace with AI Bot",
+  about: "About",
 };

@@ -6,6 +6,7 @@ import Lobby from "./pages/Lobby";
 import Game from "./pages/Game";
 import Rules from "./pages/Rules";
 import GameMode from "./pages/GameMode";
+import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
@@ -16,6 +17,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
             <Route path="/game-mode" element={<GameMode />} />
             <Route path="/player-setup" element={<Lobby />} />
             <Route path="/lobby" element={<Lobby />} />

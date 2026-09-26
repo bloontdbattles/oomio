@@ -54,6 +54,13 @@ export default function Home() {
 
                 <div className="home__content">
                     <header className="home__top">
+                        <button
+                            type="button"
+                            className="home__about-btn"
+                            onClick={() => navigate("/about")}
+                        >
+                            {t("about")}
+                        </button>
                         <LanguageSwitcher />
                     </header>
 
