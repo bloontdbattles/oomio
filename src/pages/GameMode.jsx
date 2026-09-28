@@ -4,6 +4,7 @@ import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import { createLobby, lobbyExists } from "../firebase/lobbyService";
 import Avatar from "../components/common/Avatar";
+import SettingsModal from "../components/common/SettingsModal";
 import LobbySettingsModal from "../components/lobby/LobbySettingsModal";
 import JoinLobbyModal from "../components/lobby/JoinLobbyModal";
 import "./GameMode.css";
@@ -14,6 +15,7 @@ export default function GameMode() {
   const [player, setPlayer] = useState(null);
   const [showFriendsOptions, setShowFriendsOptions] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showGeneralSettings, setShowGeneralSettings] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [isJoining, setIsJoining] = useState(false);
@@ -80,11 +82,12 @@ export default function GameMode() {
         <button
           type="button"
           className="game-mode__settings"
+          onClick={() => setShowGeneralSettings(true)}
           aria-label={t("settings")}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8">
             <circle cx="12" cy="12" r="3" />
-            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.37a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06.06A1.7 1.7 0 0 0 4.63 15a1.7 1.7 0 0 0-1.56-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.63 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.63a1.7 1.7 0 0 0 1.04-1.56V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 4.63a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.37 9a1.7 1.7 0 0 0 1.56 1.04H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
           </svg>
         </button>
       </header>
@@ -170,6 +173,14 @@ export default function GameMode() {
         )}
       </main>
 
+      <SettingsModal
+        isOpen={showGeneralSettings}
+        onClose={() => setShowGeneralSettings(false)}
+        onPlayerNameChange={(newName) => {
+          setPlayer((prev) => (prev ? { ...prev, name: newName } : prev));
+        }}
+      />
+
       <LobbySettingsModal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
@@ -186,7 +197,7 @@ export default function GameMode() {
         onJoin={handleJoinLobby}
         isSubmitting={isJoining}
         error={joinError}
-      />
+      />/>
     </div>
   );
 }

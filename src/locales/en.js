@@ -48,4 +48,10 @@ export default {
   waitForReconnect: "Wait for Reconnect",
   replaceWithBot: "Replace with AI Bot",
   about: "About",
+  language: "Language",
+  soundEffects: "Sound Effects",
+  music: "Background Music",
+  playerName: "Player Name",
+  save: "Save",
+  close: "Close",
 };

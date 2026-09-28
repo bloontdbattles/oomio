@@ -48,4 +48,10 @@ export default {
   waitForReconnect: "kej; iïnkaëlrKh n,dfmdfrd;a;=fjka isákak",
   replaceWithBot: "<AI Bot> iu. bj;a lrkak",
   about: "wms .ek",
+  language: "<Language>",
+  soundEffects: "iog wio",
+  music: "miqìï ix.S;h",
+  playerName: "l%Svl ku",
+  save: "iqrlskak",
+  close: "jiakak",
 };
