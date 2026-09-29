@@ -12,3 +12,14 @@ export function getPlayer() {
 export function clearPlayer() {
     localStorage.removeItem(PLAYER_KEY);
 }
+
+const SOUND_KEY = "oomio_sound";
+
+export function getSoundEnabled() {
+    const raw = localStorage.getItem(SOUND_KEY);
+    return raw !== "false";
+}
+
+export function setSoundEnabled(enabled) {
+    localStorage.setItem(SOUND_KEY, enabled ? "true" : "false");
+}

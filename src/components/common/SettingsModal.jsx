@@ -44,7 +44,7 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
       <h2 className="settings-modal__title">{t("settings")}</h2>
 
       <div className="settings-modal__section">
-        <label className="settings-modal__label">{t("yourName")}</label>
+        <label className="settings-modal__label">{t("playerName")}</label>
         <input
           type="text"
           className="settings-modal__input"
@@ -68,11 +68,11 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
       </div>
 
       <button type="button" className="settings-modal__about" onClick={handleAbout}>
-        {t("aboutTitle")}
+        {t("about")}
       </button>
 
       <Button className="settings-modal__close" onClick={onClose}>
-        {t("done")}
+        {t("close")}
       </Button>
     </Modal>
   );
