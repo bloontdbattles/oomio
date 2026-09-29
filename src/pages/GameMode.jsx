@@ -197,7 +197,7 @@ export default function GameMode() {
         onJoin={handleJoinLobby}
         isSubmitting={isJoining}
         error={joinError}
-      />/>
+      />
     </div>
   );
 }
