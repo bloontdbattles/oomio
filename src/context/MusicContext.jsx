@@ -1,4 +1,5 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import bg1 from "../assets/music/background/background (1).mp3";
 import bg2 from "../assets/music/background/background (2).mp3";
 import bg3 from "../assets/music/background/background (3).mp3";
@@ -8,6 +9,10 @@ import { getMusicEnabled } from "../utils/localStorage";
 
 const TRACKS = [bg1, bg2, bg3, bg4, bg5];
 
+// Module-level singleton Audio object to guarantee ONLY 1 track can ever play at once
+const globalAudio = new Audio();
+globalAudio.volume = 0.35;
+
 export const MusicContext = createContext({
   isPlaying: false,
   trackIndex: 0,
@@ -15,74 +20,84 @@ export const MusicContext = createContext({
 });
 
 export function MusicProvider({ children }) {
+  const location = useLocation();
   const [trackIndex, setTrackIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
+  const isGameRoute = location.pathname === "/game";
 
+  // Track ended handler -> advance to next song
   useEffect(() => {
-    const audio = new Audio();
-    audio.volume = 0.35;
-    audioRef.current = audio;
-
     const handleEnded = () => {
       setTrackIndex((prev) => (prev + 1) % TRACKS.length);
     };
 
-    audio.addEventListener("ended", handleEnded);
-
+    globalAudio.addEventListener("ended", handleEnded);
     return () => {
-      audio.removeEventListener("ended", handleEnded);
-      audio.pause();
+      globalAudio.removeEventListener("ended", handleEnded);
     };
   }, []);
 
+  // Main playback manager
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
     const enabled = getMusicEnabled();
-    if (!enabled) {
-      audio.pause();
+
+    // ONLY play background music when user is actively playing the game (/game route)
+    if (!isGameRoute || !enabled) {
+      if (!globalAudio.paused) {
+        globalAudio.pause();
+        globalAudio.currentTime = 0;
+      }
       setIsPlaying(false);
       return;
     }
 
-    audio.src = TRACKS[trackIndex];
-    
-    const playPromise = audio.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch(() => {
-          setIsPlaying(false);
-          // Autoplay blocked by browser policy - resume audio on first user touch/click
-          const handleFirstInteraction = () => {
-            if (getMusicEnabled()) {
-              audio.play().then(() => setIsPlaying(true)).catch(() => {});
-            }
-            window.removeEventListener("pointerdown", handleFirstInteraction);
-            window.removeEventListener("keydown", handleFirstInteraction);
-          };
-          window.addEventListener("pointerdown", handleFirstInteraction);
-          window.addEventListener("keydown", handleFirstInteraction);
-        });
-    }
-  }, [trackIndex]);
+    // Update track source if index changed
+    const targetSrc = TRACKS[trackIndex];
+    const currentSrc = globalAudio.src ? new URL(globalAudio.src, window.location.href).pathname : "";
+    const targetPath = new URL(targetSrc, window.location.href).pathname;
 
-  // Listen for settings toggles in localStorage or custom event
+    if (currentSrc !== targetPath) {
+      globalAudio.pause();
+      globalAudio.currentTime = 0;
+      globalAudio.src = targetSrc;
+    }
+
+    let isCancelled = false;
+    globalAudio
+      .play()
+      .then(() => {
+        if (!isCancelled) setIsPlaying(true);
+      })
+      .catch(() => {
+        if (!isCancelled) setIsPlaying(false);
+        // Autoplay blocked by browser policy: play on first user interaction on /game
+        const handleUserInteraction = () => {
+          if (window.location.pathname === "/game" && getMusicEnabled() && globalAudio.paused) {
+            globalAudio.play().then(() => setIsPlaying(true)).catch(() => {});
+          }
+        };
+        window.addEventListener("click", handleUserInteraction, { once: true });
+        window.addEventListener("touchstart", handleUserInteraction, { once: true });
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [trackIndex, isGameRoute]);
+
+  // Listen for settings toggles in SettingsModal
   useEffect(() => {
     const handleMusicChange = () => {
-      const audio = audioRef.current;
-      if (!audio) return;
       const enabled = getMusicEnabled();
-      if (enabled) {
-        if (audio.paused) {
-          audio.play().then(() => setIsPlaying(true)).catch(() => {});
+      if (location.pathname === "/game" && enabled) {
+        if (globalAudio.paused) {
+          globalAudio.play().then(() => setIsPlaying(true)).catch(() => {});
         }
       } else {
-        audio.pause();
+        if (!globalAudio.paused) {
+          globalAudio.pause();
+          globalAudio.currentTime = 0;
+        }
         setIsPlaying(false);
       }
     };
@@ -93,7 +108,7 @@ export function MusicProvider({ children }) {
       window.removeEventListener("oomio_music_change", handleMusicChange);
       window.removeEventListener("storage", handleMusicChange);
     };
-  }, []);
+  }, [location.pathname]);
 
   const nextTrack = () => {
     setTrackIndex((prev) => (prev + 1) % TRACKS.length);

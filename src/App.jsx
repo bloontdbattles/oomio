@@ -14,9 +14,9 @@ import "./App.css";
 function App() {
   return (
     <LanguageProvider>
-      <MusicProvider>
-        <CardRainProvider>
-          <BrowserRouter>
+      <BrowserRouter>
+        <MusicProvider>
+          <CardRainProvider>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
@@ -27,9 +27,9 @@ function App() {
               <Route path="/rules" element={<Rules />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </BrowserRouter>
-        </CardRainProvider>
-      </MusicProvider>
+          </CardRainProvider>
+        </MusicProvider>
+      </BrowserRouter>
     </LanguageProvider>
   );
 }
