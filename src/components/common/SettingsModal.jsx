@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../../context/LanguageContext";
-import { savePlayer, getSoundEnabled, setSoundEnabled } from "../../utils/localStorage";
+import { savePlayer, getSoundEnabled, setSoundEnabled, getMusicEnabled, setMusicEnabled } from "../../utils/localStorage";
 import Modal from "./Modal";
 import Toggle from "./Toggle";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -13,11 +13,13 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
   const navigate = useNavigate();
   const [name, setName] = useState(player?.name || "");
   const [soundOn, setSoundOn] = useState(true);
+  const [musicOn, setMusicOn] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
       setName(player?.name || "");
       setSoundOn(getSoundEnabled());
+      setMusicOn(getMusicEnabled());
     }
   }, [isOpen, player]);
 
@@ -32,6 +34,11 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
   const handleToggleSound = (value) => {
     setSoundOn(value);
     setSoundEnabled(value);
+  };
+
+  const handleToggleMusic = (value) => {
+    setMusicOn(value);
+    setMusicEnabled(value);
   };
 
   const handleAbout = () => {
@@ -65,6 +72,10 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
 
       <div className="settings-modal__section">
         <Toggle checked={soundOn} onChange={handleToggleSound} label={t("soundEffects")} />
+      </div>
+
+      <div className="settings-modal__section">
+        <Toggle checked={musicOn} onChange={handleToggleMusic} label={t("music")} />
       </div>
 
       <button type="button" className="settings-modal__about" onClick={handleAbout}>
