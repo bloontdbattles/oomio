@@ -29,7 +29,7 @@ function parseTaggedText(text, isSinhala, options = {}) {
     return <span className="si-text">{renderedParts}</span>;
   }
 
-  return renderedParts.length === 1 ? renderedParts[0] : renderedParts;
+  return <span className="en-text">{renderedParts}</span>;
 }
 
 export const LanguageContext = createContext({
