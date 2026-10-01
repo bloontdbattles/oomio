@@ -3,6 +3,8 @@ import cardRedImg from "../../assets/images/cardred.png";
 import "./ScoreBoard.css";
 
 export default function ScoreBoard({
+    team1Tricks = 0,
+    team2Tricks = 0,
     team1Score = 0,
     team2Score = 0,
     players,
@@ -18,6 +20,8 @@ export default function ScoreBoard({
                 {/* US team — blue card */}
                 <div className="scoreboard__team scoreboard__team--us">
                     <span className="scoreboard__team-name">Us</span>
+
+                    {/* Points row */}
                     <div className="scoreboard__points-row">
                         <img
                             src={cardBlueImg}
@@ -26,6 +30,11 @@ export default function ScoreBoard({
                         />
                         <span className="scoreboard__points-val">{t1Points}</span>
                     </div>
+
+                    {/* Tricks row */}
+                    <div className="scoreboard__tricks-row">
+                        <span className="scoreboard__tricks-badge">{team1Tricks}</span>
+                    </div>
                 </div>
 
                 <div className="scoreboard__divider" />
@@ -33,6 +42,8 @@ export default function ScoreBoard({
                 {/* THEM team — red card */}
                 <div className="scoreboard__team scoreboard__team--them">
                     <span className="scoreboard__team-name">Them</span>
+
+                    {/* Points row */}
                     <div className="scoreboard__points-row">
                         <img
                             src={cardRedImg}
@@ -40,6 +51,11 @@ export default function ScoreBoard({
                             className="scoreboard__card-icon"
                         />
                         <span className="scoreboard__points-val">{t2Points}</span>
+                    </div>
+
+                    {/* Tricks row */}
+                    <div className="scoreboard__tricks-row">
+                        <span className="scoreboard__tricks-badge">{team2Tricks}</span>
                     </div>
                 </div>
             </div>

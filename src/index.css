@@ -85,10 +85,10 @@
   --heading: var(--font-display);
 }
 
-/* Apply font3 (EnglishFont) with 200% scale to translated English text strings (.en-text) */
+/* Apply font3 (EnglishFont) to translated English text strings (.en-text) */
 .en-text {
   font-family: 'EnglishFont', 'Inter', sans-serif;
-  font-size: 1.8em;
+  font-size: 1.15em;
   line-height: 1.15;
   display: inline-block;
 }
@@ -96,6 +96,7 @@
 /* Apply font2 (SinhalaFont) exclusively to translated Sinhala text strings (.si-text) */
 .si-text {
   font-family: 'SinhalaFont', 'Inter', sans-serif;
+  font-size: 1.5em;
 }
 
 /* Ensure user typed inputs always use normal fonts and not font2 */
