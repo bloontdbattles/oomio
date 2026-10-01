@@ -8,11 +8,11 @@ export const PHASES = Object.freeze({
     GAME_END: "GAME_END",
 });
 
-export function createInitialState({ rng = Math.random, targetCats = 10 } = {}) {
+export function createInitialState({ rng = Math.random, targetPoints = 11 } = {}) {
     return {
         phase: PHASES.DEALING,
         roundNumber: 1,
-        targetCats,
+        targetPoints,
         players: [0, 1, 2, 3].map((seat) => ({
             seat,
             team: TEAM_BY_SEAT[seat],
@@ -24,7 +24,7 @@ export function createInitialState({ rng = Math.random, targetCats = 10 } = {}) 
         currentTrick: [],
         completedTricks: [],
         trickWinners: [],
-        cats: [0, 0],
+        points: [0, 0],
         lastRoundResult: null,
         rng,
     };

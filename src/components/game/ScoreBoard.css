@@ -78,3 +78,40 @@
     background: rgba(246, 240, 222, 0.15);
     margin: 0 12px;
 }
+
+/* Points with /11 target */
+.scoreboard__stat-val--points {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+}
+
+.scoreboard__target {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: rgba(246, 240, 222, 0.45);
+}
+
+/* Match progress bars */
+.scoreboard__progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(246, 240, 222, 0.12);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.scoreboard__progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.5s ease;
+}
+
+.scoreboard__progress-fill--us {
+    background: linear-gradient(90deg, var(--oomio-gold), #f5c842);
+}
+
+.scoreboard__progress-fill--them {
+    background: linear-gradient(90deg, #e05c5c, #c94040);
+}

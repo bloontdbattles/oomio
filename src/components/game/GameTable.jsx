@@ -463,8 +463,9 @@ export default function GameTable({
                 <ScoreBoard
                     team1Tricks={team0Tricks}
                     team2Tricks={team1Tricks}
-                    team1Score={engineState.cats[0]}
-                    team2Score={engineState.cats[1]}
+                    team1Score={engineState.points[0]}
+                    team2Score={engineState.points[1]}
+                    targetPoints={engineState.targetPoints}
                     players={isMultiplayer ? externalPlayers : undefined}
                 />
             </div>
@@ -595,9 +596,14 @@ export default function GameTable({
             {/* Round/game result overlay — singleplayer only */}
             {showResult && (
                 <GameResult
+                    isGameOver={engineState.phase === PHASES.GAME_END}
                     playerWon={engineState.lastRoundResult?.winnerTeam === 0}
-                    team1Score={lastTrickCounts[0]}
-                    team2Score={lastTrickCounts[1]}
+                    roundResult={engineState.lastRoundResult?.result}
+                    team1Tricks={lastTrickCounts[0]}
+                    team2Tricks={lastTrickCounts[1]}
+                    team1Points={engineState.points[0]}
+                    team2Points={engineState.points[1]}
+                    targetPoints={engineState.targetPoints}
                     onPlayAgain={handlePlayAgain}
                 />
             )}

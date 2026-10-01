@@ -1,13 +1,15 @@
-// Traditional 8-trick round scoring used by this engine.
-// A normal 5-7 trick win = 1 cat.
-// The team that did NOT choose trump gets 2 cats for a 5-7 win.
-// Winning all 8 = 3 cats (Kapothi).
-// A 4-4 round is a draw and awards no immediate cat.
+// Real Oomi scoring system.
 //
-// The "pending 4-4" mechanic can vary by local Oomi table rules, so it is
-// represented explicitly in state and can be enabled/adjusted later.
+// There are 20 "point cards" (2,3,4,5,6 of each of the 4 suits) that form a
+// point pool. Each round, the team that wins more tricks earns 1 point from
+// the pool. A 4-4 draw gives 1 point to EACH team from the pool.
+//
+// The first team to accumulate 11 or more points wins the MATCH.
+// The pool is shared — both teams drawing continuously will eventually push
+// one of them to 11 (10 draws = 20 points, each team 10, then next round
+// breaks the tie).
 
-export const DEFAULT_TARGET_CATS = 10;
+export const DEFAULT_TARGET_POINTS = 11;
 
 export function countTricksByTeam(trickWinners) {
     return trickWinners.reduce(
@@ -19,44 +21,41 @@ export function countTricksByTeam(trickWinners) {
     );
 }
 
-export function scoreRound({ trickWinners, trumpChooserTeam }) {
+/**
+ * Score a completed round.
+ *
+ * Returns:
+ *   trickCounts    — [team0Tricks, team1Tricks]
+ *   winnerTeam     — 0 | 1 | null (draw)
+ *   pointsAwarded  — [team0Points, team1Points]  (each 0 or 1)
+ *   result         — "WIN" | "DRAW"
+ */
+export function scoreRound({ trickWinners }) {
     const [team0, team1] = countTricksByTeam(trickWinners);
 
-    if (team0 === 4 && team1 === 4) {
+    // 4-4 draw: each team earns 1 point
+    if (team0 === team1) {
         return {
             trickCounts: [team0, team1],
             winnerTeam: null,
-            catsAwarded: [0, 0],
+            pointsAwarded: [1, 1],
             result: "DRAW",
-            kapothi: false,
         };
     }
 
+    // One team won more tricks: that team earns 1 point
     const winnerTeam = team0 > team1 ? 0 : 1;
-    const winningTricks = Math.max(team0, team1);
-
-    if (winningTricks === 8) {
-        return {
-            trickCounts: [team0, team1],
-            winnerTeam,
-            catsAwarded: winnerTeam === 0 ? [3, 0] : [0, 3],
-            result: "KAPOTHI",
-            kapothi: true,
-        };
-    }
-
-    const winnerIsTrumpChooser = winnerTeam === trumpChooserTeam;
-    const cats = winnerIsTrumpChooser ? 1 : 2;
-
     return {
         trickCounts: [team0, team1],
         winnerTeam,
-        catsAwarded: winnerTeam === 0 ? [cats, 0] : [0, cats],
+        pointsAwarded: winnerTeam === 0 ? [1, 0] : [0, 1],
         result: "WIN",
-        kapothi: false,
     };
 }
 
-export function isMatchOver(cats, targetCats = DEFAULT_TARGET_CATS) {
-    return cats[0] >= targetCats || cats[1] >= targetCats;
+/**
+ * Check if a team has reached the 11-point target (match is over).
+ */
+export function isMatchOver(points, targetPoints = DEFAULT_TARGET_POINTS) {
+    return points[0] >= targetPoints || points[1] >= targetPoints;
 }

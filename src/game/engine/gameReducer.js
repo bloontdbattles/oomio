@@ -97,15 +97,14 @@ export function gameReducer(state, action) {
 
             const roundResult = scoreRound({
                 trickWinners,
-                trumpChooserTeam: state.players[state.trumpChooserSeat].team,
             });
 
-            const newCats = [
-                state.cats[0] + roundResult.catsAwarded[0],
-                state.cats[1] + roundResult.catsAwarded[1],
+            const newPoints = [
+                state.points[0] + roundResult.pointsAwarded[0],
+                state.points[1] + roundResult.pointsAwarded[1],
             ];
 
-            const gameOver = isMatchOver(newCats, state.targetCats);
+            const gameOver = isMatchOver(newPoints, state.targetPoints);
 
             return {
                 ...state,
@@ -114,7 +113,7 @@ export function gameReducer(state, action) {
                 completedTricks,
                 trickWinners,
                 trickWinnerSeats,
-                cats: newCats,
+                points: newPoints,
                 lastRoundResult: roundResult,
                 phase: gameOver ? PHASES.GAME_END : PHASES.ROUND_END,
                 currentTurn: winnerSeat,
