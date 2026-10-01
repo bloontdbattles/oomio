@@ -20,8 +20,8 @@
     background: linear-gradient(165deg, var(--oomio-green-700), var(--oomio-green-950));
     border: 2px solid var(--oomio-gold);
     border-radius: 28px;
-    padding: 40px;
-    max-width: 440px;
+    padding: 36px 40px;
+    max-width: 460px;
     width: 100%;
     text-align: center;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
@@ -41,10 +41,18 @@
     }
 }
 
+/* Final match panel glows brighter */
+.game-result__panel--final {
+    border-color: #f5c842;
+    box-shadow:
+        0 30px 60px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(232, 184, 75, 0.3);
+}
+
 .game-result__title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 800;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
     color: var(--oomio-gold);
     text-shadow: 0 4px 10px rgba(232, 184, 75, 0.2);
     letter-spacing: 0.02em;
@@ -52,17 +60,30 @@
 
 .game-result__subtitle {
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: rgba(246, 240, 222, 0.75);
-    margin: 0 0 32px;
+    margin: 0 0 20px;
     line-height: 1.5;
 }
 
+/* Section headers */
+.game-result__section-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(246, 240, 222, 0.4);
+    margin-bottom: 5px;
+    margin-top: 2px;
+    text-align: left;
+}
+
+/* Score tables */
 .game-result__scores {
     background: rgba(3, 19, 10, 0.5);
-    border-radius: 20px;
-    padding: 20px 24px;
-    margin-bottom: 32px;
+    border-radius: 14px;
+    padding: 12px 18px;
+    margin-bottom: 12px;
     border: 1px solid rgba(246, 240, 222, 0.1);
 }
 
@@ -70,7 +91,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 5px 0;
 }
 
 .game-result__score-row:not(:last-child) {
@@ -79,18 +100,79 @@
 
 .game-result__team {
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 0.92rem;
 }
 
 .game-result__score-val {
-    font-size: 1.35rem;
-    font-weight: 750;
+    font-size: 1.05rem;
+    font-weight: 700;
     color: var(--oomio-gold);
 }
 
+/* Highlight the winning team's match points */
+.game-result__score-val--winner {
+    color: #f5c842;
+    text-shadow: 0 0 12px rgba(245, 200, 66, 0.5);
+}
+
+/* Match progress bars */
+.game-result__progress-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.game-result__progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.game-result__progress-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: rgba(246, 240, 222, 0.6);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.game-result__progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(246, 240, 222, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.game-result__progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.game-result__progress-fill--us {
+    background: linear-gradient(90deg, var(--oomio-gold), #f5c842);
+}
+
+.game-result__progress-fill--them {
+    background: linear-gradient(90deg, #e05c5c, #c94040);
+}
+
+.game-result__progress-val {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(246, 240, 222, 0.7);
+    width: 20px;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+/* CTA button */
 .game-result__cta.btn {
     width: 100%;
-    padding: 16px 32px;
-    font-size: 1.15rem;
+    padding: 14px 32px;
+    font-size: 1.1rem;
     border-radius: 999px;
 }
