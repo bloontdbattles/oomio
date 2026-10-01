@@ -28,6 +28,12 @@ export default function GameMode() {
       return;
     }
     setPlayer(stored);
+
+    const handlePlayerChange = (e) => {
+      if (e.detail) setPlayer(e.detail);
+    };
+    window.addEventListener("oomio_player_change", handlePlayerChange);
+    return () => window.removeEventListener("oomio_player_change", handlePlayerChange);
   }, [navigate]);
 
   if (!player) return null;
@@ -176,8 +182,9 @@ export default function GameMode() {
       <SettingsModal
         isOpen={showGeneralSettings}
         onClose={() => setShowGeneralSettings(false)}
-        onPlayerNameChange={(newName) => {
-          setPlayer((prev) => (prev ? { ...prev, name: newName } : prev));
+        player={player}
+        onNameChange={(updated) => {
+          setPlayer(updated);
         }}
       />
 

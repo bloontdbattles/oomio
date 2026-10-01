@@ -19,12 +19,14 @@ export default function Home() {
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [isModalOpen, setModalOpen] = useState(false);
-    const [name, setName] = useState("");
+    const [name, setName] = useState(() => getPlayer()?.name || "");
 
     const handlePlayNow = () => {
         if (isTransitioning) return;
         setIsTransitioning(true);
         setTimeout(() => {
+            const existing = getPlayer();
+            setName(existing?.name || "");
             setModalOpen(true);
             // intentionally keep isTransitioning=true so the stage
             // stays zoomed and the logo stays fallen while modal is open
@@ -40,7 +42,9 @@ export default function Home() {
         const trimmed = name.trim();
         if (!trimmed) return;
 
-        savePlayer({ playerId: generateId("p"), name: trimmed });
+        const existing = getPlayer();
+        const playerId = existing?.playerId || generateId("p");
+        savePlayer({ playerId, name: trimmed });
         setModalOpen(false);
 
         playCardRain(() => navigate("/game-mode"));

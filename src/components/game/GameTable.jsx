@@ -198,6 +198,12 @@ export default function GameTable({
     useEffect(() => {
         const stored = getStoredPlayer();
         if (stored?.name) setPlayerName(stored.name);
+
+        const handlePlayerChange = (e) => {
+            if (e.detail?.name) setPlayerName(e.detail.name);
+        };
+        window.addEventListener("oomio_player_change", handlePlayerChange);
+        return () => window.removeEventListener("oomio_player_change", handlePlayerChange);
     }, []);
 
     // ── Responsive ────────────────────────────────────────────────────────────

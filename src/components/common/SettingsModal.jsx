@@ -8,16 +8,18 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import Button from "./Button";
 import "./SettingsModal.css";
 
-export default function SettingsModal({ isOpen, onClose, player, onNameChange }) {
+export default function SettingsModal({ isOpen, onClose, player, onNameChange, onPlayerNameChange }) {
   const { t } = useContext(LanguageContext);
   const navigate = useNavigate();
-  const [name, setName] = useState(player?.name || "");
+  const activePlayer = player || getPlayer();
+  const [name, setName] = useState(activePlayer?.name || "");
   const [soundOn, setSoundOn] = useState(true);
   const [musicOn, setMusicOn] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
-      setName(player?.name || "");
+      const current = player || getPlayer();
+      setName(current?.name || "");
       setSoundOn(getSoundEnabled());
       setMusicOn(getMusicEnabled());
     }
@@ -25,10 +27,11 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange })
 
   const handleSaveName = () => {
     const trimmed = name.trim();
-    if (!trimmed || trimmed === player?.name) return;
-    const updated = { ...player, name: trimmed };
-    savePlayer(updated);
+    const current = player || getPlayer();
+    if (!trimmed || trimmed === current?.name) return;
+    const updated = savePlayer({ ...current, name: trimmed });
     onNameChange?.(updated);
+    onPlayerNameChange?.(trimmed);
   };
 
   const handleToggleSound = (value) => {

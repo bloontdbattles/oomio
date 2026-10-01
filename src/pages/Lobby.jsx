@@ -67,6 +67,24 @@ export default function Lobby() {
     }
   }, [lobby?.status, code, navigate]);
 
+  // Sync player name in lobby if name in localStorage differs from Firebase lobby slot
+  useEffect(() => {
+    if (!lobby || !code || !currentPlayerId || !currentPlayer?.name) return;
+    const redSlots = lobby.teams?.red || {};
+    const blueSlots = lobby.teams?.blue || {};
+    
+    Object.entries(redSlots).forEach(([idx, playerSlot]) => {
+      if (playerSlot && playerSlot.id === currentPlayerId && playerSlot.name !== currentPlayer.name) {
+        seatPlayer(code, "red", Number(idx), { ...playerSlot, name: currentPlayer.name });
+      }
+    });
+    Object.entries(blueSlots).forEach(([idx, playerSlot]) => {
+      if (playerSlot && playerSlot.id === currentPlayerId && playerSlot.name !== currentPlayer.name) {
+        seatPlayer(code, "blue", Number(idx), { ...playerSlot, name: currentPlayer.name });
+      }
+    });
+  }, [lobby, code, currentPlayerId, currentPlayer?.name]);
+
   // Firebase drops empty objects/arrays entirely, so a team with no
   // players at all won't even have a `red`/`blue` key yet - normalize
   // that into a fixed-length [seat0, seat1] array for rendering.

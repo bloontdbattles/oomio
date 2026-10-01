@@ -1,7 +1,15 @@
 const PLAYER_KEY = "oomio_player";
 
-export function savePlayer(player) {
-    localStorage.setItem(PLAYER_KEY, JSON.stringify(player));
+export function savePlayer(playerData) {
+    if (!playerData) return null;
+    const existing = getPlayer() || {};
+    const updated = {
+        playerId: playerData.playerId || existing.playerId,
+        name: (typeof playerData === "string" ? playerData : playerData.name || "").trim(),
+    };
+    localStorage.setItem(PLAYER_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("oomio_player_change", { detail: updated }));
+    return updated;
 }
 
 export function getPlayer() {

@@ -214,8 +214,8 @@ export default function Game() {
   const mySeat = Number(mySeatEntry[0]);
   mySeatRef.current = mySeat;
 
-  // Automatically reclaim seat if player rejoined and seat was converted to bot
-  if (mySeatEntry[1]?.isBot) {
+  // Automatically reclaim seat if player rejoined (seat converted to bot) or if player name updated
+  if (mySeatEntry[1]?.isBot || (currentPlayer?.name && mySeatEntry[1]?.name !== currentPlayer.name)) {
     reclaimPlayerSeat(code, mySeat, myId, currentPlayer?.name || "Player");
   }
 
