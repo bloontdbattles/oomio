@@ -99,6 +99,10 @@
   font-size: 1.5em;
 }
 
+.si-text .en-text {
+  font-size: 0.767em; /* Keeps EnglishFont at 1.15em relative to container (1.15 / 1.5) */
+}
+
 /* Ensure user typed inputs always use normal fonts and not font2 */
 input, textarea, select {
   font-family: 'Inter', sans-serif !important;

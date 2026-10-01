@@ -17,7 +17,7 @@ function parseTaggedText(text, isSinhala, options = {}) {
     if (part.startsWith("<") && part.endsWith(">")) {
       const content = part.slice(1, -1);
       return (
-        <span key={index} className="no-font2" data-no-font2="true">
+        <span key={index} className="en-text">
           {content}
         </span>
       );
