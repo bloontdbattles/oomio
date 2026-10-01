@@ -2,9 +2,9 @@
     background: rgba(3, 19, 10, 0.85);
     border: 1px solid rgba(246, 240, 222, 0.15);
     border-radius: 16px;
-    padding: 12px 18px;
+    padding: 12px 20px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    min-width: 220px;
+    min-width: 200px;
     font-family: var(--font-display);
     color: var(--oomio-cream);
     user-select: none;
@@ -12,10 +12,10 @@
 
 .scoreboard__header {
     text-align: center;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     color: var(--oomio-gold);
     margin-bottom: 10px;
     border-bottom: 1px solid rgba(246, 240, 222, 0.1);
@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 4px;
 }
 
 .scoreboard__team {
@@ -33,85 +34,44 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .scoreboard__team-name {
-    font-size: 0.9rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
-}
-
-.scoreboard__team--us .scoreboard__team-name {
-    color: var(--oomio-cream);
-}
-
-.scoreboard__team--them .scoreboard__team-name {
-    color: rgba(246, 240, 222, 0.6);
-}
-
-.scoreboard__stats {
-    display: flex;
-    gap: 12px;
-}
-
-.scoreboard__stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.scoreboard__stat-label {
-    font-size: 0.65rem;
-    color: rgba(246, 240, 222, 0.55);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    opacity: 0.7;
 }
 
-.scoreboard__stat-val {
-    font-size: 1.15rem;
-    font-weight: 700;
+/* Points row: card icon + big number */
+.scoreboard__points-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.scoreboard__card-icon {
+    width: 28px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+    border-radius: 3px;
+}
+
+.scoreboard__points-val {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--oomio-cream);
 }
 
 .scoreboard__divider {
     width: 1px;
-    height: 36px;
+    height: 48px;
     background: rgba(246, 240, 222, 0.15);
-    margin: 0 12px;
-}
-
-/* Points with /11 target */
-.scoreboard__stat-val--points {
-    display: flex;
-    align-items: baseline;
-    gap: 1px;
-}
-
-.scoreboard__target {
-    font-size: 0.65rem;
-    font-weight: 500;
-    color: rgba(246, 240, 222, 0.45);
-}
-
-/* Match progress bars */
-.scoreboard__progress-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(246, 240, 222, 0.12);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-top: 4px;
-}
-
-.scoreboard__progress-fill {
-    height: 100%;
-    border-radius: 999px;
-    transition: width 0.5s ease;
-}
-
-.scoreboard__progress-fill--us {
-    background: linear-gradient(90deg, var(--oomio-gold), #f5c842);
-}
-
-.scoreboard__progress-fill--them {
-    background: linear-gradient(90deg, #e05c5c, #c94040);
+    margin: 0 8px;
+    flex-shrink: 0;
 }

@@ -461,11 +461,8 @@ export default function GameTable({
             <div className="game-table__header-widgets">
                 <TrumpDisplay suit={trumpSuitDisplay} />
                 <ScoreBoard
-                    team1Tricks={team0Tricks}
-                    team2Tricks={team1Tricks}
                     team1Score={engineState.points[0]}
                     team2Score={engineState.points[1]}
-                    targetPoints={engineState.targetPoints}
                     players={isMultiplayer ? externalPlayers : undefined}
                 />
             </div>
