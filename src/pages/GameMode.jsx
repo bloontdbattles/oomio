@@ -6,7 +6,6 @@ import { createLobby, lobbyExists } from "../firebase/lobbyService";
 import Avatar from "../components/common/Avatar";
 import profileIcon from "../assets/images/1.png";
 import SettingsModal from "../components/common/SettingsModal";
-import LobbySettingsModal from "../components/lobby/LobbySettingsModal";
 import JoinLobbyModal from "../components/lobby/JoinLobbyModal";
 import "./GameMode.css";
 
@@ -15,7 +14,6 @@ export default function GameMode() {
   const navigate = useNavigate();
   const [player, setPlayer] = useState(null);
   const [showFriendsOptions, setShowFriendsOptions] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showGeneralSettings, setShowGeneralSettings] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -39,15 +37,14 @@ export default function GameMode() {
 
   if (!player) return null;
 
-  const handleCreateLobby = async (settings) => {
+  const handleCreateLobby = async () => {
+    if (isCreating) return;
     setIsCreating(true);
     try {
       const code = await createLobby({
         hostId: player.playerId,
         hostName: player.name,
-        ...settings,
       });
-      setShowSettingsModal(false);
       navigate("/lobby", { state: { mode: "create", code } });
     } catch (err) {
       console.error("Failed to create lobby:", err);
@@ -150,7 +147,8 @@ export default function GameMode() {
               <button
                 type="button"
                 className="mode-card mode-card--sub"
-                onClick={() => setShowSettingsModal(true)}
+                onClick={handleCreateLobby}
+                disabled={isCreating}
               >
                 <span className="mode-card__icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -158,7 +156,7 @@ export default function GameMode() {
                     <path d="M12 8v8M8 12h8" />
                   </svg>
                 </span>
-                <span className="mode-card__label">{t("createLobby")}</span>
+                <span className="mode-card__label">{isCreating ? t("creating") : t("createLobby")}</span>
               </button>
 
               <button
@@ -187,13 +185,6 @@ export default function GameMode() {
         onNameChange={(updated) => {
           setPlayer(updated);
         }}
-      />
-
-      <LobbySettingsModal
-        isOpen={showSettingsModal}
-        onClose={() => setShowSettingsModal(false)}
-        onConfirm={handleCreateLobby}
-        isSubmitting={isCreating}
       />
 
       <JoinLobbyModal
