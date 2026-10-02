@@ -103,7 +103,11 @@
 .lobby__start.btn {
   width: 100%;
   max-width: 320px;
-  margin-top: auto;
+  padding: 18px 40px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border-radius: 18px;
 }
 
 .lobby__start.btn:disabled {

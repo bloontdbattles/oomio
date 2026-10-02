@@ -96,7 +96,6 @@ export default function Home() {
                         id="player-name-input"
                         className="home__modal-input"
                         type="text"
-                        placeholder={t("enterYourName")}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleContinue()}

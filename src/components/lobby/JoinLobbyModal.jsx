@@ -20,7 +20,6 @@ export default function JoinLobbyModal({ isOpen, onClose, onJoin, isSubmitting, 
       <input
         type="text"
         className="join-lobby__input"
-        placeholder={t("lobbyCodePlaceholder")}
         value={code}
         onChange={(e) => setCode(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleJoin()}
