@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
@@ -24,7 +24,14 @@ export default function Lobby() {
   const location = useLocation();
   const { code } = location.state || {};
 
-  const currentPlayer = useMemo(() => getPlayer(), []);
+  // Keep currentPlayer reactive so name changes via Settings while in lobby propagate
+  const [currentPlayer, setCurrentPlayer] = useState(() => getPlayer());
+  useEffect(() => {
+    const handler = (e) => { if (e.detail) setCurrentPlayer(e.detail); };
+    window.addEventListener("oomio_player_change", handler);
+    return () => window.removeEventListener("oomio_player_change", handler);
+  }, []);
+
   const currentPlayerId = currentPlayer?.playerId || "you";
 
   const [lobby, setLobby] = useState(null);

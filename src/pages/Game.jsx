@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import { playSound1 } from "../utils/soundEffects";
@@ -39,8 +39,17 @@ function seatToPosition(mySeat, seat) {
 export default function Game() {
   const { t } = useContext(LanguageContext);
   const location = useLocation();
+  const navigate = useNavigate();
   const { code } = location.state || {};
-  const currentPlayer = getPlayer();
+
+  // Keep currentPlayer reactive so name/id changes mid-session are picked up
+  const [currentPlayer, setCurrentPlayer] = useState(() => getPlayer());
+  useEffect(() => {
+    const handler = (e) => { if (e.detail) setCurrentPlayer(e.detail); };
+    window.addEventListener("oomio_player_change", handler);
+    return () => window.removeEventListener("oomio_player_change", handler);
+  }, []);
+
   const myId = currentPlayer?.playerId || "you";
 
   const [game, setGame] = useState(null);
