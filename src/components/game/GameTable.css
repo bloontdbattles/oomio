@@ -126,12 +126,35 @@
 /* Adjustments for different screens */
 @media (max-width: 768px) {
     .game-table__header-widgets {
-        top: 20px;
-        left: 20px;
-        right: 20px;
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .scoreboard {
+        min-width: 150px;
+        padding: 6px 10px;
+    }
+
+    .scoreboard__points-val {
+        font-size: 1.6rem;
+    }
+
+    .scoreboard__card-icon {
+        width: 20px;
+    }
+
+    .scoreboard__divider {
+        height: 48px;
+        margin: 0 4px;
+    }
+
+    .trump-display {
+        padding: 4px 10px;
     }
 
     .game-table__arena {
