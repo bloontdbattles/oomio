@@ -52,10 +52,14 @@
 }
 
 .game-mode__profile-icon {
-    width: 44px;
-    height: 44px;
+    width: 66px;
+    height: 66px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid rgba(246, 240, 222, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: rgba(3, 19, 10, 0.5);
+    flex-shrink: 0;
 }
 
 .game-mode__name {
