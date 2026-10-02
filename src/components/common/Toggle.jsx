@@ -1,9 +1,12 @@
 import "./Toggle.css";
 
-export default function Toggle({ checked, onChange, label }) {
+export default function Toggle({ checked, onChange, label, icon }) {
     return (
         <label className="toggle">
-            <span className="toggle__label">{label}</span>
+            <span className="toggle__label">
+                {icon && <img src={icon} alt="" className="toggle__icon" />}
+                {label}
+            </span>
             <button
                 type="button"
                 role="switch"

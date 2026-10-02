@@ -4,6 +4,7 @@ import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
 import { createLobby, lobbyExists } from "../firebase/lobbyService";
 import Avatar from "../components/common/Avatar";
+import profileIcon from "../assets/images/1.png";
 import SettingsModal from "../components/common/SettingsModal";
 import LobbySettingsModal from "../components/lobby/LobbySettingsModal";
 import JoinLobbyModal from "../components/lobby/JoinLobbyModal";
@@ -81,7 +82,7 @@ export default function GameMode() {
 
       <header className="game-mode__top">
         <div className="game-mode__profile">
-          <Avatar name={player.name} size={44} />
+          <img src={profileIcon} alt="" className="game-mode__profile-icon" />
           <span className="game-mode__name">{player.name}</span>
         </div>
 

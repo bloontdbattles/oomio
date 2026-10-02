@@ -6,6 +6,9 @@ import Modal from "./Modal";
 import Toggle from "./Toggle";
 import LanguageSwitcher from "./LanguageSwitcher";
 import Button from "./Button";
+import profileIcon from "../../assets/images/1.png";
+import musicIcon from "../../assets/images/2.png";
+import soundIcon from "../../assets/images/3.png";
 import "./SettingsModal.css";
 
 export default function SettingsModal({ isOpen, onClose, player, onNameChange, onPlayerNameChange }) {
@@ -54,7 +57,10 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange, o
       <h2 className="settings-modal__title">{t("settings")}</h2>
 
       <div className="settings-modal__section">
-        <label className="settings-modal__label">{t("playerName")}</label>
+        <label className="settings-modal__label">
+          <img src={profileIcon} alt="" className="settings-modal__label-icon" />
+          {t("playerName")}
+        </label>
         <input
           type="text"
           className="settings-modal__input"
@@ -74,11 +80,11 @@ export default function SettingsModal({ isOpen, onClose, player, onNameChange, o
       </div>
 
       <div className="settings-modal__section">
-        <Toggle checked={soundOn} onChange={handleToggleSound} label={t("soundEffects")} />
+        <Toggle checked={soundOn} onChange={handleToggleSound} label={t("soundEffects")} icon={soundIcon} />
       </div>
 
       <div className="settings-modal__section">
-        <Toggle checked={musicOn} onChange={handleToggleMusic} label={t("music")} />
+        <Toggle checked={musicOn} onChange={handleToggleMusic} label={t("music")} icon={musicIcon} />
       </div>
 
       <button type="button" className="settings-modal__about" onClick={handleAbout}>

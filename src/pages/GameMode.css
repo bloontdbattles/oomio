@@ -51,6 +51,13 @@
     padding: 6px 18px 6px 6px;
 }
 
+.game-mode__profile-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 .game-mode__name {
     font-family: var(--font-display);
     font-weight: 600;

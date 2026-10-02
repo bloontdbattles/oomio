@@ -6,10 +6,19 @@
 }
 
 .toggle__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-body);
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--oomio-cream);
+}
+
+.toggle__icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
 }
 
 .toggle__track {

@@ -12,13 +12,21 @@
 }
 
 .settings-modal__label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: rgba(246, 240, 222, 0.55);
   margin-bottom: 8px;
   font-weight: 600;
+}
+
+.settings-modal__label-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .settings-modal__input {
