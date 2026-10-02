@@ -17,17 +17,13 @@ async function findUnusedCode() {
  * Creates a new lobby, seats the host in red/slot 0, and returns the
  * generated room code.
  */
-export async function createLobby({ hostId, hostName, timerEnabled, timerSeconds }) {
+export async function createLobby({ hostId, hostName }) {
     const code = await findUnusedCode();
 
     await set(lobbyRef(code), {
         createdAt: Date.now(),
         hostId,
         status: "waiting",
-        settings: {
-            timerEnabled,
-            timerSeconds: timerEnabled ? timerSeconds : null,
-        },
         teams: {
             red: { 0: { id: hostId, name: hostName, isHost: true } },
             blue: {},
