@@ -1,4 +1,4 @@
-import { getSoundEnabled } from "./localStorage";
+import { getSoundEnabled, getSoundVolume } from "./localStorage";
 import sound1Url from "../assets/music/sounds/sound1.mp3";
 import sound2Url from "../assets/music/sounds/sound2.mp3";
 import sound3Url from "../assets/music/sounds/sound3.mp3";
@@ -10,6 +10,7 @@ const audio3 = typeof window !== "undefined" ? new Audio(sound3Url) : null;
 function playAudio(audioObj) {
   if (!getSoundEnabled() || !audioObj) return;
   try {
+    audioObj.volume = getSoundVolume();
     audioObj.currentTime = 0;
     audioObj.play().catch((err) => {
       console.debug("Audio play blocked or failed:", err);

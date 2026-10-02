@@ -5,13 +5,13 @@ import bg2 from "../assets/music/background/background (2).mp3";
 import bg3 from "../assets/music/background/background (3).mp3";
 import bg4 from "../assets/music/background/background (4).mp3";
 import bg5 from "../assets/music/background/background(5).mp3";
-import { getMusicEnabled } from "../utils/localStorage";
+import { getMusicEnabled, getMusicVolume } from "../utils/localStorage";
 
 const TRACKS = [bg1, bg2, bg3, bg4, bg5];
 
 // Module-level singleton Audio object to guarantee ONLY 1 track can ever play at once
 const globalAudio = new Audio();
-globalAudio.volume = 0.35;
+globalAudio.volume = getMusicVolume();
 
 export const MusicContext = createContext({
   isPlaying: false,
@@ -102,10 +102,16 @@ export function MusicProvider({ children }) {
       }
     };
 
+    const handleVolumeChange = () => {
+      globalAudio.volume = getMusicVolume();
+    };
+
     window.addEventListener("oomio_music_change", handleMusicChange);
+    window.addEventListener("oomio_music_volume_change", handleVolumeChange);
     window.addEventListener("storage", handleMusicChange);
     return () => {
       window.removeEventListener("oomio_music_change", handleMusicChange);
+      window.removeEventListener("oomio_music_volume_change", handleVolumeChange);
       window.removeEventListener("storage", handleMusicChange);
     };
   }, [location.pathname]);

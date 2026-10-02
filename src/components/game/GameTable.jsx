@@ -8,6 +8,7 @@ import ScoreBoard from "./ScoreBoard";
 import TrumpPicker from "./TrumpPicker";
 import GameResult from "./GameResult";
 import { playSound1 } from "../../utils/soundEffects";
+import HeaderControls from "./HeaderControls";
 import player1Img from "../../assets/images/player1.png";
 import player2Img from "../../assets/images/player2.png";
 import player3Img from "../../assets/images/player3.png";
@@ -467,7 +468,10 @@ export default function GameTable({
         <div className="game-table">
             {/* Header widgets */}
             <div className="game-table__header-widgets">
-                <TrumpDisplay suit={trumpSuitDisplay} />
+                <div className="game-table__left-widgets">
+                    <HeaderControls />
+                    <TrumpDisplay suit={trumpSuitDisplay} />
+                </div>
                 <ScoreBoard
                     team1Tricks={team0Tricks}
                     team2Tricks={team1Tricks}
