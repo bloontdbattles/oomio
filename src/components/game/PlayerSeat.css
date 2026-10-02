@@ -21,10 +21,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.player-seat.is-active .player-seat__avatar-wrap {
-    border-color: var(--oomio-gold);
-    box-shadow: 0 0 15px rgba(232, 184, 75, 0.3);
-}
+/* Active player yellow circle removed */
 
 .player-seat__name {
     font-family: var(--font-display);
