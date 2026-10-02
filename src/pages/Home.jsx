@@ -6,7 +6,7 @@ import LanguageSwitcher from "../components/common/LanguageSwitcher";
 import Button from "../components/common/Button";
 import Modal from "../components/common/Modal";
 import { generateId } from "../utils/generateId";
-import { savePlayer } from "../utils/localStorage";
+import { getPlayer, savePlayer } from "../utils/localStorage";
 import logo from "../assets/images/logo.png";
 import "./Home.css";
 

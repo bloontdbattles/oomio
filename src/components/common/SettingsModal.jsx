@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../../context/LanguageContext";
-import { savePlayer, getSoundEnabled, setSoundEnabled, getMusicEnabled, setMusicEnabled } from "../../utils/localStorage";
+import { getPlayer, savePlayer, getSoundEnabled, setSoundEnabled, getMusicEnabled, setMusicEnabled } from "../../utils/localStorage";
 import Modal from "./Modal";
 import Toggle from "./Toggle";
 import LanguageSwitcher from "./LanguageSwitcher";
