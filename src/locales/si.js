@@ -29,6 +29,8 @@ export default {
   oomiBot: "<Oomi Bot>",
   pickTrump: ";=reïmq f;darkak",
   trump: "තුරුම්පු",
+  confirmPlay: "තහවුරු කරන්න",
+  cancelSelection: "අවලංගු කරන්න",
   waitingForTrump: ";=reïmq f;areula n,dfmdfrd;a;=fjka...",
   roundDraw: "jgij iu jsh",
   redWins: "r;= lKavdhu ch.%yKh lf<ah",

@@ -29,6 +29,8 @@ export default {
   oomiBot: "Oomi Bot",
   pickTrump: "Pick Trump Suit",
   trump: "Trump",
+  confirmPlay: "Confirm",
+  cancelSelection: "Cancel Selection",
   waitingForTrump: "Waiting for trump selection...",
   roundDraw: "Round ended in a draw",
   redWins: "Red Team wins the round!",
