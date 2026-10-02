@@ -8,17 +8,23 @@
 
 .card-rain__card {
   position: absolute;
-  top: -250px;
-  width: 160px;
-  height: 224px;
-  border-radius: 24px;
-  background: linear-gradient(155deg, var(--oomio-green-600), var(--oomio-green-900));
-  border: 6px solid var(--oomio-gold);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), inset 0 0 0 8px rgba(246, 240, 222, 0.15);
+  top: -380px;
+  width: 240px;
+  height: 336px;
   opacity: 0;
   animation-name: card-fall;
   animation-timing-function: cubic-bezier(0.55, 0.05, 0.85, 0.35);
   animation-fill-mode: forwards;
+}
+
+/* Make the real PlayingCard fill the rain wrapper — no rounded corners */
+.card-rain__card .playing-card {
+  width: 100%;
+  height: 100%;
+  font-size: 1.1rem;
+  border-radius: 0;
+  pointer-events: none;
+  user-select: none;
 }
 
 @keyframes card-fall {
@@ -30,7 +36,7 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(calc(100vh + 300px)) rotate(var(--rotate, 20deg)) scale(var(--scale, 1));
-    opacity: 0.85;
+    transform: translateY(calc(100vh + 280px)) rotate(var(--rotate, 20deg)) scale(var(--scale, 1));
+    opacity: 0.9;
   }
 }

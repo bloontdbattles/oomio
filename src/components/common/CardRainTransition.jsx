@@ -1,18 +1,23 @@
 import { useMemo } from "react";
+import PlayingCard from "../game/PlayingCard";
 import "./CardRainTransition.css";
 
-const CARD_COUNT = 16;
+const CARD_COUNT = 18;
+const RANKS = ["7", "8", "9", "10", "J", "Q", "K", "A"];
+const SUITS = ["clubs", "diamonds", "hearts", "spades"];
 
 export default function CardRainTransition() {
   const cards = useMemo(
     () =>
       Array.from({ length: CARD_COUNT }, (_, i) => ({
         id: i,
+        rank: RANKS[Math.floor(Math.random() * RANKS.length)],
+        suit: SUITS[Math.floor(Math.random() * SUITS.length)],
         left: Math.random() * 100,
-        delay: Math.random() * 0.35,
-        duration: 0.85 + Math.random() * 0.3,
-        rotate: (Math.random() - 0.5) * 60,
-        scale: 0.7 + Math.random() * 0.35,
+        delay: Math.random() * 0.5,
+        duration: 0.9 + Math.random() * 0.4,
+        rotate: (Math.random() - 0.5) * 70,
+        scale: 0.55 + Math.random() * 0.3,
       })),
     []
   );
@@ -30,7 +35,9 @@ export default function CardRainTransition() {
             "--rotate": `${c.rotate}deg`,
             "--scale": c.scale,
           }}
-        />
+        >
+          <PlayingCard rank={c.rank} suit={c.suit} />
+        </div>
       ))}
     </div>
   );
