@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import { getPlayer } from "../utils/localStorage";
+import { playSound1 } from "../utils/soundEffects";
 import {
   subscribeToGame,
   selectTrump,
@@ -141,6 +142,7 @@ export default function Game() {
       sweepTimerRef.current = setTimeout(() => {
         setWinnerPosition(winPos);
         setIsCollecting(true);
+        playSound1();
       }, TRICK_SWEEP_START_MS);
 
       clearTimerRef.current = setTimeout(() => {

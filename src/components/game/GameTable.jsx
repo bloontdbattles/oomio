@@ -7,6 +7,7 @@ import TrumpDisplay from "./TrumpDisplay";
 import ScoreBoard from "./ScoreBoard";
 import TrumpPicker from "./TrumpPicker";
 import GameResult from "./GameResult";
+import { playSound1 } from "../../utils/soundEffects";
 import player1Img from "../../assets/images/player1.png";
 import player2Img from "../../assets/images/player2.png";
 import player3Img from "../../assets/images/player3.png";
@@ -261,6 +262,7 @@ export default function GameTable({
             sweepTimerRef.current = setTimeout(() => {
                 setWinnerPosition(winnerPos);
                 setIsCollecting(true);
+                playSound1();
             }, 3000);
 
             clearTimerRef.current = setTimeout(() => {

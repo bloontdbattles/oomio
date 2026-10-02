@@ -5,6 +5,7 @@ import handLeft from "../../assets/images/hand-left.png";
 import handLeft2 from "../../assets/images/hand-left2.png";
 import handRight from "../../assets/images/hand-right.png";
 import "./PlayerHand.css";
+import { playSound2, playSound3 } from "../../utils/soundEffects";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ADJUST THESE to position / size / rotate the single reference card
@@ -61,7 +62,10 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
     const selectedCard = cards.find((c) => c.id === selectedCardId) || null;
     const fanCards = cards.filter((c) => c.id !== selectedCardId);
 
-    const selectCard = (cardId) => setSelectedCardId(cardId);
+    const selectCard = (cardId) => {
+        playSound2();
+        setSelectedCardId(cardId);
+    };
 
     const handleContextMenu = (e, cardId) => {
         e.preventDefault();
@@ -72,6 +76,7 @@ export default function PlayerHand({ cards = [], onConfirmPlay }) {
 
     const handleConfirm = () => {
         if (!selectedCard) return;
+        playSound3();
         onConfirmPlay(selectedCard);
         setSelectedCardId(null);
     };
