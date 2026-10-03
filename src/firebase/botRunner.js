@@ -36,30 +36,17 @@ function toFull(suit) { return CODE_TO_FULL[suit] ?? suit; }
 function convertCard(card) { return { rank: card.rank, suit: toCode(card.suit) }; }
 
 /**
- * Returns true when the occupant of `seat` is an AI bot.
+ * Returns true when the occupant of `seat` is an AI bot or a disconnected player.
  */
 export function isBotSeat(game, seat, presence = null) {
     const isBot = !!game?.seats?.[seat]?.isBot;
     const player = game?.seats?.[seat];
-    const isDisconnected = !isBot && player?.id && presence !== null && presence[player.id] === false;
+    const isDisconnected = !isBot && player?.id && presence !== null && presence[player.id] !== true;
     return isBot || isDisconnected;
 }
 
 /**
  * Convert Firebase game state into the shape expected by aiStrategy / aiKnowledge.
- *
- * Firebase shape:
- *   game.seats[seat]      { id, name, team, isBot }
- *   game.hands[seat]      [{ rank, suit }, ...]
- *   game.trick            [{ seat, card }, ...]
- *   game.trickHistory     [{ winnerSeat, plays: [{ seat, card }] }, ...]
- *   game.trumpSuit        string | null
- *
- * Engine shape (what aiStrategy / aiKnowledge expect):
- *   state.players         [{ seat, team, hand: [{ rank, suit }] }]
- *   state.currentTrick    [{ seat, card: { rank, suit } }]
- *   state.completedTricks [[{ seat, card }], ...]  (array of play arrays)
- *   state.trumpSuit       string | null
  */
 function buildAIState(game, mySeat) {
     const players = Object.entries(game.seats || {}).map(([seatStr, player]) => {

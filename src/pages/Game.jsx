@@ -88,12 +88,12 @@ export default function Game() {
     if (!code || !game || !presence) return;
 
     const activeHostId = game.hostId || Object.values(game.seats || {})[0]?.id;
-    const isHostOnline = activeHostId && presence[activeHostId];
+    const isHostOnline = activeHostId && presence[activeHostId] === true;
 
     if (!isHostOnline) {
       const connectedHumanSeats = Object.entries(game.seats || {})
         .map(([seatStr, p]) => ({ seat: Number(seatStr), ...p }))
-        .filter((p) => !p.isBot && p.id && presence[p.id]);
+        .filter((p) => !p.isBot && p.id && presence[p.id] === true);
 
       if (connectedHumanSeats.length > 0) {
         connectedHumanSeats.sort((a, b) => a.seat - b.seat);
@@ -233,7 +233,7 @@ export default function Game() {
   // 3. If still not matched, check if there is a disconnected real player seat to reclaim
   if (!mySeatEntry && presence !== null) {
     const disconnectedSeatEntry = Object.entries(game.seats || {}).find(
-      ([, p]) => !p?.isBot && p?.id && !presence[p.id]
+      ([, p]) => !p?.isBot && p?.id && presence[p.id] !== true
     );
     if (disconnectedSeatEntry) {
       mySeatEntry = disconnectedSeatEntry;
@@ -254,8 +254,8 @@ export default function Game() {
   const mySeat = Number(mySeatEntry[0]);
   mySeatRef.current = mySeat;
 
-  // Automatically reclaim seat if player rejoined (seat converted to bot) or if player name updated
-  if (mySeatEntry[1]?.isBot || (currentPlayer?.name && mySeatEntry[1]?.name !== currentPlayer.name)) {
+  // Reclaim seat if YOU rejoined your own seat that was temporarily converted to bot or if name updated
+  if (mySeatEntry[1]?.id === myId && (mySeatEntry[1]?.isBot || (currentPlayer?.name && mySeatEntry[1]?.name !== currentPlayer.name))) {
     reclaimPlayerSeat(code, mySeat, myId, currentPlayer?.name || "Player");
   }
 
@@ -264,7 +264,7 @@ export default function Game() {
 
   // Detect disconnected real players
   const disconnectedEntry = Object.entries(game.seats || {}).find(
-    ([, p]) => !p?.isBot && p?.id && presence !== null && !presence[p.id]
+    ([, p]) => !p?.isBot && p?.id && presence !== null && presence[p.id] !== true
   );
   const disconnectedSeat = disconnectedEntry ? Number(disconnectedEntry[0]) : null;
   const disconnectedPlayer = disconnectedEntry ? disconnectedEntry[1] : null;
@@ -284,7 +284,7 @@ export default function Game() {
     const opponentIndex = ["left", "top", "right"].indexOf(position);
 
     const isBot = !!player?.isBot;
-    const isDisconnected = !isBot && player?.id && presence !== null && !presence[player.id];
+    const isDisconnected = !isBot && player?.id && presence !== null && presence[player.id] !== true;
 
     const normalAvatar = opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined;
     const dcAvatar = opponentIndex !== -1 ? DISCONNECTED_AVATARS[opponentIndex] : undefined;
