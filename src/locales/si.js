@@ -73,4 +73,7 @@ export default {
   featureLiveLobbies: "සජීවී ලොබි සහ කණ්ඩායම්",
   featureLanguages: "ඉංග්‍රීසි සහ සිංහල",
   aboutFooter: "♥ සමඟ නිර්මාණය කරන ලදී — Oomio නොමිලේ සහ විවෘත මූලාශ්‍රයකි.",
+  aboutContactTitle: "මා අමතන්න",
+  aboutContactName: "Kavinda Hasaranga",
+  aboutContactNote: "ප්‍රතිචාරයක්, දෝෂයක් හෝ හුදෙක් ආයුබෝවන් කියන්න අවශ්‍යද? මට පණිවිඩයක් එවන්න!",
 };

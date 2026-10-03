@@ -105,9 +105,29 @@ export default function About() {
           ))}
         </div>
 
+        <hr className="about__divider" />
+
+        {/* Contact Me */}
+        <h2 className="about__section-title">{t("aboutContactTitle")}</h2>
+        <div className="about__contact">
+          <div className="about__contact-icon">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <rect x="2" y="4" width="20" height="16" rx="3" />
+              <path d="M2 7l10 7 10-7" />
+            </svg>
+          </div>
+          <p className="about__contact-name">{t("aboutContactName")}</p>
+          <a
+            href="mailto:kavindahasaranga2003@gmail.com"
+            className="about__contact-email"
+          >
+            kavindahasaranga2003@gmail.com
+          </a>
+          <p className="about__contact-note">{t("aboutContactNote")}</p>
+        </div>
+
         {/* Footer */}
         <div className="about__footer">
-          <p className="about__footer-text">{t("aboutFooter")}</p>
           <Button
             className="about__play-btn"
             onClick={() => navigate("/")}

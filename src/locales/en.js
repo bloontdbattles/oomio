@@ -73,4 +73,7 @@ export default {
   featureLiveLobbies: "Live Lobbies & Teams",
   featureLanguages: "English & Sinhala",
   aboutFooter: "Built with ♥ — Oomio is free and open source.",
+  aboutContactTitle: "Contact Me",
+  aboutContactName: "Kavinda Hasaranga",
+  aboutContactNote: "Got feedback, found a bug, or just want to say hi? Drop me a message!",
 };

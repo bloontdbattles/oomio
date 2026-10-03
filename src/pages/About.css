@@ -288,6 +288,79 @@
     line-height: 1.35;
 }
 
+/* ── Contact section ─────────────────────────────────── */
+.about__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 24px;
+    margin: 0 0 48px;
+    border-radius: 16px;
+    border: 1px solid rgba(246, 240, 222, 0.12);
+    background: linear-gradient(165deg,
+            rgba(246, 240, 222, 0.06),
+            rgba(3, 19, 10, 0.35));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    text-align: center;
+    animation: about-fadeUp 0.6s ease 0.55s both;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about__contact:hover {
+    transform: translateY(-3px);
+    border-color: rgba(232, 184, 75, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.about__contact-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(232, 184, 75, 0.12);
+    color: var(--oomio-gold);
+    margin-bottom: 4px;
+}
+
+.about__contact-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--oomio-cream);
+    margin: 0;
+}
+
+.about__contact-email {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: var(--oomio-gold);
+    text-decoration: none;
+    padding: 8px 20px;
+    border-radius: 999px;
+    background: rgba(232, 184, 75, 0.1);
+    border: 1px solid rgba(232, 184, 75, 0.25);
+    transition: all 0.25s ease;
+    word-break: break-all;
+}
+
+.about__contact-email:hover {
+    background: rgba(232, 184, 75, 0.2);
+    border-color: var(--oomio-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 184, 75, 0.15);
+}
+
+.about__contact-note {
+    font-size: 0.8rem;
+    color: rgba(246, 240, 222, 0.5);
+    margin: 4px 0 0;
+    line-height: 1.4;
+}
+
 /* ── Footer section ──────────────────────────────────── */
 .about__footer {
     text-align: center;
@@ -320,18 +393,55 @@
     }
 }
 
+/* ── Smooth scrolling ────────────────────────────────── */
+.about {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .about__content {
-        padding: 12px 16px 48px;
+        padding: 8px 18px 48px;
     }
 
-    .about__features {
-        grid-template-columns: 1fr;
+    .about__header {
+        margin-bottom: 36px;
+    }
+
+    .about__wordmark {
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+    }
+
+    .about__title {
+        font-size: 1.4rem;
+        margin-bottom: 16px;
+    }
+
+    .about__body {
+        font-size: 0.88rem;
+        line-height: 1.6;
+    }
+
+    .about__divider {
+        margin: 0 auto 32px;
+    }
+
+    .about__section-title {
+        font-size: 1.1rem;
+        margin-bottom: 20px;
+    }
+
+    .about__steps {
+        gap: 12px;
+        margin-bottom: 36px;
     }
 
     .about__step {
-        padding: 16px;
+        padding: 14px;
+        gap: 12px;
+        border-radius: 12px;
     }
 
     .about__step-number {
@@ -339,11 +449,105 @@
         height: 32px;
         font-size: 0.78rem;
     }
+
+    .about__step-text {
+        font-size: 0.84rem;
+        padding-top: 4px;
+        line-height: 1.5;
+    }
+
+    .about__features {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 36px;
+    }
+
+    .about__feature {
+        flex-direction: row;
+        padding: 14px 16px;
+        gap: 14px;
+        border-radius: 12px;
+    }
+
+    .about__feature-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .about__feature-label {
+        text-align: left;
+        font-size: 0.82rem;
+    }
+
+    .about__contact {
+        padding: 24px 16px;
+        margin-bottom: 36px;
+        border-radius: 12px;
+        gap: 10px;
+    }
+
+    .about__contact-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    .about__contact-name {
+        font-size: 0.95rem;
+    }
+
+    .about__contact-email {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+
+    .about__contact-note {
+        font-size: 0.75rem;
+    }
+
+    .about__play-btn.btn {
+        min-width: unset;
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 0.95rem;
+    }
+
+    /* Disable hover lifts on touch — they feel sticky */
+    .about__step:hover,
+    .about__feature:hover,
+    .about__contact:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .about__content {
+        padding: 4px 12px 40px;
+    }
+
+    .about__topbar {
+        padding: 14px 12px;
+    }
+
+    .about__back-btn {
+        font-size: 0.82rem;
+        padding: 6px 14px;
+    }
+
+    .about__title {
+        font-size: 1.25rem;
+    }
+
+    .about__contact-email {
+        font-size: 0.72rem;
+        padding: 6px 12px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .about__step,
     .about__feature,
+    .about__contact,
     .about__header,
     .about__section-title,
     .about__footer {
