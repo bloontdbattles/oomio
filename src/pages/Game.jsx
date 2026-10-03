@@ -115,6 +115,7 @@ export default function Game() {
 
   const sweepTimerRef = useRef(null);
   const clearTimerRef = useRef(null);
+  const isHoldingRef = useRef(false);
 
   // ── Mirror live trick / hold completed trick for 5s ───────────────────
   // At 3s (TRICK_SWEEP_START_MS), triggers 1s animation collecting cards to trick winner.
@@ -123,6 +124,7 @@ export default function Game() {
 
     if (game.status === "selecting-trump") {
       completedLenRef.current = 0;
+      isHoldingRef.current = false;
       if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
       if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
       setShownPlays([]);
@@ -132,9 +134,13 @@ export default function Game() {
     }
 
     const newLen = (game.trickHistory || []).length;
+    const currentTrickPlays = game.trick || [];
 
+    // Case 1: A trick just completed (newLen increased) — start 5s hold and 3s sweep animation
     if (newLen > completedLenRef.current) {
       completedLenRef.current = newLen;
+      isHoldingRef.current = true;
+
       const lastTrick = game.trickHistory[newLen - 1];
       const frozenPlays = (lastTrick?.plays || []).map((play) => ({
         seat: seatToPosition(mySeatRef.current, play.seat),
@@ -156,15 +162,37 @@ export default function Game() {
       }, TRICK_SWEEP_START_MS);
 
       clearTimerRef.current = setTimeout(() => {
-        setShownPlays([]);
+        isHoldingRef.current = false;
         setIsCollecting(false);
         setWinnerPosition(null);
+        setShownPlays((game.trick || []).map((play) => ({
+          seat: seatToPosition(mySeatRef.current, play.seat),
+          card: play.card,
+        })));
       }, TRICK_HOLD_MS);
       return;
     }
 
-    if (completedLenRef.current === newLen) {
-      const livePlays = (game.trick || []).map((play) => ({
+    // Case 2: We are holding a completed trick animation, but someone played a card for the new trick
+    if (isHoldingRef.current && currentTrickPlays.length > 0) {
+      // End the completed trick hold early so the new card is immediately shown!
+      isHoldingRef.current = false;
+      if (sweepTimerRef.current) clearTimeout(sweepTimerRef.current);
+      if (clearTimerRef.current) clearTimeout(clearTimerRef.current);
+      setIsCollecting(false);
+      setWinnerPosition(null);
+
+      const livePlays = currentTrickPlays.map((play) => ({
+        seat: seatToPosition(mySeatRef.current, play.seat),
+        card: play.card,
+      }));
+      setShownPlays(livePlays);
+      return;
+    }
+
+    // Case 3: Normal live trick update during active play (not holding completed trick)
+    if (!isHoldingRef.current) {
+      const livePlays = currentTrickPlays.map((play) => ({
         seat: seatToPosition(mySeatRef.current, play.seat),
         card: play.card,
       }));
