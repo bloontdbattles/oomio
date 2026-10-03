@@ -176,6 +176,10 @@ export default function GameTable({
     isMultiplayer = false,
     winnerPosition: externalWinnerPosition,
     isCollecting: externalIsCollecting,
+    team1Tricks: extTeam1Tricks,
+    team2Tricks: extTeam2Tricks,
+    team1Score: extTeam1Score,
+    team2Score: extTeam2Score,
 }) {
     const [engineState, dispatch] = useReducer(
         gameReducerWithIds,
@@ -439,9 +443,14 @@ export default function GameTable({
         ? externalPlayers?.find((p) => p.seat === "bottom")
         : null;
 
-    // Current round trick counts (singleplayer)
+    // Current round trick counts
     const team0Tricks = engineState.trickWinners.filter((t) => t === 0).length;
     const team1Tricks = engineState.trickWinners.filter((t) => t === 1).length;
+
+    const displayTeam1Tricks = isMultiplayer ? (extTeam1Tricks ?? 0) : team0Tricks;
+    const displayTeam2Tricks = isMultiplayer ? (extTeam2Tricks ?? 0) : team1Tricks;
+    const displayTeam1Score = isMultiplayer ? (extTeam1Score ?? 0) : engineState.points[0];
+    const displayTeam2Score = isMultiplayer ? (extTeam2Score ?? 0) : engineState.points[1];
 
     // Last round result trick counts (for GameResult display)
     const lastTrickCounts = engineState.lastRoundResult?.trickCounts ?? [0, 0];
@@ -473,11 +482,10 @@ export default function GameTable({
                     <TrumpDisplay suit={trumpSuitDisplay} />
                 </div>
                 <ScoreBoard
-                    team1Tricks={team0Tricks}
-                    team2Tricks={team1Tricks}
-                    team1Score={engineState.points[0]}
-                    team2Score={engineState.points[1]}
-                    players={isMultiplayer ? externalPlayers : undefined}
+                    team1Tricks={displayTeam1Tricks}
+                    team2Tricks={displayTeam2Tricks}
+                    team1Score={displayTeam1Score}
+                    team2Score={displayTeam2Score}
                 />
             </div>
 
@@ -582,6 +590,7 @@ export default function GameTable({
                         isDisconnected={bottomPlayer?.isDisconnected}
                         isActive={currentActiveSeat === "bottom"}
                         position="bottom"
+                        avatarImg={bottomPlayer?.avatar}
                     />
                 </div>
             </div>

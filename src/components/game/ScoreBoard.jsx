@@ -7,11 +7,7 @@ export default function ScoreBoard({
     team2Tricks = 0,
     team1Score = 0,
     team2Score = 0,
-    players,
 }) {
-    const t1Points = players ? (players.find((p) => p.seat === "bottom")?.score ?? 0) : team1Score;
-    const t2Points = players ? (players.find((p) => p.seat === "left")?.score ?? 0) : team2Score;
-
     return (
         <div className="scoreboard">
             <div className="scoreboard__header">Score</div>
@@ -28,7 +24,7 @@ export default function ScoreBoard({
                             alt="blue card"
                             className="scoreboard__card-icon"
                         />
-                        <span className="scoreboard__points-val">{t1Points}</span>
+                        <span className="scoreboard__points-val">{team1Score}</span>
                     </div>
 
                     {/* Tricks row */}
@@ -50,7 +46,7 @@ export default function ScoreBoard({
                             alt="red card"
                             className="scoreboard__card-icon"
                         />
-                        <span className="scoreboard__points-val">{t2Points}</span>
+                        <span className="scoreboard__points-val">{team2Score}</span>
                     </div>
 
                     {/* Tricks row */}

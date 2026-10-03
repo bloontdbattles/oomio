@@ -16,6 +16,7 @@ import { runBotTurn } from "../firebase/botRunner";
 import { trackPresence, subscribeToPresence } from "../firebase/presenceService";
 import GameTable from "../components/game/GameTable";
 import TrumpPicker from "../components/game/TrumpPicker";
+import GameResult from "../components/game/GameResult";
 import DisconnectModal from "../components/game/DisconnectModal";
 import Button from "../components/common/Button";
 import player1 from "../assets/images/player1.png";
@@ -24,6 +25,10 @@ import player3 from "../assets/images/player3.png";
 import dc1 from "../assets/images/dc1.png";
 import dc2 from "../assets/images/dc2.png";
 import dc3 from "../assets/images/dc3.png";
+import img4 from "../assets/images/4.png";
+import img5 from "../assets/images/5.png";
+import img6 from "../assets/images/6.png";
+import img7 from "../assets/images/7.png";
 import "./Game.css";
 
 // Seat 0 is always "me" once rotated - offset 1/2/3 map to left/top/right
@@ -240,6 +245,15 @@ export default function Game() {
   const disconnectedSeat = disconnectedEntry ? Number(disconnectedEntry[0]) : null;
   const disconnectedPlayer = disconnectedEntry ? disconnectedEntry[1] : null;
 
+  const myTeam = game.seats?.[mySeat]?.team || "red";
+  const oppTeam = myTeam === "red" ? "blue" : "red";
+
+  const myTricks = game.scores?.[myTeam] || 0;
+  const oppTricks = game.scores?.[oppTeam] || 0;
+
+  const myMatchPoints = game.matchScore?.[myTeam] || 0;
+  const oppMatchPoints = game.matchScore?.[oppTeam] || 0;
+
   const players = Object.entries(game.seats || {}).map(([seatStr, player]) => {
     const seat = Number(seatStr);
     const position = seatToPosition(mySeat, seat);
@@ -248,9 +262,16 @@ export default function Game() {
     const isBot = !!player?.isBot;
     const isDisconnected = !isBot && player?.id && presence !== null && !presence[player.id];
 
-    const normalAvatar = opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined;
+    let teamAvatar = undefined;
+    if (player?.team === "blue") {
+      teamAvatar = isBot ? img7 : img4;
+    } else if (player?.team === "red") {
+      teamAvatar = isBot ? img6 : img5;
+    }
+
+    const normalAvatar = teamAvatar || (opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined);
     const dcAvatar = opponentIndex !== -1 ? DISCONNECTED_AVATARS[opponentIndex] : undefined;
-    const avatar = position === "bottom" ? undefined : (isDisconnected ? dcAvatar : normalAvatar);
+    const avatar = isDisconnected ? dcAvatar : normalAvatar;
 
     return {
       id: player?.id || `seat-${seat}`,
@@ -288,12 +309,8 @@ export default function Game() {
     startNextRound(code);
   };
 
-  const roundOverMessage =
-    game.roundWinner === "draw"
-      ? t("roundDraw")
-      : game.roundWinner === "red"
-      ? t("redWins")
-      : t("blueWins");
+  const isGameOverStatus = game.status === "game-over" || myMatchPoints >= 11 || oppMatchPoints >= 11;
+  const isRoundOverStatus = game.status === "round-over" || isGameOverStatus;
 
   return (
     <>
@@ -323,6 +340,10 @@ export default function Game() {
         isMultiplayer={true}
         winnerPosition={winnerPosition}
         isCollecting={isCollecting}
+        team1Tricks={myTricks}
+        team2Tricks={oppTricks}
+        team1Score={myMatchPoints}
+        team2Score={oppMatchPoints}
       />
 
       {game.status === "selecting-trump" && (
@@ -332,14 +353,22 @@ export default function Game() {
         />
       )}
 
-      {game.status === "round-over" && (
-        <div className="round-over">
-          <div className="round-over__panel">
-            <h2 className="round-over__title">{t("roundOver")}</h2>
-            <p className="round-over__message">{roundOverMessage}</p>
-            <Button onClick={handleNextRound}>{t("nextRound")}</Button>
-          </div>
-        </div>
+      {isRoundOverStatus && (
+        <GameResult
+          isGameOver={isGameOverStatus}
+          playerWon={
+            isGameOverStatus
+              ? myMatchPoints >= 11
+              : (game.roundWinner === "draw" ? false : game.roundWinner === myTeam)
+          }
+          roundResult={game.roundResultType || (game.roundWinner === "draw" ? "DRAW" : "WIN")}
+          team1Tricks={game.lastRoundTricks?.[myTeam] ?? myTricks}
+          team2Tricks={game.lastRoundTricks?.[oppTeam] ?? oppTricks}
+          team1Points={myMatchPoints}
+          team2Points={oppMatchPoints}
+          targetPoints={11}
+          onPlayAgain={handleNextRound}
+        />
       )}
 
       {isHost && disconnectedPlayer && (
@@ -354,4 +383,3 @@ export default function Game() {
     </>
   );
 }
-

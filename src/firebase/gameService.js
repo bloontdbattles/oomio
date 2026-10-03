@@ -2,18 +2,6 @@ import { get, onValue, runTransaction, update } from "firebase/database";
 import { gameRef } from "./database";
 import { dealHands } from "../game/cards/deck";
 
-// ---------------------------------------------------------------------
-// Rules logic (follow-suit legality + trick-winner resolution)
-//
-// This mirrors what you built in src/game/rules/cardRules.js and
-// trickRules.js, kept self-contained here so this file doesn't depend on
-// their exact function names. If you'd rather have one source of truth,
-// swap these two helpers for imports from your own rules files - the
-// logic they need to implement is identical.
-// ---------------------------------------------------------------------
-
-// Assumed rank order: 7 (lowest) up to Ace (highest). Adjust this array
-// if Oomi actually ranks cards differently.
 const RANK_ORDER = ["7", "8", "9", "10", "J", "Q", "K", "A"];
 const rankValue = (rank) => RANK_ORDER.indexOf(rank);
 
@@ -42,15 +30,6 @@ function getTrickWinner(trick, trumpSuit) {
     ).seat;
 }
 
-// ---------------------------------------------------------------------
-// Seat mapping
-//
-// Lobby teams are red/blue x 2 slots. For the table, seats alternate
-// red/blue/red/blue around the table so partners (same team) end up
-// sitting opposite each other - seats 0 & 2 are partners, 1 & 3 are
-// partners, matching what you described.
-// ---------------------------------------------------------------------
-
 function buildSeats(teams) {
     const seatFor = (player, team) => (player ? { ...player, team } : null);
     return {
@@ -61,15 +40,6 @@ function buildSeats(teams) {
     };
 }
 
-// ---------------------------------------------------------------------
-// Public API
-// ---------------------------------------------------------------------
-
-/**
- * Deals a fresh 32-card game and starts it in "selecting-trump" status,
- * with seat 0 as the first trump picker. Call this once, when the host
- * presses Start Game in the lobby.
- */
 export async function initializeGame(code, teams, hostId = null) {
     await update(gameRef(code), {
         status: "selecting-trump",
@@ -84,6 +54,8 @@ export async function initializeGame(code, teams, hostId = null) {
         matchScore: { red: 0, blue: 0 },
         roundNumber: 1,
         roundWinner: null,
+        lastRoundTricks: { red: 0, blue: 0 },
+        roundResultType: null,
         hostId: hostId || null,
         createdAt: Date.now(),
     });
@@ -95,10 +67,6 @@ export function subscribeToGame(code, callback) {
     });
 }
 
-/**
- * The current trump-picker chooses a suit. They also lead the first
- * card of the round, so currentTurnSeat stays on them.
- */
 export async function selectTrump(code, seat, suit) {
     const snap = await get(gameRef(code));
     const game = snap.val();
@@ -114,17 +82,6 @@ export async function selectTrump(code, seat, suit) {
     return true;
 }
 
-/**
- * Attempts to play a card for the given seat. Runs as a transaction so
- * it's safe even if triggered unexpectedly at the same time as another
- * write. Returns true if the move was accepted, false if it was rejected
- * (not your turn, illegal move, etc).
- *
- * NOTE: this is client-side validation only - a modified client could in
- * theory skip these checks. Real cheat-proofing would need this logic to
- * run in a trusted place (e.g. Firebase Cloud Functions) instead of here.
- * Fine for now, worth revisiting before a public launch.
- */
 export async function playCard(code, seat, card) {
     const result = await runTransaction(gameRef(code), (game) => {
         if (!game) return game;
@@ -162,14 +119,40 @@ export async function playCard(code, seat, card) {
 
             const cardsLeft = Object.values(nextGame.hands).some((h) => (h || []).length > 0);
             if (!cardsLeft) {
-                // Round over. Default rule (not yet confirmed): most tricks wins.
-                nextGame.status = "round-over";
-                nextGame.roundWinner =
-                    nextGame.scores.red === nextGame.scores.blue
-                        ? "draw"
-                        : nextGame.scores.red > nextGame.scores.blue
-                            ? "red"
-                            : "blue";
+                // Round over: calculate points earned this round and update match scores
+                const redTricks = nextGame.scores.red || 0;
+                const blueTricks = nextGame.scores.blue || 0;
+                let redPts = 0;
+                let bluePts = 0;
+                let roundWinner = null;
+                let roundResultType = "WIN";
+
+                if (redTricks === blueTricks) {
+                    // 4-4 draw: both teams earn 1 point
+                    redPts = 1;
+                    bluePts = 1;
+                    roundWinner = "draw";
+                    roundResultType = "DRAW";
+                } else if (redTricks > blueTricks) {
+                    redPts = 1;
+                    roundWinner = "red";
+                } else {
+                    bluePts = 1;
+                    roundWinner = "blue";
+                }
+
+                const newMatchScore = {
+                    red: (game.matchScore?.red || 0) + redPts,
+                    blue: (game.matchScore?.blue || 0) + bluePts,
+                };
+
+                const isGameOver = newMatchScore.red >= 11 || newMatchScore.blue >= 11;
+
+                nextGame.status = isGameOver ? "game-over" : "round-over";
+                nextGame.roundWinner = roundWinner;
+                nextGame.roundResultType = roundResultType;
+                nextGame.lastRoundTricks = { red: redTricks, blue: blueTricks };
+                nextGame.matchScore = newMatchScore;
             }
         } else {
             nextGame.currentTurnSeat = (seat + 1) % 4;
@@ -181,15 +164,12 @@ export async function playCard(code, seat, card) {
     return result.committed;
 }
 
-/**
- * Deals a new round. Trump-picker rotates to the next seat, per "go one
- * by one". Match score accumulates the previous round's result.
- */
 export async function startNextRound(code) {
     const snap = await get(gameRef(code));
     const game = snap.val();
     if (!game) return;
 
+    const isGameOver = (game.matchScore?.red || 0) >= 11 || (game.matchScore?.blue || 0) >= 11;
     const nextPickerSeat = (game.trumpPickerSeat + 1) % 4;
 
     await update(gameRef(code), {
@@ -201,18 +181,13 @@ export async function startNextRound(code) {
         trick: [],
         trickHistory: [],
         scores: { red: 0, blue: 0 },
-        roundNumber: (game.roundNumber || 1) + 1,
-        matchScore: {
-            red: (game.matchScore?.red || 0) + (game.roundWinner === "red" ? 1 : 0),
-            blue: (game.matchScore?.blue || 0) + (game.roundWinner === "blue" ? 1 : 0),
-        },
+        roundNumber: isGameOver ? 1 : (game.roundNumber || 1) + 1,
+        matchScore: isGameOver ? { red: 0, blue: 0 } : (game.matchScore || { red: 0, blue: 0 }),
         roundWinner: null,
+        roundResultType: null,
     });
 }
 
-/**
- * Converts a disconnected human player's seat to a bot permanently so the AI takes over.
- */
 export async function replacePlayerWithBot(code, seat, botName = "Oomi Bot") {
     let nameStr = "Oomi Bot";
     if (typeof botName === "string" && botName.trim()) {
@@ -224,9 +199,6 @@ export async function replacePlayerWithBot(code, seat, botName = "Oomi Bot") {
     });
 }
 
-/**
- * Restores a player to their seat when they rejoin using the room code.
- */
 export async function reclaimPlayerSeat(code, seat, playerId, playerName) {
     await update(gameRef(code), {
         [`seats/${seat}/isBot`]: false,
@@ -235,9 +207,6 @@ export async function reclaimPlayerSeat(code, seat, playerId, playerName) {
     });
 }
 
-/**
- * Migrates host status to a new player ID if the previous host disconnects.
- */
 export async function migrateHost(code, newHostId) {
     await update(gameRef(code), { hostId: newHostId });
 }
