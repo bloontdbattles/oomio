@@ -25,10 +25,6 @@ import player3 from "../assets/images/player3.png";
 import dc1 from "../assets/images/dc1.png";
 import dc2 from "../assets/images/dc2.png";
 import dc3 from "../assets/images/dc3.png";
-import img4 from "../assets/images/4.png";
-import img5 from "../assets/images/5.png";
-import img6 from "../assets/images/6.png";
-import img7 from "../assets/images/7.png";
 import "./Game.css";
 
 // Seat 0 is always "me" once rotated - offset 1/2/3 map to left/top/right
@@ -262,16 +258,9 @@ export default function Game() {
     const isBot = !!player?.isBot;
     const isDisconnected = !isBot && player?.id && presence !== null && !presence[player.id];
 
-    let teamAvatar = undefined;
-    if (player?.team === "blue") {
-      teamAvatar = isBot ? img7 : img4;
-    } else if (player?.team === "red") {
-      teamAvatar = isBot ? img6 : img5;
-    }
-
-    const normalAvatar = teamAvatar || (opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined);
+    const normalAvatar = opponentIndex !== -1 ? OPPONENT_AVATARS[opponentIndex] : undefined;
     const dcAvatar = opponentIndex !== -1 ? DISCONNECTED_AVATARS[opponentIndex] : undefined;
-    const avatar = isDisconnected ? dcAvatar : normalAvatar;
+    const avatar = position === "bottom" ? undefined : (isDisconnected ? dcAvatar : normalAvatar);
 
     return {
       id: player?.id || `seat-${seat}`,
