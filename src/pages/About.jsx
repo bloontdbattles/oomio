@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import Button from "../components/common/Button";
+import SEO from "../components/common/SEO";
 import "./About.css";
 
 /* ── SVG icons (inline, no external deps) ────────────── */
@@ -51,6 +52,10 @@ export default function About() {
 
   return (
     <div className="about">
+      <SEO 
+        title="About Oomio - Card Game Rules & How to Play" 
+        description="Learn how to play Oomio, explore card game rules, bidding strategies, and contact developer Kavinda Hasaranga." 
+      />
       <div className="about__texture" aria-hidden="true" />
       <div className="about__vignette" aria-hidden="true" />
 

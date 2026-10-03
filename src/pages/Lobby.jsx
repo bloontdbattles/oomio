@@ -14,6 +14,7 @@ import { initializeGame } from "../firebase/gameService";
 import { trackPresence } from "../firebase/presenceService";
 import TeamPanel from "../components/lobby/TeamPanel";
 import Button from "../components/common/Button";
+import SEO from "../components/common/SEO";
 import "./Lobby.css";
 
 const EMPTY_TEAM = [null, null];
@@ -168,6 +169,10 @@ export default function Lobby() {
 
   return (
     <div className="lobby">
+      <SEO 
+        title={`Lobby ${code ? `#${code}` : ''} - Oomio`} 
+        description="Join and invite friends to your Oomio game room lobby. Team up, configure bots, and start playing!" 
+      />
       <div className="lobby__texture" aria-hidden="true" />
       <div className="lobby__vignette" aria-hidden="true" />
 

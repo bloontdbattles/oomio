@@ -7,6 +7,7 @@ import Avatar from "../components/common/Avatar";
 import profileIcon from "../assets/images/1.png";
 import SettingsModal from "../components/common/SettingsModal";
 import JoinLobbyModal from "../components/lobby/JoinLobbyModal";
+import SEO from "../components/common/SEO";
 import "./GameMode.css";
 
 export default function GameMode() {
@@ -74,6 +75,10 @@ export default function GameMode() {
 
   return (
     <div className="game-mode">
+      <SEO 
+        title="Select Game Mode - Oomio" 
+        description="Choose your Oomio game mode: Play singleplayer vs offline AI bots or create and join multiplayer rooms with friends." 
+      />
       <div className="game-mode__texture" aria-hidden="true" />
       <div className="game-mode__vignette" aria-hidden="true" />
 

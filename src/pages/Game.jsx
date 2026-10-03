@@ -25,6 +25,7 @@ import player3 from "../assets/images/player3.png";
 import dc1 from "../assets/images/dc1.png";
 import dc2 from "../assets/images/dc2.png";
 import dc3 from "../assets/images/dc3.png";
+import SEO from "../components/common/SEO";
 import "./Game.css";
 
 // Seat 0 is always "me" once rotated - offset 1/2/3 map to left/top/right
@@ -331,6 +332,10 @@ export default function Game() {
 
   return (
     <>
+      <SEO 
+        title="Live Match - Oomio Card Game" 
+        description="Experience live Oomio gameplay. Bid for trump, win tricks, and score points in real-time." 
+      />
       {disconnectedPlayer && (
         <div className="game-dc-bar">
           <span>⚠️ <strong>{disconnectedPlayer.name}</strong> disconnected</span>

@@ -8,6 +8,7 @@ import Modal from "../components/common/Modal";
 import { generateId } from "../utils/generateId";
 import { getPlayer, savePlayer } from "../utils/localStorage";
 import logo from "../assets/images/logo.png";
+import SEO from "../components/common/SEO";
 import "./Home.css";
 
 const TRANSITION_MS = 1100;
@@ -52,6 +53,10 @@ export default function Home() {
 
     return (
         <div className={`home${isTransitioning ? " home--transitioning" : ""}`}>
+            <SEO 
+                title="Oomio - Play Free Online Card Game" 
+                description="Play Oomio online! A trick-taking card game featuring singleplayer AI bots and real-time multiplayer lobbies." 
+            />
             <div className="home__stage">
                 <div className="home__texture" aria-hidden="true" />
                 <div className="home__vignette" aria-hidden="true" />
