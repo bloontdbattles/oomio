@@ -33,6 +33,14 @@ export default function SEO({ title, description }) {
       const twDesc = document.querySelector('meta[name="twitter:description"]');
       if (twDesc) twDesc.setAttribute("content", description);
     }
+
+    // Trigger Google Analytics pageview tracking on SPA route changes
+    if (typeof window.gtag === "function") {
+      window.gtag("config", "G-6TWPEPR21S", {
+        page_path: window.location.pathname + window.location.search,
+        page_title: document.title,
+      });
+    }
   }, [title, description]);
 
   return null;
