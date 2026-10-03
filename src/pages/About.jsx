@@ -43,13 +43,7 @@ const FEATURES = [
   { key: "featureLanguages", icon: icons.globe },
 ];
 
-const STEPS = [
-  { key: "step1" },
-  { key: "step2" },
-  { key: "step3" },
-  { key: "step4" },
-  { key: "step5" },
-];
+const STEP_COUNT = 5;
 
 export default function About() {
   const { t } = useContext(LanguageContext);
@@ -88,13 +82,12 @@ export default function About() {
         {/* How to Play */}
         <h2 className="about__section-title">{t("aboutHowToPlay")}</h2>
         <ol className="about__steps">
-          {STEPS.map((s, i) => (
-            <li key={s.key} className="about__step">
+          {Array.from({ length: STEP_COUNT }, (_, i) => (
+            <li key={i} className="about__step">
               <span className="about__step-number">{i + 1}</span>
-              <span
-                className="about__step-text"
-                dangerouslySetInnerHTML={{ __html: t(`aboutStep${i + 1}`) }}
-              />
+              <span className="about__step-text">
+                {t(`aboutStep${i + 1}`)}
+              </span>
             </li>
           ))}
         </ol>
