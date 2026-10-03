@@ -51,3 +51,23 @@
 .confirm-play__btn--cancel:hover {
     background: rgba(3, 19, 10, 0.7);
 }
+
+@media (max-width: 768px) {
+    .confirm-play {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+
+    .confirm-play__btn--confirm {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 25px -4px rgba(232, 184, 75, 0.75), 0 0 20px rgba(232, 184, 75, 0.4);
+    }
+
+    .confirm-play__btn--cancel {
+        width: 44px;
+        height: 44px;
+    }
+}
