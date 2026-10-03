@@ -56,4 +56,21 @@ export default {
   playerName: "Player Name",
   save: "Save",
   close: "Close",
+
+  /* ── About page ── */
+  aboutTitle: "About Oomio",
+  aboutBody1: "Oomio is a modern take on the beloved traditional Sinhala trick-taking card game. Played in teams of two, the goal is to win tricks and outscore your opponents across multiple rounds.",
+  aboutBody2: "Whether you're learning the game for the first time or reliving childhood memories, Oomio brings the classic experience to your browser — with friends or AI opponents.",
+  aboutHowToPlay: "How to Play",
+  aboutStep1: "<strong>Form teams</strong> — Two teams of two players sit across from each other.",
+  aboutStep2: "<strong>Deal the cards</strong> — All 32 cards are dealt equally. Each player gets 8 cards.",
+  aboutStep3: "<strong>Pick a trump suit</strong> — The first player selects the trump suit for the round.",
+  aboutStep4: "<strong>Play tricks</strong> — Players take turns playing one card. Follow the lead suit or play trump to win the trick.",
+  aboutStep5: "<strong>Score & win</strong> — The team that wins more tricks scores a point. First to 11 points wins the match!",
+  aboutFeaturesTitle: "Features",
+  featurePlayAI: "Play vs AI",
+  featurePlayFriends: "Multiplayer with Friends",
+  featureLiveLobbies: "Live Lobbies & Teams",
+  featureLanguages: "English & Sinhala",
+  aboutFooter: "Built with ♥ — Oomio is free and open source.",
 };
