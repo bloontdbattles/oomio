@@ -20,6 +20,7 @@ export default function TeamPanel({
                     <PlayerSlot
                         key={player ? player.id : `empty-${i}`}
                         player={player}
+                        teamColor={teamColor}
                         isHost={isHost}
                         canAddBot={!player}
                         canSelfJoin={!player && allowSelfJoin}
