@@ -60,7 +60,7 @@ export function setMusicEnabled(enabled) {
 
 export function getMusicVolume() {
     const raw = localStorage.getItem(MUSIC_VOL_KEY);
-    return raw !== null ? parseFloat(raw) : 0.5;
+    return raw !== null ? parseFloat(raw) : 0.1;
 }
 
 export function setMusicVolume(vol) {
