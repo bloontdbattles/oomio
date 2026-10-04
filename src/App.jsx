@@ -8,6 +8,8 @@ import Game from "./pages/Game";
 import Rules from "./pages/Rules";
 import GameMode from "./pages/GameMode";
 import About from "./pages/About";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
@@ -25,6 +27,8 @@ function App() {
               <Route path="/lobby" element={<Lobby />} />
               <Route path="/game" element={<Game />} />
               <Route path="/rules" element={<Rules />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </CardRainProvider>
