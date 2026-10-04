@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
 import Button from "../components/common/Button";
 import SEO from "../components/common/SEO";
@@ -139,6 +139,11 @@ export default function About() {
           >
             {t("playNow")}
           </Button>
+          <div style={{ marginTop: "24px", display: "flex", gap: "16px", justifyContent: "center", fontSize: "0.9rem" }}>
+            <Link to="/rules" style={{ color: "var(--oomio-gold)", textDecoration: "none" }}>Rules</Link>
+            <Link to="/privacy" style={{ color: "var(--oomio-gold)", textDecoration: "none" }}>Privacy Policy</Link>
+            <Link to="/terms" style={{ color: "var(--oomio-gold)", textDecoration: "none" }}>Terms of Service</Link>
+          </div>
         </div>
       </div>
     </div>
